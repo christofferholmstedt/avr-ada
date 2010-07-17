@@ -1,0 +1,172 @@
+---------------------------------------------------------------------------
+-- The AVR-Ada Library is free software;  you can redistribute it and/or --
+-- modify it under terms of the  GNU General Public License as published --
+-- by  the  Free Software  Foundation;  either  version 2, or  (at  your --
+-- option) any later version.  The AVR-Ada Library is distributed in the --
+-- hope that it will be useful, but  WITHOUT ANY WARRANTY;  without even --
+-- the  implied warranty of MERCHANTABILITY or FITNESS FOR A  PARTICULAR --
+-- PURPOSE. See the GNU General Public License for more details.         --
+---------------------------------------------------------------------------
+
+project MCU is
+
+   type MCU_Type is
+     ("None",
+
+      "attiny13",
+      "attiny167",
+      "attiny22",
+      "attiny2313",
+      "attiny24",
+      "attiny25",
+      "attiny26",
+      "attiny261",
+      "attiny44",
+      "attiny45",
+      "attiny461",
+      "attiny48",
+      "attiny84",
+      "attiny85",
+      "attiny861",
+      "attiny88",
+
+      "at90can128",
+      "at90can32",
+      "at90can64",
+
+      "at90pwm1",
+      "at90pwm2",
+      "at90pwm2b",
+      "at90pwm216",
+      "at90pwm3",
+      "at90pwm3b",
+      "at90pwm316",
+      "at90pwm81",
+
+      "at90usb1286",
+      "at90usb1287",
+      "at90usb162",
+      "at90usb646",
+      "at90usb647",
+      "at90usb82",
+
+      "at90s2313",
+      "at90s2323",
+      "at90s2343",
+
+      "at90s4414",
+      "at90s4433",
+      "at90s4434",
+
+      "at90s8515",
+      "at90s8535",
+
+      "atmega103",
+      "atmega128",
+      "atmega1280",
+      "atmega1281",
+      "atmega1284p",
+      "atmega16",
+      "atmega16hva",
+      "atmega16m1",
+      "atmega16u4",
+      "atmega161",
+      "atmega162",
+      "atmega163",
+      "atmega164p",
+      "atmega165",
+      "atmega165p",
+      "atmega168",
+      "atmega168p",
+      "atmega169",
+      "atmega169p",
+      "atmega2560",
+      "atmega2561",
+      "atmega32",
+      "atmega32c1",
+      "atmega32hvb",
+      "atmega32m1",
+      "atmega32u4",
+      "atmega32u6",
+      "atmega323",
+      "atmega324p",
+      "atmega325",
+      "atmega325p",
+      "atmega3250",
+      "atmega3250p",
+      "atmega328p",
+      "atmega329",
+      "atmega329p",
+      "atmega3290",
+      "atmega3290p",
+      "atmega406",
+      "atmega48",
+      "atmega48p",
+      "atmega64",
+      "atmega64c1",
+      "atmega64m1",
+      "atmega640",
+      "atmega644",
+      "atmega644p",
+      "atmega645",
+      "atmega6450",
+      "atmega649",
+      "atmega6490",
+      "atmega8",
+      "atmega8hva",
+      "atmega8515",
+      "atmega8535",
+      "atmega88",
+      "atmega88p",
+
+      "host"
+      );
+
+   type Architecture is
+      ("avr1",
+       "avr2",
+       "avr25",
+       "avr3",
+       "avr35",
+       "avr4",
+       "avr5",
+       "avr51",
+       "avr6",
+
+       "host");
+
+   MCU  : MCU_Type := external ("MCU", "None");
+   Arch : Architecture := "avr2";
+
+   case MCU is
+   when "atmega48"   | "atmega48p"  | "atmega8"    | "atmega8515" | "atmega8535"
+      | "atmega88"   | "atmega88p"  | "atmega8hva" | "at90pwm1"   | "at90pwm2"
+      | "at90pwm2b"  | "at90pwm3"   | "at90pwm3b"  | "at90pwm81"
+     => Arch := "avr4";
+
+   when "at90pwm216" | "at90pwm316" | "at90can32"  | "at90can64"  | "at90usb646"
+      | "at90usb647" | "atmega16"   | "atmega161"  | "atmega162"  | "atmega163"
+      | "atmega164p" | "atmega165"  | "atmega165p" | "atmega168"  | "atmega168p"
+      | "atmega169"  | "atmega169p" | "atmega16hva"| "atmega16m1" | "atmega16u4"
+      | "atmega32"   | "atmega323"  | "atmega324p" | "atmega325"  | "atmega3250"
+      | "atmega3250p"| "atmega328p" | "atmega329"  | "atmega329p" | "atmega3290"
+      | "atmega3290p"| "atmega32c1" | "atmega32hvb"| "atmega32m1" | "atmega32u4"
+      | "atmega32u6" | "atmega406"  | "atmega64"   | "atmega640"  | "atmega644"
+      | "atmega644p" | "atmega645"  | "atmega6450" | "atmega649"
+      | "atmega6490" | "atmega64c1" | "atmega64m1" | "atmega128"  | "atmega1280"
+      | "atmega1281" | "atmega1284p"| "at90can128" | "at90usb1286"| "at90usb1287"
+     => Arch := "avr5";
+
+   when "atmega2560" | "atmega2561"
+     => Arch := "avr6";
+
+   when "host"
+     => Arch := "host";
+
+   when others
+     => Arch := "avr2";
+   end case;
+
+   for Source_Files use ();
+
+end MCU;

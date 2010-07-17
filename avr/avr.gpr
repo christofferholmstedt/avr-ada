@@ -1,0 +1,300 @@
+-- -*- Mode: Ada-GPR -*-
+---------------------------------------------------------------------------
+-- The AVR-Ada Library is free software;  you can redistribute it and/or --
+-- modify it under terms of the  GNU General Public License as published --
+-- by  the  Free Software  Foundation;  either  version 2, or  (at  your --
+-- option) any later version.  The AVR-Ada Library is distributed in the --
+-- hope that it will be useful, but  WITHOUT ANY WARRANTY;  without even --
+-- the  implied warranty of MERCHANTABILITY or FITNESS FOR A  PARTICULAR --
+-- PURPOSE. See the GNU General Public License for more details.         --
+---------------------------------------------------------------------------
+
+with "mcu.gpr";
+
+project AVR is
+
+   MCU  := MCU.MCU;
+   Arch := MCU.Arch;
+
+   for Library_Name use "avrada";
+   for Library_Dir  use "avr_lib/" & MCU & "/lib";
+   for Library_Kind use "static";
+   --  for Externally_Built use "true";
+
+   for Languages use ("Ada");
+   for Object_Dir use "avr_lib/" & MCU & "/obj";
+
+
+   package Builder is
+      for Global_Configuration_Pragmas use "gnat.adc";
+      for Executable_Suffix use ".elf";
+      for Default_Switches ("Ada") use ("--RTS=rts/" & Arch);
+   end Builder;
+
+
+   package Compiler is
+      System_Case_Style_Checks := "n";
+      Space_Style_Checks       := "t";
+      Base_Style_Checks        := "-gnaty3abefhiklM120pr";
+      Style_Checks             := Base_Style_Checks &
+                                  System_Case_Style_Checks &
+                                  Space_Style_Checks;
+      Non_Spacing_Style_Checks := Base_Style_Checks &
+                                  System_Case_Style_Checks;
+
+      for Default_Switches ("Ada") use
+        (
+         "-gdwarf-2",          --  generate debug symbols
+
+         "-gnatwp",            --  warnings on ineffective pragma Inlines
+         "-gnatwu",            --  warnings on unused entities
+
+         "-gnatn",             --  enable inlining
+         --         "-gnatN",             --  enable front-end inlining
+         "-gnatp",             --  suppress run-time checks
+         "-gnatVn",            --  no validity checks (smaller code)
+         "-Os",                --  optimize for space
+         "-gnatef",            --  full path in error messages
+         --  "-mcall-prologues",   --  use function calls for prologues
+
+         "-fverbose-asm",       --  include names of variables in asm code
+
+         "-frename-registers",  --  avoid false dependencies in
+         --  scheduled code
+         --  Attempt to avoid false dependencies in scheduled code by
+         --  making use of registers left over after register
+         --  allocation.  This optimization will most benefit
+         --  processors with lots of registers. It can, however, make
+         --  debugging impossible, since variables will no longer stay
+         --  in a "home register".
+
+         -- "-fstack-usage",      --  static stack usage analysis
+         --  A unit compiled with `-fstack-usage' will generate an
+         --  extra file that specifies the maximum amount of stack
+         --  used, on a per-function basis.
+
+         "-mmcu=" & MCU,       --  name of the micro controler
+         "-gnateDMCU=" & MCU,  --  name of the micro controler for preprocessor
+
+         "-fdata-sections",    --  create separate data sections
+         "-ffunction-sections" --  create separate function sections
+        )
+        ;
+      -- & Non_Spacing_Style_Checks;
+   end Compiler;
+
+
+   package Binder is
+      for Default_Switches ("Ada") use
+        ("-freestanding");       -- small binder file
+   end Binder;
+
+
+   package Linker is
+      for Default_Switches ("Ada") use
+        (--  the following line does not solve the problem that
+         --  avr-gnatlink does not find the target parameters in
+         --  system.ads
+         --  "--RTS=rts/" & Arch,     -- tell the linker about the RTS
+         --
+         "-Wl,--gc-sections",    -- remove sections of unused code
+         "-gdwarf-2",            -- keep binder file
+         "-Wl,--relax",          -- linker relaxation
+         "--GCC=avr-gcc -Os -mmcu=" & MCU
+          & " --RTS=rts/" & Arch
+          & " -fdata-sections -ffunction-sections"
+        );
+   end Linker;
+
+
+   for Source_Dirs use ("avr_lib/" & MCU,  --  first look in the MCU specific dir
+                        "avr_lib");        --  then look in the default dir
+
+
+   type Clock_Type is
+     ("no_clock",     --  no clock available.  A poor man's implementation
+                      --  of the delay statement is provided with busy
+                      --  waits.
+      "millisec_8b",  --  Resolution is about 1ms (0.25, 0.5, 1.0, 2.0)
+                      --  derived form the MCU frequency.  Delays and
+                      --  duration calculation are possible.  Variables
+                      --  of type Time use 8 bytes.
+      "ext_1sec_6b"); --  An external 32MHz quartz provides the time base.
+                      --  Smallest unit is one second, no calculation, no
+                      --  delays.
+                      --  Variables of type Time use 6 bytes, 3 for the
+                      --  date part and 3 for the time part.
+
+   -- Clock : Clock_Type := "millisec_8b";
+   Clock : Clock_Type := "ext_1sec_6b";
+
+   Std_Sources :=
+      (
+       --
+       -- general purpose definitions and subprograms
+       --
+       "avr.ads",                      "avr.adb",
+       "avr-wait.ads",                 "avr-wait.adb",
+       "avr-interrupts.ads",           "avr-interrupts.adb",
+       "avr-programspace.ads",         "avr-programspace.adb",
+       --
+       -- adoptions from the standard Ada library
+       --
+       "avr-strings.ads",
+       "avr-pstrings.ads",
+       "avr-strings-pstring.ads",      "avr-strings-pstring.adb",
+       "avr-strings-search.ads",       "avr-strings-search.adb",
+--       "avr-strings-maps.ads",         "avr-strings-maps.adb",
+--       "avr-strings-maps-constants.ads",
+       "avr-containers8.ads",
+       "avr-containers8-generic_bounded_priority_queues.ads",
+       "avr-containers8-generic_bounded_priority_queues.adb",
+       --
+       --  conversion between integer <-> string
+       --
+       "avr-int_img.ads",              "avr-int_img.adb",
+       "avr-int_val.ads",              "avr-int_val.adb",
+       --
+       "avr-generic_text_io.ads",      "avr-generic_text_io.adb",
+       "avr-shared_text_io.ads",       "avr-shared_text_io.adb",
+       --
+       --  µC description and its general name AVR.MCU.
+       --  Generated by a Python script from the Atmel XML part descriptions.
+       --
+       "avr-" & MCU & ".ads",
+       "avr-mcu.ads",
+       "avr-config.ads"
+      );
+
+   UART_Sources     := ("avr-uart.ads",         "avr-uart.adb");
+
+   EEPROM_Sources   := ("avr-eeprom.ads",       "avr-eeprom.adb");
+
+   WDT_Sources      := ("avr-watchdog.ads",     "avr-watchdog.adb");
+
+   ADC_Sources      := ("avr-adc.ads",          "avr-adc.adb");
+
+   Timer0_Sources   := ("avr-timer0.ads",       "avr-timer0.adb");
+   Timer1_Sources   := ("avr-timer1.ads",       "avr-timer1.adb");
+   Timer2_Sources   := ("avr-timer2.ads",       "avr-timer2.adb");
+
+   Time_No_Clock_Sources :=
+                       ("avr-wait-delays.ads",
+                        "avr-wait-delays.adb");
+
+   Time_Std_Sources := ("avr-real_time-clock.ads",
+                        "avr-real_time-clock.adb",
+                        "avr-real_time-clock_impl.ads",
+                        "avr-real_time-delays.ads",
+                        "avr-real_time-delays.adb"
+                       );
+
+   Time_TE_Sources  := ("avr-real_time-timing_events.ads",
+                        "avr-real_time-timing_events.adb",
+                        "avr-real_time-timing_events-process.ads",
+                        "avr-real_time-timing_events-process.adb"
+                       );
+
+   Time_1s_Sources  :=  Time_Std_Sources &
+                       ("avr-real_time_1s.ads",
+                        "avr-real_time_1s.adb",
+                        "avr-real_time-clock_impl_1s.adb",
+                        "avr-real_time-mod_time.ads",
+                        "avr-real_time-mod_time_1s.adb",
+                        "avr-real_time-set_clock.ads",
+                        "avr-real_time-set_clock_1s.adb"
+                       ) & Time_TE_Sources;
+
+   Time_1ms_Sources := Time_Std_Sources &
+                       ("avr-real_time.ads",
+                        "avr-real_time.adb",
+                        "avr-real_time-clock_impl.adb"
+--                        "avr-config.ads"
+                       ) & Time_TE_Sources;
+
+   Time_Sources     := ();
+
+   Sleep_Sources    := ("avr-sleep.ads",         "avr-sleep.adb");
+
+   Power_Sources    := ("avr-power.ads",         "avr-power.adb");
+
+   case MCU.MCU is
+      when "at90s2313" | "at90s8515" =>
+         for Source_Files use Std_Sources & UART_Sources & EEPROM_Sources
+                              & Time_No_Clock_Sources;
+
+      when "atmega168" | "atmega32" | "atmega328p" | "atmega644" | "atmega644p" =>
+         for Source_Files use
+           Std_Sources & UART_Sources & EEPROM_Sources & Sleep_Sources
+           & ADC_Sources & Timer0_Sources & Time_1ms_Sources;
+
+      when "atmega8" | "atmega162" =>
+         for Source_Files use Std_Sources & UART_Sources & EEPROM_Sources
+                              & WDT_Sources & Time_No_Clock_Sources;
+
+--       when "atmega8" =>
+--           case Clock is
+--              when "millisec_8b" =>
+--                 for Source_Files use Std_Sources & UART_Sources & EEPROM_Sources
+--                   & WDT_Sources & Time_1ms_Sources & Sleep_Sources;
+--              when "ext_1sec_6b" =>
+--                 for Source_Files use Std_Sources & UART_Sources & EEPROM_Sources
+--                   & WDT_Sources;
+--           end case;
+
+      when "atmega169" =>
+         case Clock is
+            when "millisec_8b" =>
+               Time_Sources := Time_1ms_Sources;
+            when "ext_1sec_6b" =>
+               Time_Sources := Time_1s_Sources;
+            when "no_clock" =>
+               Time_Sources := Time_No_Clock_Sources;
+         end case;
+         for Source_Files use
+           Std_Sources & UART_Sources & EEPROM_Sources & WDT_Sources
+           & Time_Sources & Sleep_Sources & Timer0_Sources & Timer2_Sources;
+           --  & Power_Sources;
+
+      when   "attiny13" =>
+         for Source_Files use
+           Std_Sources & EEPROM_Sources & WDT_Sources
+           & Timer0_Sources & Time_No_Clock_Sources;
+
+      when   "atmega165"  | "atmega64"  | "atmega128"
+           | "at90can128" | "at90can32" | "at90can64"  | "atmega325"
+           | "atmega3250" | "atmega329" | "atmega3290" | "atmega645"
+           | "atmega6450" | "atmega649" | "atmega6490" | "atmega8515"
+           | "atmega8535" | "attiny26"  =>
+         for Source_Files use Std_Sources & EEPROM_Sources & WDT_Sources
+                 & Time_No_Clock_Sources;
+
+      when "attiny2313" | "attiny25" | "attiny45" | "attiny85" =>
+         for Source_Files use Std_Sources & WDT_Sources;
+
+      when "atmega163" | "atmega161" | "atmega16" =>
+         for Source_Files use Std_Sources & EEPROM_Sources;
+
+      when others =>
+         for Source_Files use Std_Sources;
+   end case;
+
+
+   package Naming is
+   case MCU.MCU is
+      when "atmega169" =>
+      case Clock is
+         when "ext_1sec_6b" =>
+            for Spec ("AVR.Real_Time")            use "avr-real_time_1s.ads";
+            for Body ("AVR.Real_Time")            use "avr-real_time_1s.adb";
+            for Body ("AVR.Real_Time.Clock_Impl") use "avr-real_time-clock_impl_1s.adb";
+            for Body ("AVR.Real_Time.Mod_Time")   use "avr-real_time-mod_time_1s.adb";
+            for Body ("AVR.Real_Time.Set_Clock")  use "avr-real_time-set_clock_1s.adb";
+         when "millisec_8b" =>
+         when "no_clock" =>
+      end case; -- Clock
+      when others =>
+   end case;
+   end Naming;
+
+end AVR;

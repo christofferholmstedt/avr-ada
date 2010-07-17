@@ -1,0 +1,562 @@
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!-- ViewVC - http://viewvc.org/
+by Greg Stein - mailto:gstein@lyra.org -->
+<head>
+<title> avr-ada largedemo_main.adb</title>
+<meta name="generator" content="ViewVC 1.0-dev" />
+<link rel="stylesheet" href="/viewcvs.cgi/*docroot*/styles.css" type="text/css" />
+</head>
+<body>
+
+
+<div id="vc_markup"><pre><I><FONT COLOR="#B22222">-- ----------------------------------------------------------------------------
+</FONT></I><I><FONT COLOR="#B22222">--  &quot;THE BEER-WARE LICENSE&quot; (Revision 42):
+</FONT></I><I><FONT COLOR="#B22222">--  &lt;joerg@FreeBSD.ORG&gt; wrote this file.  As long as you retain this notice you
+</FONT></I><I><FONT COLOR="#B22222">--  can do whatever you want with this stuff. If we meet some day, and you
+</FONT></I><I><FONT COLOR="#B22222">--  think this stuff is worth it, you can buy me a beer in return. Joerg Wunsch
+</FONT></I><I><FONT COLOR="#B22222">-- ----------------------------------------------------------------------------
+</FONT></I>
+<I><FONT COLOR="#B22222">--  More advanced AVR demonstration.  Controls a LED attached to OCR1A.
+</FONT></I><I><FONT COLOR="#B22222">--  The brightness of the LED is controlled with the PWM.  A number of
+</FONT></I><I><FONT COLOR="#B22222">--  methods are implemented to control that PWM.
+</FONT></I>
+<I><FONT COLOR="#B22222">--  This demo was translated from C to Ada by Bernd Trog
+</FONT></I><I><FONT COLOR="#B22222">--  You can find the C source code in the file avr-libc-1.4.4.tar.bz2
+</FONT></I><I><FONT COLOR="#B22222">--  This demo was tested on a real ATmega88, compiled with gcc-4.1.0 &amp; 3.4.6
+</FONT></I>
+<I><FONT COLOR="#B22222">--  It compiles OK for ATmega48/168, but was not tested on these devices.
+</FONT></I>
+<B><FONT COLOR="#A020F0">with</FONT></B> System;               <I><FONT COLOR="#B22222">--  system.address
+</FONT></I><B><FONT COLOR="#A020F0">with</FONT></B> Interfaces; <B><FONT COLOR="#A020F0">use</FONT></B> Interfaces;
+<B><FONT COLOR="#A020F0">with</FONT></B> Ada.Unchecked_Conversion;
+
+<B><FONT COLOR="#A020F0">with</FONT></B> AVR.IO;  <B><FONT COLOR="#A020F0">use</FONT></B> AVR.IO;  <I><FONT COLOR="#B22222">--  low level hw access
+</FONT></I><B><FONT COLOR="#A020F0">with</FONT></B> AVR.MCU; <B><FONT COLOR="#A020F0">use</FONT></B> AVR.MCU; <I><FONT COLOR="#B22222">--  register descriptions
+</FONT></I>
+<B><FONT COLOR="#A020F0">with</FONT></B> Watchdog;             <I><FONT COLOR="#B22222">--  on-chip watchdog timer
+</FONT></I><B><FONT COLOR="#A020F0">with</FONT></B> AVR.Interrupts;       <I><FONT COLOR="#B22222">--  enable/disable interrupts
+</FONT></I><B><FONT COLOR="#A020F0">with</FONT></B> AVR.Int_Img;          <I><FONT COLOR="#B22222">--  integer to decimal convertion
+</FONT></I><B><FONT COLOR="#A020F0">with</FONT></B> AVR.Strings; <B><FONT COLOR="#A020F0">use</FONT></B> AVR.Strings;
+<B><FONT COLOR="#A020F0">with</FONT></B> AVR.Programspace;     <I><FONT COLOR="#B22222">--  read data from on-chip program memory
+</FONT></I>
+<B><FONT COLOR="#A020F0">with</FONT></B> EEprom;               <I><FONT COLOR="#B22222">--  r/w on-chip EEPROM
+</FONT></I><B><FONT COLOR="#A020F0">with</FONT></B> Sleep;                <I><FONT COLOR="#B22222">--  power save modes
+</FONT></I>
+
+<B><FONT COLOR="#A020F0">use</FONT></B> AVR;
+
+<B><FONT COLOR="#A020F0">package</FONT></B> <B><FONT COLOR="#A020F0">body</FONT></B> largedemo_main <B><FONT COLOR="#A020F0">is</FONT></B>
+
+   <I><FONT COLOR="#B22222">--  Part 1: constants definitions
+</FONT></I>   CONTROL_PORT  : <B><FONT COLOR="#A020F0">constant</FONT></B> System.Address := PORTD;
+   CONTROL_DDR   : <B><FONT COLOR="#A020F0">constant</FONT></B> System.Address := DDRD;
+
+   TRIGGER_DOWN  : <B><FONT COLOR="#A020F0">constant</FONT></B> := PORTD2;
+   TRIGGER_UP    : <B><FONT COLOR="#A020F0">constant</FONT></B> := PORTD3;
+   TRIGGER_ADC   : <B><FONT COLOR="#A020F0">constant</FONT></B> := PORTD4;
+   CLOCKOUT      : <B><FONT COLOR="#A020F0">constant</FONT></B> := PORTD6;
+   FLASH_LED_Bit : <B><FONT COLOR="#A020F0">constant</FONT></B> := PORTD7_Bit;
+
+   PWMDDR        : <B><FONT COLOR="#A020F0">constant</FONT></B> System.Address := DDRB;
+   PWMOUT_Bit    : <B><FONT COLOR="#A020F0">constant</FONT></B> := PORTB1_Bit;
+
+   F_CPU : <B><FONT COLOR="#A020F0">constant</FONT></B> DWord := 1_000_000; <I><FONT COLOR="#B22222">--  CPU clock in Hertz
+</FONT></I>
+   SOFTCLOCK_FREQ  : <B><FONT COLOR="#A020F0">constant</FONT></B> := 100; <I><FONT COLOR="#B22222">--  internal software clock
+</FONT></I>
+
+   <I><FONT COLOR="#B22222">--  Timeout to wait after last PWM change till updating the EEPROM.
+</FONT></I>   <I><FONT COLOR="#B22222">--  Measured in internal clock ticks (approx. 100 Hz).
+</FONT></I>
+   EE_UPDATE_TIME : <B><FONT COLOR="#A020F0">constant</FONT></B> := 3 * SOFTCLOCK_FREQ; <I><FONT COLOR="#B22222">--  ca. 3 seconds
+</FONT></I>
+
+   <I><FONT COLOR="#B22222">--  Timer1 overflow interrupt will be called with F_CPU / 2048
+</FONT></I>   <I><FONT COLOR="#B22222">--  frequency.  This interrupt routine further divides that value,
+</FONT></I>   <I><FONT COLOR="#B22222">--  resulting in an internal update interval of approx. 10 ms.
+</FONT></I>   <I><FONT COLOR="#B22222">--  (The complicated looking scaling by 10 / addition of 9 is
+</FONT></I>   <I><FONT COLOR="#B22222">--  poor man's fixed-point rounding algorithm...)
+</FONT></I>
+   TMR1_SCALE : <B><FONT COLOR="#A020F0">constant</FONT></B> :=
+     ((F_CPU * 10) / (2048 * SOFTCLOCK_FREQ) + 9) / 10;
+
+   <I><FONT COLOR="#B22222">--  Part 2: Variable definitions
+</FONT></I>
+   <I><FONT COLOR="#B22222">--  Bits that are set inside interrupt routines, and watched outside in
+</FONT></I>   <I><FONT COLOR="#B22222">--  the program's main loop.
+</FONT></I>
+   <B><FONT COLOR="#A020F0">type</FONT></B> Intflags_Type <B><FONT COLOR="#A020F0">is</FONT></B> <B><FONT COLOR="#A020F0">record</FONT></B>
+      Tmr_Int : Boolean;
+      Adc_Int : Boolean;
+      Rx_Int  : Boolean;
+   <B><FONT COLOR="#A020F0">end</FONT></B> <B><FONT COLOR="#A020F0">record</FONT></B>;
+   <B><FONT COLOR="#A020F0">for</FONT></B> Intflags_Type <B><FONT COLOR="#A020F0">use</FONT></B> <B><FONT COLOR="#A020F0">record</FONT></B>
+      Tmr_Int <B><FONT COLOR="#A020F0">at</FONT></B> 0 <B><FONT COLOR="#A020F0">range</FONT></B> 0 .. 0;
+      ADC_Int <B><FONT COLOR="#A020F0">at</FONT></B> 0 <B><FONT COLOR="#A020F0">range</FONT></B> 1 .. 1;
+      RX_Int  <B><FONT COLOR="#A020F0">at</FONT></B> 0 <B><FONT COLOR="#A020F0">range</FONT></B> 2 .. 2;
+   <B><FONT COLOR="#A020F0">end</FONT></B> <B><FONT COLOR="#A020F0">record</FONT></B>;
+   <B><FONT COLOR="#A020F0">for</FONT></B> Intflags_Type'Size <B><FONT COLOR="#A020F0">use</FONT></B> 8;
+   <B><FONT COLOR="#A020F0">pragma</FONT></B> Volatile (Intflags_Type);
+
+   Intflags : Intflags_Type;
+
+
+   <I><FONT COLOR="#B22222">--  Last character read from the UART.
+</FONT></I>
+   <B><FONT COLOR="#A020F0">type</FONT></B> Volatile_Character <B><FONT COLOR="#A020F0">is</FONT></B> <B><FONT COLOR="#A020F0">new</FONT></B> Character;
+   <B><FONT COLOR="#A020F0">pragma</FONT></B> Volatile (Volatile_Character);
+
+   Rxbuff : Volatile_Character;
+
+
+   <I><FONT COLOR="#B22222">--  Last value read from ADC.
+</FONT></I>
+   <B><FONT COLOR="#A020F0">type</FONT></B> Volatile_U16 <B><FONT COLOR="#A020F0">is</FONT></B> <B><FONT COLOR="#A020F0">mod</FONT></B> 2**16;
+   <B><FONT COLOR="#A020F0">for</FONT></B> Volatile_U16'Size <B><FONT COLOR="#A020F0">use</FONT></B> 16;
+   <B><FONT COLOR="#A020F0">pragma</FONT></B> Volatile (Volatile_U16);
+   Adcval : Volatile_U16;
+
+
+   <I><FONT COLOR="#B22222">--  Where to store the PWM value in EEPROM.  This is used in order
+</FONT></I>   <I><FONT COLOR="#B22222">--  to remember the value across a RESET or power cycle.
+</FONT></I>
+   <B><FONT COLOR="#A020F0">subtype</FONT></B> PWM_Type <B><FONT COLOR="#A020F0">is</FONT></B> Integer <B><FONT COLOR="#A020F0">range</FONT></B> -10 .. 1010;
+
+   EE_PWM : PWM_Type := 42;
+   <B><FONT COLOR="#A020F0">pragma</FONT></B> Linker_Section (EE_PWM, <FONT COLOR="#BC8F8F"><B>&quot;.eeprom&quot;</FONT></B>);
+
+
+   <I><FONT COLOR="#B22222">--  Current value of the PWM.
+</FONT></I>
+   PWM : PWM_Type;
+
+
+   <I><FONT COLOR="#B22222">--  EEPROM backup timer.  Bumped by the PWM update routine.  If it
+</FONT></I>   <I><FONT COLOR="#B22222">--  expires, the current PWM value will be written to EEPROM.
+</FONT></I>
+   PWM_Backup_Tmr : Unsigned_16;
+
+
+   <I><FONT COLOR="#B22222">--  Mirror of the MCUCSR register, taken early during startup.
+</FONT></I>
+   Mcucsr_backup : Byte;
+   <B><FONT COLOR="#A020F0">pragma</FONT></B> Linker_Section (Mcucsr_backup, <FONT COLOR="#BC8F8F"><B>&quot;.noinit&quot;</FONT></B>);
+
+
+   <I><FONT COLOR="#B22222">--  Part 3: Interrupt service routines
+</FONT></I>
+   <B><FONT COLOR="#A020F0">procedure</FONT></B> TIMER1_OVF;
+   <B><FONT COLOR="#A020F0">pragma</FONT></B> Export (C, TIMER1_OVF, Sig_TIMER1_OVF_String);
+   <B><FONT COLOR="#A020F0">pragma</FONT></B> Machine_Attribute (TIMER1_OVF, <FONT COLOR="#BC8F8F"><B>&quot;signal&quot;</FONT></B>);
+
+
+   TIMER1_OVF_Scaler : Byte;
+
+   <B><FONT COLOR="#A020F0">procedure</FONT></B> TIMER1_OVF
+   <B><FONT COLOR="#A020F0">is</FONT></B>
+   <B><FONT COLOR="#A020F0">begin</FONT></B>
+      TIMER1_OVF_Scaler := TIMER1_OVF_Scaler - 1;
+      <B><FONT COLOR="#A020F0">if</FONT></B> TIMER1_OVF_Scaler = 0 <B><FONT COLOR="#A020F0">then</FONT></B>
+         TIMER1_OVF_Scaler := TMR1_SCALE;
+         Intflags.Tmr_Int := True;
+      <B><FONT COLOR="#A020F0">end</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B>;
+   <B><FONT COLOR="#A020F0">end</FONT></B> TIMER1_OVF;
+
+
+   <I><FONT COLOR="#B22222">--  ADC conversion complete.  Fetch the 10-bit value, and feed the
+</FONT></I>   <I><FONT COLOR="#B22222">--  PWM with it.
+</FONT></I>
+   <B><FONT COLOR="#A020F0">procedure</FONT></B> ADC;
+   <B><FONT COLOR="#A020F0">pragma</FONT></B> Machine_Attribute (ADC, <FONT COLOR="#BC8F8F"><B>&quot;signal&quot;</FONT></B>);
+   <B><FONT COLOR="#A020F0">pragma</FONT></B> Export (C, ADC, Sig_ADC_String);
+   <B><FONT COLOR="#A020F0">procedure</FONT></B> ADC
+   <B><FONT COLOR="#A020F0">is</FONT></B>
+   <B><FONT COLOR="#A020F0">begin</FONT></B>
+      Adcval := Volatile_U16 (IO.Get16 (MCU.ADC));
+      Set_Bit (ADCSRA, ADIE_Bit, False);         <I><FONT COLOR="#B22222">--  disable ADC interrupt
+</FONT></I>      Intflags.Adc_Int := True;
+   <B><FONT COLOR="#A020F0">end</FONT></B> ADC;
+
+
+   <I><FONT COLOR="#B22222">--  UART receive interrupt.  Fetch the character received and buffer
+</FONT></I>   <I><FONT COLOR="#B22222">--  it, unless there was a framing error.  Note that the main loop
+</FONT></I>   <I><FONT COLOR="#B22222">--  checks the received character only once per 10 ms.
+</FONT></I>
+   <B><FONT COLOR="#A020F0">procedure</FONT></B> USART_RXC;
+   <B><FONT COLOR="#A020F0">pragma</FONT></B> Export (C, USART_RXC, Sig_USART_RX_String);
+   <B><FONT COLOR="#A020F0">pragma</FONT></B> Machine_Attribute (USART_RXC, <FONT COLOR="#BC8F8F"><B>&quot;signal&quot;</FONT></B>);
+
+   <B><FONT COLOR="#A020F0">function</FONT></B> To_Char <B><FONT COLOR="#A020F0">is</FONT></B> <B><FONT COLOR="#A020F0">new</FONT></B> Ada.Unchecked_Conversion (Target =&gt; Character,
+                                                     Source =&gt; Unsigned_8);
+
+   <B><FONT COLOR="#A020F0">procedure</FONT></B> USART_RXC
+   <B><FONT COLOR="#A020F0">is</FONT></B>
+      C : Character;
+   <B><FONT COLOR="#A020F0">begin</FONT></B>
+      C := To_Char (Get (UDR0));
+      <B><FONT COLOR="#A020F0">if</FONT></B> (IO.Get (UCSR0A) <B><FONT COLOR="#A020F0">and</FONT></B> FE0) = 0 <B><FONT COLOR="#A020F0">then</FONT></B>
+         Rxbuff := Volatile_Character (C);
+         Intflags.Rx_Int := True;
+      <B><FONT COLOR="#A020F0">end</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B>;
+   <B><FONT COLOR="#A020F0">end</FONT></B> USART_RXC;
+
+
+   <I><FONT COLOR="#B22222">--  Part 4: Auxiliary functions
+</FONT></I>
+   <I><FONT COLOR="#B22222">--  Read out and reset MCUCSR early during startup.
+</FONT></I>
+   <B><FONT COLOR="#A020F0">procedure</FONT></B> Handle_MCUCSR;
+   <B><FONT COLOR="#A020F0">pragma</FONT></B> Linker_Section (Handle_MCUCSR, <FONT COLOR="#BC8F8F"><B>&quot;.init3&quot;</FONT></B>);
+   <B><FONT COLOR="#A020F0">pragma</FONT></B> Machine_Attribute (Handle_MCUCSR, <FONT COLOR="#BC8F8F"><B>&quot;naked&quot;</FONT></B>);
+
+   <B><FONT COLOR="#A020F0">procedure</FONT></B> Handle_MCUCSR
+   <B><FONT COLOR="#A020F0">is</FONT></B>
+   <B><FONT COLOR="#A020F0">begin</FONT></B>
+      Mcucsr_backup := IO.Get (MCUSR);
+      Set (MCUSR, 0);
+   <B><FONT COLOR="#A020F0">end</FONT></B> Handle_MCUCSR;
+
+
+   <I><FONT COLOR="#B22222">--  Do all the startup-time peripheral initializations.
+</FONT></I>
+   <B><FONT COLOR="#A020F0">procedure</FONT></B> Ioinit
+   <B><FONT COLOR="#A020F0">is</FONT></B>
+      PWM_From_EEPROM : Word;
+      <B><FONT COLOR="#A020F0">use</FONT></B> Interfaces;
+   <B><FONT COLOR="#A020F0">begin</FONT></B>
+
+      <I><FONT COLOR="#B22222">--  Set up the 16-bit timer 1.
+</FONT></I>
+      <I><FONT COLOR="#B22222">--  Timer 1 will be set up as a 10-bit phase-correct PWM (WGM10 and
+</FONT></I>      <I><FONT COLOR="#B22222">--  WGM11 bits), with OC1A used as PWM output.  OC1A will be set when
+</FONT></I>      <I><FONT COLOR="#B22222">--  up-counting, and cleared when down-counting (COM1A1|COM1A0), this
+</FONT></I>      <I><FONT COLOR="#B22222">--  matches the behaviour needed by the STK500's low-active LEDs.
+</FONT></I>      <I><FONT COLOR="#B22222">--  The timer will runn on full MCU clock (1 MHz, CS10 in TCCR1B).
+</FONT></I>
+      Set (TCCR1A, WGM10 <B><FONT COLOR="#A020F0">or</FONT></B> WGM11 <B><FONT COLOR="#A020F0">or</FONT></B> COM1A1 <B><FONT COLOR="#A020F0">or</FONT></B> COM1A0);
+      Set (TCCR1B, CS10);
+
+      Set16 (OCR1A, 0);  <I><FONT COLOR="#B22222">--  set PWM value to 0
+</FONT></I>
+
+      <I><FONT COLOR="#B22222">--  enable pull-ups for pushbuttons
+</FONT></I>
+      Set (CONTROL_PORT, TRIGGER_DOWN <B><FONT COLOR="#A020F0">or</FONT></B> TRIGGER_UP <B><FONT COLOR="#A020F0">or</FONT></B> TRIGGER_ADC);
+
+
+      <I><FONT COLOR="#B22222">--  Enable Port D outputs: PD6 for the clock output, PD7 for the LED
+</FONT></I>      <I><FONT COLOR="#B22222">--  flasher.  PD1 is UART TxD but not DDRD setting is provided for
+</FONT></I>      <I><FONT COLOR="#B22222">--  that, as enabling the UART transmitter will automatically turn
+</FONT></I>      <I><FONT COLOR="#B22222">--  this pin into an output.
+</FONT></I>
+      Set (CONTROL_DDR, CLOCKOUT <B><FONT COLOR="#A020F0">or</FONT></B> BN (FLASH_LED_Bit));
+
+
+      <I><FONT COLOR="#B22222">--  As the location of OC1A differs between supported MCU types, we
+</FONT></I>      <I><FONT COLOR="#B22222">--  enable that output separately here. Note that the DDRx register
+</FONT></I>      <I><FONT COLOR="#B22222">--  *might* be the same as CONTROL_DDR above, so make sure to not
+</FONT></I>      <I><FONT COLOR="#B22222">--  clobber it.
+</FONT></I>
+      Set_Bit (PWMDDR, PWMOUT_Bit, True);
+
+      Set (UCSR0A, U2X0);        <I><FONT COLOR="#B22222">--  improves baud rate error @ F_CPU = 1 MHz
+</FONT></I>      Set (UCSR0B, TXEN0 <B><FONT COLOR="#A020F0">or</FONT></B> RXEN0 <B><FONT COLOR="#A020F0">or</FONT></B> RXCIE0); <I><FONT COLOR="#B22222">--  tx/rx enable, rx complete int
+</FONT></I>      Set16 (UBRR0, Word (F_CPU / (8 * 9600)) - 1);  <I><FONT COLOR="#B22222">--  9600 Bd
+</FONT></I>
+
+      <I><FONT COLOR="#B22222">--  enable ADC, select ADC clock = F_CPU / 8 (i.e. 125 kHz)
+</FONT></I>
+      Set (ADCSRA, ADEN <B><FONT COLOR="#A020F0">or</FONT></B> ADPS1 <B><FONT COLOR="#A020F0">or</FONT></B> ADPS0);
+
+      Set (TIMSK1, TOIE1);
+      Interrupts.Enable;
+
+
+      <I><FONT COLOR="#B22222">--  Enable the watchdog with the largest prescaler.  Will cause a
+</FONT></I>      <I><FONT COLOR="#B22222">--  watchdog reset after approximately 2 s @ Vcc = 5 V
+</FONT></I>
+      Watchdog.Enable (Watchdog.WDT_1024K);
+
+
+      <I><FONT COLOR="#B22222">--  Read the value from EEPROM.  If it is not 0xffff (erased cells),
+</FONT></I>      <I><FONT COLOR="#B22222">--  use it as the starting value for the PWM.
+</FONT></I>
+      PWM_From_EEPROM := EEprom.Get (EE_PWM'Address);
+      <B><FONT COLOR="#A020F0">if</FONT></B> PWM_From_EEPROM /= 16#ffff# <B><FONT COLOR="#A020F0">then</FONT></B>
+         PWM := PWM_Type (PWM_From_EEPROM);
+         Set16 (OCR1A, Word (PWM));
+      <B><FONT COLOR="#A020F0">end</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B>;
+   <B><FONT COLOR="#A020F0">end</FONT></B> Ioinit;
+
+
+   <I><FONT COLOR="#B22222">--  Some simple UART IO functions.
+</FONT></I>
+   <I><FONT COLOR="#B22222">--  Send character c down the UART Tx, wait until tx holding register
+</FONT></I>   <I><FONT COLOR="#B22222">--  is empty.
+</FONT></I>
+   <B><FONT COLOR="#A020F0">procedure</FONT></B> Putchr (C : Character)
+   <B><FONT COLOR="#A020F0">is</FONT></B>
+   <B><FONT COLOR="#A020F0">begin</FONT></B>
+      Loop_Until_Bit_Is_Set (UCSR0A, UDRE0_Bit);
+      Set (UDR0, Character'Pos (C));
+   <B><FONT COLOR="#A020F0">end</FONT></B> Putchr;
+
+
+   <I><FONT COLOR="#B22222">--  Send a String down the UART Tx.
+</FONT></I>
+   <B><FONT COLOR="#A020F0">procedure</FONT></B> Printstr (S : AVR_String)
+   <B><FONT COLOR="#A020F0">is</FONT></B>
+   <B><FONT COLOR="#A020F0">begin</FONT></B>
+      <B><FONT COLOR="#A020F0">for</FONT></B> I <B><FONT COLOR="#A020F0">in</FONT></B> S'Range <B><FONT COLOR="#A020F0">loop</FONT></B>
+         <B><FONT COLOR="#A020F0">if</FONT></B> S (I) = ASCII.LF <B><FONT COLOR="#A020F0">then</FONT></B>
+            Putchr (ASCII.CR);
+         <B><FONT COLOR="#A020F0">end</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B>;
+         Putchr (S (I));
+      <B><FONT COLOR="#A020F0">end</FONT></B> <B><FONT COLOR="#A020F0">loop</FONT></B>;
+   <B><FONT COLOR="#A020F0">end</FONT></B> Printstr;
+   <B><FONT COLOR="#A020F0">pragma</FONT></B> Inline_Always (Printstr);
+
+
+   <I><FONT COLOR="#B22222">--  Same as above, but the string is located in program memory,
+</FONT></I>   <I><FONT COLOR="#B22222">--  so &quot;lpm&quot; instructions are needed to fetch it.
+</FONT></I>
+   <B><FONT COLOR="#A020F0">procedure</FONT></B> Printstr_P (S : AVR_String)
+   <B><FONT COLOR="#A020F0">is</FONT></B>
+      C : Character;
+   <B><FONT COLOR="#A020F0">begin</FONT></B>
+      <B><FONT COLOR="#A020F0">for</FONT></B> U <B><FONT COLOR="#A020F0">in</FONT></B> S'Range <B><FONT COLOR="#A020F0">loop</FONT></B>
+         <I><FONT COLOR="#B22222">--      while C loo = pgm_read_byte(s); c; ++s, c = pgm_read_byte(s))
+</FONT></I>         C := To_Char (Programspace.Get (S (U)'Address));
+         <B><FONT COLOR="#A020F0">if</FONT></B> C = ASCII.LF <B><FONT COLOR="#A020F0">then</FONT></B>
+            Putchr (ASCII.CR);
+         <B><FONT COLOR="#A020F0">end</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B>;
+         Putchr (C);
+      <B><FONT COLOR="#A020F0">end</FONT></B> <B><FONT COLOR="#A020F0">loop</FONT></B>;
+   <B><FONT COLOR="#A020F0">end</FONT></B> Printstr_P;
+
+
+   <I><FONT COLOR="#B22222">--  Update the PWM value.  If it has changed, send the new value down
+</FONT></I>   <I><FONT COLOR="#B22222">--  the serial line.
+</FONT></I>
+   <B><FONT COLOR="#A020F0">procedure</FONT></B> Set_PWM (Value : PWM_Type)
+   <B><FONT COLOR="#A020F0">is</FONT></B>
+      New_Value : PWM_Type;
+   <B><FONT COLOR="#A020F0">begin</FONT></B>
+      <B><FONT COLOR="#A020F0">if</FONT></B> Value &lt; 0 <B><FONT COLOR="#A020F0">then</FONT></B>
+         New_Value := 0;
+      <B><FONT COLOR="#A020F0">elsif</FONT></B> Value &gt; 1000 <B><FONT COLOR="#A020F0">then</FONT></B>
+         New_Value := 1000;
+      <B><FONT COLOR="#A020F0">else</FONT></B>
+         New_Value := Value;
+      <B><FONT COLOR="#A020F0">end</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B>;
+
+      <B><FONT COLOR="#A020F0">if</FONT></B> New_Value /= PWM <B><FONT COLOR="#A020F0">then</FONT></B>
+         PWM := New_Value;
+         Set16 (OCR1A, Word (PWM));
+
+         <I><FONT COLOR="#B22222">--        Calculate a &quot;percentage&quot;.  We just divide by 10, as we
+</FONT></I>         <I><FONT COLOR="#B22222">--        limited the max value of the PWM to 1000 above.
+</FONT></I>
+         New_Value := New_Value / 10;
+         <B><FONT COLOR="#A020F0">declare</FONT></B>
+            V_Img : Strings.AStr3;
+         <B><FONT COLOR="#A020F0">begin</FONT></B>
+            <B><FONT COLOR="#A020F0">null</FONT></B>;
+            Int_Img.U8_Img_Right (Byte (New_Value), V_Img);
+            Printstr (AVR_String (V_Img));
+            Putchr (<FONT COLOR="#BC8F8F"><B>' '</FONT></B>);
+         <B><FONT COLOR="#A020F0">end</FONT></B>;
+
+         PWM_Backup_Tmr := EE_UPDATE_TIME;
+      <B><FONT COLOR="#A020F0">end</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B>;
+   <B><FONT COLOR="#A020F0">end</FONT></B> Set_PWM;
+
+
+   <I><FONT COLOR="#B22222">--  Strings stored in flash memory:
+</FONT></I>
+   Flash_OOOPS : AVR_String := ASCII.LF &amp; <FONT COLOR="#BC8F8F"><B>&quot;Ooops, the watchdog bit me!&quot;</FONT></B>;
+   <B><FONT COLOR="#A020F0">pragma</FONT></B> Linker_Section (Flash_OOOPS, <FONT COLOR="#BC8F8F"><B>&quot;.progmem&quot;</FONT></B>);
+
+   Flash_HELLO : AVR_String := ASCII.LF
+     &amp; <FONT COLOR="#BC8F8F"><B>&quot;Hello, this is the AVR-Ada largedemo V1.0 running on an ATmega88&quot;</FONT></B>;
+   <B><FONT COLOR="#A020F0">pragma</FONT></B> Linker_Section (Flash_HELLO, <FONT COLOR="#BC8F8F"><B>&quot;.progmem&quot;</FONT></B>);
+
+   Flash_UPDATED : AVR_String := <FONT COLOR="#BC8F8F"><B>&quot;[EEPROM updated] &quot;</FONT></B>;
+   <B><FONT COLOR="#A020F0">pragma</FONT></B> Linker_Section (Flash_UPDATED, <FONT COLOR="#BC8F8F"><B>&quot;.progmem&quot;</FONT></B>);
+
+   Flash_Thank_You : AVR_String :=
+     ASCII.LF &amp; <FONT COLOR="#BC8F8F"><B>&quot;Thank you for using serial mode. Good-bye!&quot;</FONT></B> &amp; ASCII.LF;
+   <B><FONT COLOR="#A020F0">pragma</FONT></B> Linker_Section (Flash_Thank_You, <FONT COLOR="#BC8F8F"><B>&quot;.progmem&quot;</FONT></B>);
+
+   Flash_WELCOME : AVR_String :=
+     ASCII.LF &amp; <FONT COLOR="#BC8F8F"><B>&quot;Welcome at serial control, &quot;</FONT></B>
+     &amp; <FONT COLOR="#BC8F8F"><B>&quot;type +/- to adjust, or 0/1 to turn on/off&quot;</FONT></B> &amp; ASCII.LF
+     &amp; <FONT COLOR="#BC8F8F"><B>&quot;the LED, q to quit serial mode, &quot;</FONT></B>
+     &amp; <FONT COLOR="#BC8F8F"><B>&quot;r to demonstrate a watchdog reset&quot;</FONT></B> &amp; ASCII.LF;
+   <B><FONT COLOR="#A020F0">pragma</FONT></B> Linker_Section (Flash_WELCOME, <FONT COLOR="#BC8F8F"><B>&quot;.progmem&quot;</FONT></B>);
+
+   Flash_ZZZZ : AVR_String := ASCII.LF &amp; <FONT COLOR="#BC8F8F"><B>&quot;zzzz... zzz.....&quot;</FONT></B>; <I><FONT COLOR="#B22222">-- 17 Byte min.!
+</FONT></I>   <B><FONT COLOR="#A020F0">pragma</FONT></B> Linker_Section (Flash_ZZZZ, <FONT COLOR="#BC8F8F"><B>&quot;.progmem&quot;</FONT></B>);
+
+
+   <I><FONT COLOR="#B22222">--  Part 5: main
+</FONT></I>
+   <B><FONT COLOR="#A020F0">procedure</FONT></B> Main
+   <B><FONT COLOR="#A020F0">is</FONT></B>
+      <B><FONT COLOR="#A020F0">type</FONT></B> Mode_Type <B><FONT COLOR="#A020F0">is</FONT></B> (MODE_UPDOWN, MODE_ADC, MODE_SERIAL);
+      <B><FONT COLOR="#A020F0">for</FONT></B> Mode_Type'Size <B><FONT COLOR="#A020F0">use</FONT></B> 8;
+      Mode  : Mode_Type := MODE_UPDOWN;
+      Flash : Byte      := 0;
+   <B><FONT COLOR="#A020F0">begin</FONT></B>
+
+      <I><FONT COLOR="#B22222">--    Our modus of operation.  MODE_UPDOWN means we watch out for
+</FONT></I>      <I><FONT COLOR="#B22222">--    either PD2 or PD3 being low, and increase or decrease the
+</FONT></I>      <I><FONT COLOR="#B22222">--    PWM value accordingly.  This is the default.
+</FONT></I>      <I><FONT COLOR="#B22222">--    MODE_ADC means the PWM value follows the value of ADC0 (PA0).
+</FONT></I>      <I><FONT COLOR="#B22222">--    This is enabled by applying low level to PD1.
+</FONT></I>      <I><FONT COLOR="#B22222">--    MODE_SERIAL means we get commands via the UART.  This is
+</FONT></I>      <I><FONT COLOR="#B22222">--    enabled by sending a valid V.24 character at 9600 Bd to the
+</FONT></I>      <I><FONT COLOR="#B22222">--    UART.
+</FONT></I>
+      Ioinit;
+
+      <B><FONT COLOR="#A020F0">if</FONT></B> (Mcucsr_backup <B><FONT COLOR="#A020F0">and</FONT></B> WDRF) /= 0 <B><FONT COLOR="#A020F0">then</FONT></B>
+         Printstr_P (Flash_OOOPS);
+      <B><FONT COLOR="#A020F0">end</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B>;
+
+      Printstr_P (Flash_HELLO);
+
+      <B><FONT COLOR="#A020F0">loop</FONT></B>
+         Watchdog.Reset;
+
+         <B><FONT COLOR="#A020F0">if</FONT></B> Intflags.Tmr_Int <B><FONT COLOR="#A020F0">then</FONT></B>
+            <I><FONT COLOR="#B22222">--  Our periodic 10 ms interrupt happened.  See what we can
+</FONT></I>            <I><FONT COLOR="#B22222">--  do about it.
+</FONT></I>
+            Intflags.Tmr_Int := False;
+
+            <I><FONT COLOR="#B22222">--  toggle PD6, just to show the internal clock; should
+</FONT></I>            <I><FONT COLOR="#B22222">--  yield ~ 48 Hz on PD6
+</FONT></I>
+            Set (CONTROL_PORT, Get (CONTROL_PORT) <B><FONT COLOR="#A020F0">xor</FONT></B> CLOCKOUT);
+
+            <I><FONT COLOR="#B22222">--  flash LED on PD7, approximately once per second
+</FONT></I>
+            Flash := Flash + 1;
+            <B><FONT COLOR="#A020F0">if</FONT></B> Flash = 5 <B><FONT COLOR="#A020F0">then</FONT></B>
+               Set_Bit (CONTROL_PORT, FLASH_LED_Bit, True);
+            <B><FONT COLOR="#A020F0">elsif</FONT></B> Flash = 100 <B><FONT COLOR="#A020F0">then</FONT></B>
+               Flash := 0;
+               Set_Bit (CONTROL_PORT, FLASH_LED_Bit, False);
+            <B><FONT COLOR="#A020F0">end</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B>;
+
+            <B><FONT COLOR="#A020F0">case</FONT></B> Mode <B><FONT COLOR="#A020F0">is</FONT></B>
+               <B><FONT COLOR="#A020F0">when</FONT></B> MODE_SERIAL =&gt;
+                  <B><FONT COLOR="#A020F0">null</FONT></B>;
+                  <I><FONT COLOR="#B22222">--  In serial mode, there's nothing to do anymore here.
+</FONT></I>
+               <B><FONT COLOR="#A020F0">when</FONT></B> MODE_UPDOWN =&gt;
+
+                  <I><FONT COLOR="#B22222">--  Query the pushbuttons.
+</FONT></I>
+                  <I><FONT COLOR="#B22222">--  NB: watch out to use PINx for reading, as opposed
+</FONT></I>                  <I><FONT COLOR="#B22222">--  to using PORTx which would be the mirror of the
+</FONT></I>                  <I><FONT COLOR="#B22222">--  _output_ latch register (resp. pullup configuration
+</FONT></I>                  <I><FONT COLOR="#B22222">--  bit for input pins)!
+</FONT></I>
+                  <B><FONT COLOR="#A020F0">if</FONT></B> (Get (PIND) <B><FONT COLOR="#A020F0">and</FONT></B> TRIGGER_DOWN) = 0 <B><FONT COLOR="#A020F0">then</FONT></B>
+                     Set_PWM (PWM - 10);
+                  <B><FONT COLOR="#A020F0">elsif</FONT></B> (Get (PIND) <B><FONT COLOR="#A020F0">and</FONT></B> TRIGGER_UP) = 0 <B><FONT COLOR="#A020F0">then</FONT></B>
+                     Set_PWM (PWM + 10);
+                  <B><FONT COLOR="#A020F0">elsif</FONT></B> (Get (PIND) <B><FONT COLOR="#A020F0">and</FONT></B> TRIGGER_ADC) = 0 <B><FONT COLOR="#A020F0">then</FONT></B>
+                     Mode := MODE_ADC;
+                  <B><FONT COLOR="#A020F0">end</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B>;
+
+               <B><FONT COLOR="#A020F0">when</FONT></B> MODE_ADC =&gt;
+                  <B><FONT COLOR="#A020F0">if</FONT></B> (Get (PIND) <B><FONT COLOR="#A020F0">and</FONT></B> TRIGGER_ADC) /= 0 <B><FONT COLOR="#A020F0">then</FONT></B>
+                     Mode := MODE_UPDOWN;
+                  <B><FONT COLOR="#A020F0">else</FONT></B>
+                     <I><FONT COLOR="#B22222">--  Start one conversion.
+</FONT></I>
+                     Set_Bit (ADCSRA, ADIE_Bit, True);
+                     Set_Bit (ADCSRA, ADSC_Bit, True);
+                  <B><FONT COLOR="#A020F0">end</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B>;
+            <B><FONT COLOR="#A020F0">end</FONT></B> <B><FONT COLOR="#A020F0">case</FONT></B>;
+
+            <B><FONT COLOR="#A020F0">if</FONT></B> PWM_Backup_Tmr &gt; 0 <B><FONT COLOR="#A020F0">then</FONT></B>
+               PWM_Backup_Tmr := PWM_Backup_Tmr - 1;
+               <B><FONT COLOR="#A020F0">if</FONT></B> PWM_Backup_Tmr = 0 <B><FONT COLOR="#A020F0">then</FONT></B>
+
+                  <I><FONT COLOR="#B22222">--  The EEPROM backup timer expired.  Save the current
+</FONT></I>                  <I><FONT COLOR="#B22222">--  PWM value in EEPROM.  Note that this function might
+</FONT></I>                  <I><FONT COLOR="#B22222">--  block for a few milliseconds (after writing the
+</FONT></I>                  <I><FONT COLOR="#B22222">--  first byte).
+</FONT></I>
+                  EEprom.Put (EE_PWM'Address, Word (PWM));
+                  Printstr_P (Flash_UPDATED);
+               <B><FONT COLOR="#A020F0">end</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B>;
+            <B><FONT COLOR="#A020F0">end</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B>;
+
+            <B><FONT COLOR="#A020F0">if</FONT></B> Intflags.Adc_Int <B><FONT COLOR="#A020F0">then</FONT></B>
+               Intflags.Adc_Int := False;
+               Set_PWM (PWM_Type (Adcval)); <I><FONT COLOR="#B22222">-- none atomic
+</FONT></I>            <B><FONT COLOR="#A020F0">end</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B>;
+
+            <B><FONT COLOR="#A020F0">if</FONT></B> Intflags.Rx_Int <B><FONT COLOR="#A020F0">then</FONT></B>
+               Intflags.Rx_Int := False;
+
+               <B><FONT COLOR="#A020F0">if</FONT></B> Rxbuff = <FONT COLOR="#BC8F8F"><B>'q'</FONT></B> <B><FONT COLOR="#A020F0">then</FONT></B>
+                  Printstr_P (Flash_Thank_You);
+                  Mode := MODE_UPDOWN;
+               <B><FONT COLOR="#A020F0">else</FONT></B>
+                  <B><FONT COLOR="#A020F0">if</FONT></B> Mode /= MODE_SERIAL <B><FONT COLOR="#A020F0">then</FONT></B>
+                     Printstr_P (Flash_WELCOME);
+                     Mode := MODE_SERIAL;
+                  <B><FONT COLOR="#A020F0">end</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B>;
+
+                  <B><FONT COLOR="#A020F0">case</FONT></B> Rxbuff <B><FONT COLOR="#A020F0">is</FONT></B>
+                     <B><FONT COLOR="#A020F0">when</FONT></B> <FONT COLOR="#BC8F8F"><B>'+'</FONT></B> =&gt;
+                        Set_PWM (PWM + 10);
+
+                     <B><FONT COLOR="#A020F0">when</FONT></B> <FONT COLOR="#BC8F8F"><B>'-'</FONT></B> =&gt;
+                        Set_PWM (PWM - 10);
+
+                     <B><FONT COLOR="#A020F0">when</FONT></B> <FONT COLOR="#BC8F8F"><B>'0'</FONT></B> =&gt;
+                        Set_PWM (0);
+
+                     <B><FONT COLOR="#A020F0">when</FONT></B> <FONT COLOR="#BC8F8F"><B>'1'</FONT></B> =&gt;
+                        Set_PWM (1000);
+
+                     <B><FONT COLOR="#A020F0">when</FONT></B> <FONT COLOR="#BC8F8F"><B>'r'</FONT></B> =&gt;
+                        Printstr_P (Flash_ZZZZ);
+                        <B><FONT COLOR="#A020F0">loop</FONT></B>
+                           <B><FONT COLOR="#A020F0">null</FONT></B>;
+                        <B><FONT COLOR="#A020F0">end</FONT></B> <B><FONT COLOR="#A020F0">loop</FONT></B>;
+
+                     <B><FONT COLOR="#A020F0">when</FONT></B> <B><FONT COLOR="#A020F0">others</FONT></B> =&gt;
+                        <B><FONT COLOR="#A020F0">null</FONT></B>;
+                  <B><FONT COLOR="#A020F0">end</FONT></B> <B><FONT COLOR="#A020F0">case</FONT></B>;
+               <B><FONT COLOR="#A020F0">end</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B>;
+            <B><FONT COLOR="#A020F0">end</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B>;
+            Sleep.Go_Sleeping;
+         <B><FONT COLOR="#A020F0">end</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B>;
+      <B><FONT COLOR="#A020F0">end</FONT></B> <B><FONT COLOR="#A020F0">loop</FONT></B>;
+   <B><FONT COLOR="#A020F0">end</FONT></B> Main;
+<B><FONT COLOR="#A020F0">end</FONT></B> largedemo_main;
+
+
+
+
+
+
+
+
+</body>
+</html>
+

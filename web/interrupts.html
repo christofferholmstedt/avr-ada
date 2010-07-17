@@ -1,0 +1,138 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>AVR-Ada Interrupts</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+
+<body text="#DCDEF2" link="#F0E59E" vlink="#C7B767" alink="#dec3a9" bgcolor="#3A3C69">
+
+<table width="95%" border="0" cellspacing="0" cellpadding="0" align="right">
+<tr>
+<td width="73%">
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+</td>
+<td rowspan="2" width="27%">&nbsp; </td>
+</tr>
+<tr>
+<td width="73%">
+<h1>Interrupts</h1>
+</td>
+</tr>
+<tr>
+<td width="73%">&nbsp;</td>
+<td width="27%">&nbsp; </td>
+</tr>
+<tr>
+<td width="73%">
+<p>It would be nice to use the standard Ada features for declaring
+interrupt handler routines. Ideally this looks like</p>
+
+<pre><b>protected</b> UART <b>is</b>
+   <b>procedure</b> Handler;
+   <b>pragma</b> Attach_Handler(Handler, Ada.Interrupts.Names.UTXR);
+<b>end</b> UART;</pre>
+
+<p>
+Unfortunately, we have not yet reached that easiness. But at
+least we managed to get a working interrupt handler by
+mimicking the gcc-C way of attaching an interrupt routine.
+</p>
+
+<pre><b>procedure</b> Time_Out;
+<b>pragma</b> Machine_Attribute (Entity         =&gt; Time_Out,
+                          Attribute_Name =&gt; &quot;signal&quot;);
+<b>pragma</b> Export (C, Time_Out, &quot;__vector_6&quot;);</pre>
+
+<p>
+The interrupt routine must be a parameterless procedure at the
+library level. The both pragmas Machine_Attribute and Export must
+immediately follow the specification of the procedure. The pragma
+Machine_Attribute takes two parameters, the first one is the name
+of the interrupt handler routine, the second one is the string
+<code>&quot;interrupt&quot;</code> or
+<code>&quot;signal&quot;</code>
+including the quotes. The external name declared in pragma Export
+is built by adding the index number (-1) of the corresponding
+interrupt and the characters <code>__vector_</code>.
+The interrupt index number has to be looked up in the data sheet
+of the controller in use.</p>
+
+<h3>Selecting the vector index number</h3>
+<p>
+Please note, the <code>__vector_</code>-number is one less than the one
+in the data sheet.  We use the avr-gcc linker scripts that start
+counting at 0!
+
+<p>For example you'd like to use the "Rx Complete" interrupt of the
+ATMega16.  The data sheet reads:
+</p>
+<p>
+<table  border="1" cellspacing="1" cellpadding="10">
+ <tr >
+  <th>Vector No.</th>
+  <th>Address</th>
+  <th>Source</th>
+  <th>Interrupt Definition</th>
+ </tr>
+ <tr>
+  <td align="center"><b>12</b></td>
+  <td>$0016</td>
+  <td>USART, RXC</td>
+  <td>USART, Rx Complete</td>
+ </tr>
+</table>
+
+<p>
+Your code should look like this:
+
+<pre>
+<b>procedure</b> Rx_Complete;
+<b>pragma</b> Machine_Attribute (Entity         =&gt; Rx_Complete,
+                          Attribute_Name =&gt; "signal");
+<b>pragma</b> Export (C, Rx_Complete, "__vector_<b>11</b>"); -- OFF-BY-ONE!
+</pre>
+
+<p>
+The part description specs are now generated directly from Atmel's XML
+files.  Here we provide explicit names for all interrupts that match
+the interrupt names in the data sheets by prepending <code>Sig_</code>
+and appending <code>_String</code> to the name.  Then the code
+simplifies to <pre>
+<b>procedure</b> Overflow_1_Interrupt;
+<b>pragma</b> Machine_Attribute (Entity         =&gt; Overflow_1_Interrupt,
+                          Attribute_Name =&gt; "signal");
+<b>pragma</b> Export (Convention    =&gt; C,
+               Entity        =&gt; Overflow_1_Interrupt,
+               External_Name =&gt; MCU.Sig_TIMER1_OVF_String);
+</pre>
+
+<p>See the example in apps/pwm_int_demo that uses exactly the above
+code.</p>
+
+<h3>Parameters for pragma Machine_Attribute</h3>
+
+<p>Be careful when specifying the parameters for pragma
+Machine_Attribute. Even though you can use the named notation, the
+parser does not care. Entity must be the first parameter and the
+attribute string must be the second!</p>
+
+<p>For including the interrupt routine in the final binary program you
+either have to &ldquo;with&ldquo; it in your main program or you
+manually add the object file at the linker command.</p>
+
+</td>
+<td width="27%">
+<div align="right"></div>
+</td>
+</tr>
+<tr>
+<td width="73%">&nbsp;</td>
+<td width="27%">&nbsp; </td>
+</tr>
+</table>
+
+</body>
+</html>
