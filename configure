@@ -94,7 +94,7 @@ echo "   $RTS_BASE/rts/<MCU>/adainclude"
 echo "   $RTS_BASE/rts/<MCU>/adalib"
 echo
 echo "The AVR-Ada libraries (libavr.a) will be installed in"
-echo "   $PREFIX/avr/ada/avr_lib/<MCU>/lib/libavr.a"
+echo "   $PREFIX/lib/gnat/avr_lib/<MCU>/lib/libavr.a"
 echo
 
 ####################################################################

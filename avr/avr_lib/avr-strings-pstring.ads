@@ -22,7 +22,7 @@ package AVR.Strings.PString is
       --  hierarchy is limited to an absolute maximum of 255
       --  characters.
    package Generic_PString is
-      --  pragma Preelaborate;
+      --  pragma Preelaborate (Generic_Pstring);
       --  GNAT: "incorrect placement of pragma PREELABORATE"
 
       Max_Length : constant Pos8 := Max;

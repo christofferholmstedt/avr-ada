@@ -99,9 +99,8 @@ package AVR is
    function Low return Boolean renames False;
 
    --  alias names for setting the data direction registers
-   subtype Data_Direction is Boolean;
-   function DD_Output return Data_Direction renames True;
-   function DD_Input return Data_Direction renames False;
+   function DD_Output return Boolean renames True;
+   function DD_Input return Boolean renames False;
 
 
    --  return lower part of 16 bit value as byte.

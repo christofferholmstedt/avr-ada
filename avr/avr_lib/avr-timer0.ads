@@ -52,8 +52,6 @@ package AVR.Timer0 is
    procedure Set_Output_Compare_Mode_Clear;
    procedure Set_Output_Compare_Mode_Set;
 
-   procedure Init_Fast_PWM (Prescaler : Scale_Type);
-
    procedure Stop;  --  set prescaler to No_Clock_Source, disable timer interrupts
    procedure Enable_Interrupt_Compare;
    procedure Enable_Interrupt_Overflow;

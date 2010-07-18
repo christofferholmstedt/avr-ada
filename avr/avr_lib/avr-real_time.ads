@@ -28,13 +28,13 @@
 --  --------------------------------------------------------------------------
 
 
+
 --  The specification relies on a resolution for System.Duration being
 --  at least one millisecond = 0.001.  The AVR GNAT compiler is
 --  patched to provide a 32-bit wide type for duration that has a tick
 --  of at least one millisecond. Duration also spans at least 2 days
 --  so that day_duration'last + day_duration'last does not hit the
 --  upper limit of the base type duration.
-
 --
 --  The package is Pure since Clock is not part of  the specification.      --
 --
@@ -49,9 +49,8 @@ package AVR.Real_Time is
    Time_First : constant Time;
    Time_Last  : constant Time;
    Time_Unit  : constant := 10#1.0#E-3;
-   Tick       : constant Duration := Time_Unit;
 
-   type Duration is delta Time_Unit digits 9 range -24.0 * 3600.0 .. 48.0 * 3600.0;
+   type Duration is delta 0.001 digits 9 range -24.0 * 3600.0 .. 48.0 * 3600.0;
    -- for Duration'Small use 0.001;
    for Duration'Size use 32;
 
@@ -66,6 +65,7 @@ package AVR.Real_Time is
    --     Time_Span_Zero  : constant Time_Span;
    --     Time_Span_Unit  : constant Time_Span;
 
+   Tick : constant Duration := Duration'Small; -- = 0.001;
 
    -- Day of the week:
    type Day_Name is (Monday, Tuesday, Wednesday, Thursday,
@@ -155,6 +155,7 @@ package AVR.Real_Time is
    --
    --  Image
    --
+
    function Image (Date : Time) return AStr19;         -- "YYYY-MM-DD HH:MM:SS"
    function Time_Image (T : Time) return AStr8;        -- "HH:MM:SS"
    function Time_Image_Short (T : Time) return AStr6;  -- "HHMMSS"

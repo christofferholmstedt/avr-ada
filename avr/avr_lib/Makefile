@@ -36,6 +36,9 @@ MCU_LIST := $(filter-out $(excluded_parts), $(shell ls -d at*))
 # we build separate libraries for each supported device
 libs := $(patsubst %, %/lib/libavrada.a, $(MCU_LIST))
 
+# all part specific registers and definitions are made available 
+mcu_specs := $(patsubst %, %/avr-mcu.ads, $(MCU_LIST))
+
 # devices with 8 bit wide EEPROM addresses
 EEPROM_8BIT := at90s2313 at90s2323 at90s2343 at90s4414 at90s4433 \
    at90s4434 atmega48 attiny13 attiny22 attiny2313 attiny26 
@@ -118,7 +121,8 @@ at%/obj :
 at%/lib :
 	mkdir -p $@
 
-stamp-links: $(eeprom_8bit_bodies) $(eeprom_pe_bodies) avr-eeprom.adb \
+stamp-links: $(mcu_specs) \
+   $(eeprom_8bit_bodies) $(eeprom_pe_bodies) avr-eeprom.adb \
    $(uart_bodies) $(usart0_bodies) $(usart_bodies) \
    $(power_bodies)
 	touch $@

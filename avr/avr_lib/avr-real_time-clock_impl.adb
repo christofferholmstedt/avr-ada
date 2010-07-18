@@ -47,9 +47,6 @@ package body AVR.Real_Time.Clock_Impl is
       end if;
    end Tick;
 
-   --
-   --  first set the clock
-   --
 
    procedure Init is
    begin

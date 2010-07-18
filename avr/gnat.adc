@@ -60,9 +60,7 @@ pragma Restrictions (No_Entry_Calls_In_Elaboration_Code);
 --  use of this restriction, the compiler can assume that no code past
 --  an accept statement in a task can be executed at elaboration time.
 
-pragma Restrictions (No_Exception_Propagation);
-
---  pragma Restrictions (No_Exception_Handlers);
+pragma Restrictions (No_Exception_Handlers);
 --  This restriction ensures at compile time that there are no
 --  explicit exception handlers.
 

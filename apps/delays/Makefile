@@ -51,7 +51,7 @@ GCC_PREFIX := $(dir $(shell avr-gcc -print-libgcc-file-name))../../../../
 PRJ_AVR := $(GCC_PREFIX)avr/ada
 
 # PRJ_PATH := '$(PRJ_AVR)'
-PRJ_PATH := /k/Data/Development/AVR-Ada/avr
+# PRJ_PATH := /k/Data/Development/AVR-Ada/avr
 
 #---------------- GNATMAKE Options ----------------
 MFLAGS = -XMCU=$(MCU) -p -P$(GPR) 
@@ -110,7 +110,7 @@ OBJCOPY  := avr-objcopy
 OBJDUMP  := avr-objdump
 SIZE     := avr-size
 NM       := avr-nm
-AVRDUDE  := /c/Programme/Atmel/AVRDude/avrdude
+AVRDUDE  := avrdude
 REMOVE   := rm -f
 COPY     := cp
 RENAME   := mv

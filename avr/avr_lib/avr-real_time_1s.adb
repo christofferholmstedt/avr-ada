@@ -418,7 +418,6 @@ package body AVR.Real_Time is
    function To_U16 is new Ada.Unchecked_Conversion
      (Source => Day_Duration, Target => Nat16);
 
-   -- "00,000.000"
    function Millisec_Image (D : Day_Duration) return AStr10 is
       Img   : AStr10;
       Int   : constant Nat16 := To_U16 (D);
@@ -453,6 +452,7 @@ package body AVR.Real_Time is
 
    function Value (Date : AVR_String) return Time is
       pragma Unreferenced (Date);
+      T : Time;
    begin
       pragma Not_Implemented;
       return Time_First;

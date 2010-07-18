@@ -1,0 +1,5 @@
+stamp-links
+avr-mcu.ads
+avr-eeprom.adb
+avr-uart.adb
+avr-power.adb

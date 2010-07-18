@@ -465,7 +465,6 @@ package body AVR.Real_Time is
    end Time_Image;
 
 
-   -- "HHMMSS"
    function Time_Image_Short (T : Time) return AStr6 is
       pragma Unreferenced (T);
       Img : AStr6 := "000000";
