@@ -40,8 +40,8 @@ begin
    AVR.UART.Init(51);
 
    loop
-      C := UART.Get;
-      UART.Put (C);
+      C := AVR.UART.Get;
+      AVR.UART.Put (C);
    end loop;
 
 end Main;

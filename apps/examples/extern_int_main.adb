@@ -23,7 +23,7 @@ with Extern_Int;
 
 procedure Extern_Int_Main is
    Enable_Ext_Int0 : Boolean renames
-#if MCU = "atmega8" then
+#if MCU = "atmega8" or else MCU = "atmega32" then
      MCU.GICR_Bits (MCU.INT0_Bit);
 #elsif MCU = "atmega328p" then
      MCU.PCMSK0_Bits (MCU.PCINT0_Bit);

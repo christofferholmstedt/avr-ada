@@ -58,6 +58,12 @@ package AVR.Strings is
    subtype AStr20 is AVR_String (1 .. 20);
    subtype AStr100 is AVR_String (1 .. 100);
 
+   --  Progmem_String and PStr are not part of the ARM.
+   type Progmem_String is new AVR_String;
+   pragma Linker_Section (Progmem_String, ".progmem.data");
+   subtype PStr is Progmem_String;
+
+
    --  Length_Error, Pattern_Error, Index_Error, Translation_Error are
    --  part of the ARM, but removed here.
 

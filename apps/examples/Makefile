@@ -32,8 +32,8 @@
 
 
 # MCU name
-MCU := atmega328p
-# MCU := atmega32
+# MCU := atmega328p
+MCU := atmega32
 # MCU := attiny13
 
 
@@ -54,7 +54,7 @@ GCC_PREFIX := $(dir $(shell avr-gcc -print-libgcc-file-name))../../../../
 PRJ_AVR := $(GCC_PREFIX)avr/ada
 
 # PRJ_PATH := '$(PRJ_AVR)'
-PRJ_PATH := /c/Devel/AVR-Ada/avr
+# PRJ_PATH := /c/Devel/AVR-Ada/avr
 
 #---------------- GNATMAKE Options ----------------
 MFLAGS = -XMCU=$(MCU) -p -P$(GPR) 

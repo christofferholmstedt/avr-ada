@@ -40,7 +40,7 @@ package body Debug is
       end loop;
    end Put;
 
-   procedure Put_P (Text : P_String) is
+   procedure Put_P (Text : Progmem_String) is
    begin
       Put (Text'Length, Text'Address);
    end Put_P;

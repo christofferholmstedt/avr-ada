@@ -1,6 +1,5 @@
 with Interfaces;                   use Interfaces;
 with AVR.Strings;                  use AVR.Strings;
-with AVR.PStrings;                 use AVR.PStrings;
 with AVR.Programspace;             use AVR.Programspace;
 
 package Debug is
@@ -13,7 +12,7 @@ package Debug is
 
    procedure Put (Text : AVR_String);
    procedure Put (Len : Unsigned_8; Start : Program_Address);
-   procedure Put_P (Text : P_String);
+   procedure Put_P (Text : Progmem_String);
    procedure Put (C : Character);
    procedure Put (Q : Boolean);
    procedure Put (Data : Unsigned_8;   Base : Unsigned_8 := 10);

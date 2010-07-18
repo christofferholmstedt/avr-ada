@@ -35,20 +35,19 @@
 --  The package is Pure since Clock is not part of  the specification.      --
 --
 
-with Interfaces;
 with AVR.Strings;                  use AVR.Strings;
 
 package AVR.Real_Time is
-   pragma Pure;
+   pragma Preelaborate;
    -- pragma Elaborate_Body;
 
    type Time is private;
    Time_First : constant Time;
    Time_Last  : constant Time;
-   Time_Unit  : constant := 1.0;  -- we only count whole seconds
-   Tick       : constant Duration := Time_Unit;
+   Time_Unit  : constant := 1.0;  -- we count only whole seconds
 
-   type Duration is delta Time_Unit digits 9 range -24.0 * 3600.0 .. 48.0 * 3600.0;
+   -- deviates from std AVR spec
+   type Duration is delta 1.0 digits 9 range -24.0 * 3600.0 .. 48.0 * 3600.0;
    for Duration'Size use 32;
 
 
@@ -62,6 +61,7 @@ package AVR.Real_Time is
    --     Time_Span_Zero  : constant Time_Span;
    --     Time_Span_Unit  : constant Time_Span;
 
+   Tick : constant Duration := Duration'Small; -- = 1.0;
 
    -- Day of the week:
    type Day_Name is (Monday, Tuesday, Wednesday, Thursday,
@@ -72,13 +72,13 @@ package AVR.Real_Time is
 
 
    --  Declarations representing limits of allowed local time values.
-   subtype Year_Number     is Interfaces.Integer_8; -- offset to the year 2000
-   subtype Month_Number    is Interfaces.Unsigned_8 range 1 .. 12;
-   subtype Day_Number      is Interfaces.Unsigned_8 range 1 .. 31;
-   subtype Hour_Number     is Interfaces.Unsigned_8 range 0 .. 23;
-   subtype Minute_Number   is Interfaces.Unsigned_8 range 0 .. 59;
-   subtype Second_Number   is Interfaces.Unsigned_8 range 0 .. 59;
-   subtype Day_Duration    is Duration              range 0.0 .. 86_400.0;
+   subtype Year_Number     is Integer_8; -- offset to the year 2000
+   subtype Month_Number    is Unsigned_8 range 1 .. 12;
+   subtype Day_Number      is Unsigned_8 range 1 .. 31;
+   subtype Hour_Number     is Unsigned_8 range 0 .. 23;
+   subtype Minute_Number   is Unsigned_8 range 0 .. 59;
+   subtype Second_Number   is Unsigned_8 range 0 .. 59;
+   subtype Day_Duration    is Duration range 0.0 .. 86_400.0;
    subtype Second_Duration is Day_Duration          range 0.0 .. 1.0;
 
 
@@ -89,7 +89,7 @@ package AVR.Real_Time is
    function Hour       (Date : Time) return Hour_Number;
    function Minute     (Date : Time) return Minute_Number;
    function Second     (Date : Time) return Second_Number;
-   function Sub_Second (Date : Time) return Second_Duration;
+   -- function Sub_Second (Date : Time) return Second_Duration;
    function Seconds    (Date : Time) return Day_Duration;
 
 

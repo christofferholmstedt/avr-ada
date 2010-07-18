@@ -62,10 +62,10 @@ copy_libs:
            --exclude "*~" \
            --exclude "*.o" \
            --exclude */*~ \
-           avr_lib avr.gpr mcu.gpr \
+           avr_lib avr.gpr mcu.gpr gnat.adc avr_app.gpr \
            $(libraries) \
            $(library_gprs) \
-           gnat.adc | (cd $(INSTALL_DIR); tar xpvf -)
+           | (cd $(INSTALL_DIR); tar xpvf -)
 
 clean:
 	$(RM) stamp-*

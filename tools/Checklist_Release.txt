@@ -7,6 +7,6 @@ Checkout branch
 remove dirs that won't be distributed	
 verify AVR_PRJ_PATH in all Makefiles		must be default, not the local build avr-directory
 set label 	       	   			avr-ada-MAJOR.MINOR.PATCH
-export for release the tagged revision, set eol style to unix (LF)			
+	
 ensure Unix line ending				dos2unix
 source distribution shoud be named		avr-ada-MAJOR.MINOR.PATCH.tar.bz2

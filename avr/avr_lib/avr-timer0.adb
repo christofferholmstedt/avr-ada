@@ -191,27 +191,6 @@ package body AVR.Timer0 is
    end Init_CTC;
 
 
-   procedure Init_Fast_PWM (Prescaler : Scale_Type)
-   is
-   begin
-
--- #if MCU = "attiny13" or else MCU = "atmega168" or else MCU = "atmega169" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" then
-#if MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" then
-      Ctrl_Reg := (MCU.COM0A0_Bit => False, --  \  normal operation,
-                   MCU.COM0A1_Bit => True,  --  /  non-inverting mode.
-
-                   MCU.WGM00_Bit => True,   --  \  Fast PWM
-                   MCU.WGM01_Bit => True,   --  /
-
-                   others    => False);
-
-      Prescale_Reg := 0 or MCU.WGM02_Mask;
-
-      --  select the clock
-      Prescale_Reg := Prescale_Reg or Prescaler;
-   end Init_Fast_PWM;
-
-
 #if MCU = "attiny13" or else MCU = "atmega168" or else MCU = "atmega169" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" then
    Com0 : Boolean renames Ctrl_Reg (MCU.COM0A0_Bit);
    Com1 : Boolean renames Ctrl_Reg (MCU.COM0A1_Bit);
