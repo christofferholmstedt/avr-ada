@@ -48,7 +48,7 @@ ARCH_LIST := avr2 avr25 avr3 avr35 avr4 avr5 avr6
 
 BUILD := $(AVR_ADA_HOME)/build
 
-DOC_DIR := $(PREFIX)/doc/AVR-Ada
+DOC_DIR := $(PREFIX)/share/doc/avr-ada
 DOC_DIR_APPS := $(DOC_DIR)/apps
 DOC_DIR_DOCS := $(DOC_DIR)/.
 DOC_DIRS := $(DOC_DIR) $(DOC_DIR_APPS) $(DOC_DIR_DOCS)
