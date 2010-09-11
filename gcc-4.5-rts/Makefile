@@ -24,13 +24,14 @@ ADASRC = ada.ads interfac.ads system.ads unchconv.ads a-unccon.ads \
    s-bitops.ads s-bitops.adb \
    gnat.ads g-souinf.ads \
    s-stalib.ads s-parame.ads \
-   a-calend.ads a-caldel.ads 
-#  a-tags.ads a-tags.adb s-htable.ads s-htable.adb 
+   a-calend.ads a-caldel.ads \
+   i-c.ads i-c.adb
+#  a-tags.ads a-tags.adb s-htable.ads s-htable.adb
 #   a-stream.ads
 #   s-finroo.ads s-finroo.adb a-finali.ads a-finali.adb
-#   a-reatim.adb a-reatim.ads 
+#   a-reatim.adb a-reatim.ads
 #   a-interr.ads a-intnam.ads a-intsig.ads s-interr.adb s-interr.ads
-#  
+#
 
 OBJ = $(ADASRC:.ads=.o)
 
@@ -61,7 +62,7 @@ RANLIB  = avr-ranlib
 
 
 FORMAT = ihex
-# ------------------------------------------	
+# ------------------------------------------
 
 all: adalib/libgnat.a
 
@@ -80,11 +81,11 @@ empty.c:
 # tries to build a .ali first from .adb if available.  Only if there
 # is no .adb, it tries to build from .ads.
 %.ali %.o : %.adb
-	$(CC) -c $(ADAFLAGS) $(INC) $< 
+	$(CC) -c $(ADAFLAGS) $(INC) $<
 	$(COPY) $@ adalib
 
 %.ali %.o : %.ads
-	$(CC) -c $(ADAFLAGS) $(INC) $< 
+	$(CC) -c $(ADAFLAGS) $(INC) $<
 	$(COPY) $@ adalib
 
 
