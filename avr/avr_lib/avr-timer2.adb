@@ -1,6 +1,24 @@
+---------------------------------------------------------------------------
+-- The AVR-Ada Library is free software;  you can redistribute it and/or --
+-- modify it under terms of the  GNU General Public License as published --
+-- by  the  Free Software  Foundation;  either  version 2, or  (at  your --
+-- option) any later version.  The AVR-Ada Library is distributed in the --
+-- hope that it will be useful, but  WITHOUT ANY WARRANTY;  without even --
+-- the  implied warranty of MERCHANTABILITY or FITNESS FOR A  PARTICULAR --
+-- PURPOSE. See the GNU General Public License for more details.         --
+--                                                                       --
+-- As a special exception, if other files instantiate generics from this --
+-- unit,  or  you  link  this  unit  with  other  files  to  produce  an --
+-- executable   this  unit  does  not  by  itself  cause  the  resulting --
+-- executable to  be  covered by the  GNU General  Public License.  This --
+-- exception does  not  however  invalidate  any  other reasons why  the --
+-- executable file might be covered by the GNU Public License.           --
+---------------------------------------------------------------------------
+
 with Interfaces;                   use Interfaces;
 with AVR;                          use AVR;
 with AVR.MCU;
+with AVR.Interrupts;
 
 package body AVR.Timer2 is
 
@@ -8,21 +26,21 @@ package body AVR.Timer2 is
    -- Overflow_Count : Unsigned_16;
    -- pragma Volatile (Overflow_Count);
 
-#if MCU = "atmega168" or else MCU = "atmega169" then
+#if MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa" or else MCU = "atmega169" then
    Output_Compare_Reg : Unsigned_8 renames MCU.OCR2A;
 #elsif mcu = "atmega32" then
    Output_Compare_Reg : Unsigned_8 renames MCU.OCR2;
 #end if;
 
 
-#if MCU = "attiny13" or else MCU = "atmega168" or else MCU = "atmega169" then
+#if MCU = "attiny13" or else MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa" or else MCU = "atmega169" then
    Ctrl_Reg       : Bits_In_Byte renames MCU.TCCR2A_Bits;
 #elsif MCU = "atmega32" then
    Ctrl_Reg       : Bits_In_Byte renames MCU.TCCR2_Bits;
 #end if;
 
 
-#if MCU = "atmega168" then
+#if MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa"
    Prescale_Reg   : Unsigned_8 renames MCU.TCCR2B;
 #elsif MCU = "atmega169" then
    Prescale_Reg   : Unsigned_8 renames MCU.TCCR2A;
@@ -30,7 +48,7 @@ package body AVR.Timer2 is
    Prescale_Reg   : Unsigned_8 renames MCU.TCCR2;
 #end if;
 
-#if MCU = "atmega168" or else MCU = "atmega169" then
+#if MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa" or else MCU = "atmega169" then
    Interrupt_Mask : Bits_In_Byte renames MCU.TIMSK2_Bits;
    Output_Compare_Interrupt_Enable : Boolean renames MCU.TIMSK2_Bits (MCU.OCIE2A_Bit);
    Overflow_Interrupt_Enable       : Boolean renames MCU.TIMSK2_Bits (MCU.TOIE2_Bit);
@@ -83,10 +101,14 @@ package body AVR.Timer2 is
 
    procedure Init_CTC (Prescaler : Scale_Type; Overflow : Unsigned_8 := 0)
    is
+      Interrupt_Status : Unsigned_8;
    begin
+
+      Interrupt_Status := Interrupts.Save_And_Disable;
+
       --  set the control register with the prescaler and mode flags to
       --  timer output compare mode and clear timer on compare match
-#if MCU = "attiny13" or else MCU = "atmega168" or else MCU = "atmega169" then
+#if MCU = "attiny13" or else MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa" or else MCU = "atmega169" then
       Ctrl_Reg := (MCU.COM2A0_Bit => False, --  \  normal operation,
                    MCU.COM2A1_Bit => False, --  /  OC0 disconnected
 
@@ -119,27 +141,33 @@ package body AVR.Timer2 is
       -- Clear_Overflow_Count;
       MCU.TCNT2 := 0;
 
+      Interrupts.Restore (Interrupt_Status);
+
    end Init_CTC;
 
 
    procedure Init_Normal (Prescaler : Scale_Type)
    is
+      Interrupt_Status : Unsigned_8;
    begin
+
+      Interrupt_Status := Interrupts.Save_And_Disable;
+
       --  set the control register with the prescaler and mode flags to
       --  timer output compare mode and clear timer on compare match
-#if MCU = "atmega168" or else MCU = "atmega169" then
+#if MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa" or else MCU = "atmega169" then
       Ctrl_Reg := (MCU.COM2A0_Bit => False, --  \  normal operation,
                    MCU.COM2A1_Bit => False, --  /  OC0 disconnected
 
                    MCU.WGM20_Bit => False,  --  \  Normal
-                   MCU.WGM21_Bit => False,  --  /  
+                   MCU.WGM21_Bit => False,  --  /
 
                    others    => False);
 #elsif MCU = "atmega32" then
       Ctrl_Reg := (MCU.COM20_Bit => False, --  \  normal operation,
                    MCU.COM21_Bit => False, --  /  OC0 disconnected
 
-                   MCU.WGM20_Bit => False,  --  \  
+                   MCU.WGM20_Bit => False,  --  \
                    MCU.WGM21_Bit => False,  --  /  normal mode
 
                    others    => False);
@@ -158,9 +186,11 @@ package body AVR.Timer2 is
       -- Clear_Overflow_Count;
       MCU.TCNT2 := 0;
 
+      Interrupts.Restore (Interrupt_Status);
+
    end Init_Normal;
-   
-   
+
+
    procedure Stop is
    begin
       -- Stop the timer and disable all timer interrupts
