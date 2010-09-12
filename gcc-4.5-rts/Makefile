@@ -25,7 +25,8 @@ ADASRC = ada.ads interfac.ads system.ads unchconv.ads a-unccon.ads \
    gnat.ads g-souinf.ads \
    s-stalib.ads s-parame.ads \
    a-calend.ads a-caldel.ads \
-   i-c.ads i-c.adb
+   i-c.ads i-c.adb \
+   a-except.ads a-except.adb
 #  a-tags.ads a-tags.adb s-htable.ads s-htable.adb
 #   a-stream.ads
 #   s-finroo.ads s-finroo.adb a-finali.ads a-finali.adb
