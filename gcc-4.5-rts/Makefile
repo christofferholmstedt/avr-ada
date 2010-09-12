@@ -38,7 +38,7 @@ OBJ = $(ADASRC:.ads=.o)
 
 NOT_NEEDED_OBJS = ada.o interfac.o system.o s-maccod.o
 
-LIBGNAT_OBJS = s-bitops.o
+LIBGNAT_OBJS = s-bitops.o a-except.o
 LIBGNAT_ALIS = $(ADASRC:.ads=.ali)
 
 vpath %.ads adainclude
@@ -54,19 +54,70 @@ ADAFLAGS = -g -Os -gnatn -gnatpg -mmcu=$(MCU)
 ###### define some variables based on the AVR base path in $(AVR) #######
 CC	= avr-gcc
 RM	= rm -f
-RN	= mv
 COPY	= cp
-BIN	= avr-objcopy
-SIZE	= avr-size
 AR	= avr-ar
 RANLIB  = avr-ranlib
 
 
-FORMAT = ihex
 # ------------------------------------------
+-include ../config
 
-all: adalib/libgnat.a
+# excluded devices should be in sync with avr/avr_lib/Makefile:excluded_parts
+# include ../excldevs.mk
 
+# MCU_LIST := $(filter-out $(excluded_parts), $(shell (cd ../avr/avr_lib; ls -d at*)))
+# MCU_LIST := atmega169
+ARCH_LIST := avr2 avr25 avr3 avr35 avr4 avr5 avr6
+
+RTS_LIB_LIST := $(patsubst %, rts/%/adalib/libgnat.a, $(ARCH_LIST))
+RTS_INC_LIST := $(patsubst %, rts/%/adainclude, $(ARCH_LIST))
+RTS_SOURCE   := .
+# $(AVR_ADA_HOME)/gcc-$(major).$(minor)-rts
+
+
+###############################################################
+#
+#  build the run time system (RTS)
+#
+build_rts: ${RTS_LIB_LIST}
+
+rts/%/adalib/libgnat.a : MCU = $(patsubst rts/%/adalib/libgnat.a,%, $@)
+
+rts/%/adalib/libgnat.a:
+	$(MAKE) clean
+	$(MAKE) MCU=$(MCU) adalib/libgnat.a
+
+	mkdir -p rts/$(MCU)/adainclude
+	mkdir -p rts/$(MCU)/adalib
+
+	cp -p $(RTS_SOURCE)/adainclude/*.ad? rts/$(MCU)/adainclude
+	cp -p $(RTS_SOURCE)/adalib/*.ali     rts/$(MCU)/adalib
+	cp -p $(RTS_SOURCE)/adalib/libgnat.a rts/$(MCU)/adalib
+	$(MAKE) clean
+
+
+###############################################################
+#
+#  install the RTS
+#
+install_rts: build_rts rtsclean
+	cp -rp rts $(RTS_BASE)
+	chmod a-w -R $(RTS_BASE)/rts
+	-mkdir $(RTS_BASE)/adainclude
+	cp -p $(RTS_SOURCE)/adainclude/system.ads $(RTS_BASE)/adainclude
+	cp -p $(RTS_SOURCE)/README.gnatlink_inst  $(RTS_BASE)/adainclude
+
+
+###############################################################
+#
+#  remove RTS from the gcc tree
+#
+rtsclean:
+	-chmod a+w -R $(RTS_BASE)/rts
+	-rm -rf $(RTS_BASE)/rts
+
+###############################################################
+#
 adalib/libgnat.a: $(LIBGNAT_OBJS) $(LIBGNAT_ALIS)
 	$(AR) cr $@ $(LIBGNAT_OBJS)
 	$(RANLIB) $@
@@ -76,7 +127,6 @@ empty.o: empty.c
 
 empty.c:
 	echo > $@
-
 
 # keep the order of the following two implicit rules.  This way it
 # tries to build a .ali first from .adb if available.  Only if there
@@ -89,7 +139,6 @@ empty.c:
 	$(CC) -c $(ADAFLAGS) $(INC) $<
 	$(COPY) $@ adalib
 
-
 # --- make instruction to delete created files ---
 clean:
 	$(RM) *.o
@@ -99,3 +148,19 @@ clean:
 	$(RM) adalib/*.ali
 	$(RM) adalib/libgnat.a
 
+
+###############################################################
+#
+#  Makefile stuff
+#
+.PHONY: clean rtsclean install_rts
+
+print-%:
+	@echo $* = $($*)
+
+.PHONY: printvars
+
+printvars:
+	@$(foreach V,$(sort $(.VARIABLES)), \
+           $(if $(filter-out environment% default automatic, \
+           $(origin $V)),$(warning $V=$($V) ($(value $V)))))

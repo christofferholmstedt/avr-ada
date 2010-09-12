@@ -46,19 +46,13 @@ MCU_LIST := $(filter-out $(excluded_parts), $(shell (cd avr/avr_lib; ls -d at*))
 # MCU_LIST := atmega169
 ARCH_LIST := avr2 avr25 avr3 avr35 avr4 avr5 avr6
 
-BUILD := $(AVR_ADA_HOME)/build
-
 DOC_DIR := $(PREFIX)/share/doc/avr-ada
 DOC_DIR_APPS := $(DOC_DIR)/apps
 DOC_DIR_DOCS := $(DOC_DIR)/.
 DOC_DIRS := $(DOC_DIR) $(DOC_DIR_APPS) $(DOC_DIR_DOCS)
 
 
-#RTS_LIB_LIST := $(patsubst %, $(BUILD)/rts/%/adalib/libgnat.a, $(MCU_LIST))
-#RTS_INC_LIST := $(patsubst %, $(BUILD)/rts/%/adainclude, $(MCU_LIST))
-RTS_LIB_LIST := $(patsubst %, $(BUILD)/rts/%/adalib/libgnat.a, $(ARCH_LIST))
-RTS_INC_LIST := $(patsubst %, $(BUILD)/rts/%/adainclude, $(ARCH_LIST))
-RTS_SOURCE   := $(AVR_ADA_HOME)/gcc-$(major).$(minor)-rts
+RTS_SOURCE   := gcc-$(major).$(minor)-rts
 
 # default rule: build rts and avrlib;
 all: build_rts build_libs
@@ -66,34 +60,11 @@ all: build_rts build_libs
 
 ###############################################################
 #
-#  build the run time system (RTS)
+#  build and install the run time system (RTS)
 #
-build_rts:	${RTS_LIB_LIST}
+build_rts install_rts rtsclean:
+	$(MAKE) -C $(RTS_SOURCE) $@
 
-$(BUILD)/rts/%/adalib/libgnat.a : MCU = $(patsubst $(BUILD)/rts/%/adalib/libgnat.a,%, $@)
-
-
-$(BUILD)/rts/%/adalib/libgnat.a:
-	$(MAKE) -C $(RTS_SOURCE) clean
-	$(MAKE) MCU=$(MCU) -C $(RTS_SOURCE)
-	mkdir -p $(BUILD)/rts/$(MCU)/adainclude
-	mkdir -p $(BUILD)/rts/$(MCU)/adalib
-
-	cp -p $(RTS_SOURCE)/adainclude/*.ad? $(BUILD)/rts/$(MCU)/adainclude
-	cp -p $(RTS_SOURCE)/adalib/*.ali     $(BUILD)/rts/$(MCU)/adalib
-	cp -p $(RTS_SOURCE)/adalib/libgnat.a $(BUILD)/rts/$(MCU)/adalib
-
-
-###############################################################
-#
-#  install the RTS
-#
-install_rts: build_rts rtsclean
-	cp -rp $(BUILD)/rts $(RTS_BASE)
-	chmod a-w -R $(RTS_BASE)/rts
-	-mkdir $(RTS_BASE)/adainclude
-	cp -p $(RTS_SOURCE)/adainclude/system.ads $(RTS_BASE)/adainclude
-	cp -p $(RTS_SOURCE)/README.gnatlink_inst  $(RTS_BASE)/adainclude
 
 
 ###############################################################
@@ -122,7 +93,6 @@ install: install_rts install_libs install_doc
 #  install docs and example programs
 #
 install_doc: $(DOC_DIRS)
-#	cp -a web $(DOC_DIR)
 	cp -a apps $(DOC_DIR)
 
 
@@ -154,7 +124,7 @@ dist_prep:
 	cp -a apps/largedemo    $(DIST_PREP_DIR)/Examples
 
 unix_eol:
-	find . -type f | xargs dos2unix
+	find . -type f | xargs d2u
 
 
 ###############################################################
@@ -182,10 +152,6 @@ distclean:  clean
 #
 #  remove RTS and avrlib from the gcc tree
 #
-
-rtsclean:
-	-chmod a+w -R $(RTS_BASE)/rts
-	-rm -rf $(RTS_BASE)/rts
 
 avrlibclean:
 	-chmod a+w -R $(PREFIX)/avr/ada
