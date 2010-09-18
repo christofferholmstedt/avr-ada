@@ -23,7 +23,7 @@ with AVR.Config;
 
 package body AVR.UART is
 
-#if UART = "USART0" then
+#if UART = "usart0" then
    UCSRA      : Nat8 renames MCU.UCSR0A;
    UCSRA_Bits : Bits_In_Byte renames MCU.UCSR0A_Bits;
    UCSRB      : Nat8 renames MCU.UCSR0B;
@@ -44,14 +44,14 @@ package body AVR.UART is
    UDR        : Nat8 renames MCU.UDR0;
    RXC_Bit    : constant AVR.Bit_Number := MCU.RXC0_Bit;
 
-#elsif UART = "USART" then
+#elsif UART = "usart" then
 
    UCSZ0_Bit  : constant AVR.Bit_Number := MCU.UCSZ0_Bit;
    UCSZ1_Bit  : constant AVR.Bit_Number := MCU.UCSZ1_Bit;
 
    RXC_Bit    : constant AVR.Bit_Number := MCU.RXC_Bit;
 
-#elsif UART = "UART" then
+#elsif UART = "uart" then
    UCSRA_Bits : Bits_In_Byte renames MCU.USR_Bits;
 
    UCSRB      : Unsigned_8 renames MCU.UCR;
@@ -85,14 +85,14 @@ package body AVR.UART is
    is
    begin
       -- Set baud rate
-#if not UART = "UART" then
+#if not UART = "uart" then
       UBRR := Baud_Divider;
 #else
       UBRR := Low_Byte (Baud_Divider);
 #end if;
 
 
-#if not UART = "UART" then
+#if not UART = "uart" then
       -- Enable 2x speed
       if Double_Speed then
          UCSRA := U2X_Mask;
@@ -107,7 +107,7 @@ package body AVR.UART is
                  TXEN_Bit => True,
                  others => False);
 
-#if UART = "USART" then
+#if UART = "usart" then
       -- Async. mode, 8N1
       UCSRC := +(UCSZ0_Bit => True,
                  UCSZ1_Bit => True,
@@ -117,7 +117,7 @@ package body AVR.UART is
       --  at least on atmega8 UCSRC and UBRRH share the same address.
       --  When writing to the ACSRC register, the URSEL must be set,
       --  too.
-#elsif UART = "USART0" then
+#elsif UART = "usart0" then
       -- Async. mode, 8N1
       UCSRC := +(UCSZ0_Bit => True,
                  UCSZ1_Bit => True,
@@ -385,7 +385,7 @@ package body AVR.UART is
 
 
    procedure Send_LIN_Break is
-#if not UART = "UART" then
+#if not UART = "uart" then
       Orig_Baud_Divider : constant Unsigned_16 := UBRR;
 #else
       Orig_Baud_Divider : constant Unsigned_8 := UBRRL;
@@ -417,7 +417,7 @@ package body AVR.UART is
       UBRR := UBRR * 2;
 
 
-#if UART = "USART" then
+#if UART = "usart" then
       -- Async. mode, 8N1
       UCSRC := +(UCSZ0_Bit => True,
                  UCSZ1_Bit => True,
@@ -427,7 +427,7 @@ package body AVR.UART is
       --  at least on atmega8 UCSRC and UBRRH share the same address.
       --  When writing to the ACSRC register, the URSEL must be set,
       --  too.
-#elsif UART = "USART0" then
+#elsif UART = "usart0" then
       -- Async. mode, 8N1
       UCSRC := +(UCSZ0_Bit => True,
                  UCSZ1_Bit => True,

@@ -1195,6 +1195,3 @@ package body AVR.Power is
 
 end AVR.Power;
 
--- Local Variables:
--- mode:ada
--- End:

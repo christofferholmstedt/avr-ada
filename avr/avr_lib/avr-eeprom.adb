@@ -30,7 +30,7 @@ use AVR;
 package body AVR.EEprom is
 
 
-#if write_bit_name_is_WE
+#if Eeprom_WE = "eeprom_we" then
    EE_Master_Write_Enable : Boolean renames MCU.EECR_Bits (MCU.EEMWE_Bit);
    EE_Write_Enable        : Boolean renames MCU.EECR_Bits (MCU.EEWE_Bit);
 #else
@@ -59,7 +59,7 @@ package body AVR.EEprom is
    begin
       while not Is_Ready loop null; end loop;
 
-#if not eeprom_addr_8bit
+#if Eeprom_Width = "eeprom_16bit" then
       EEARH := High_Byte (Unsigned_16 (Address));
       EEARL := Low_Byte  (Unsigned_16 (Address));
 #else
@@ -96,7 +96,7 @@ package body AVR.EEprom is
       use AVR.MCU;
    begin
       Busy_Wait;
-#if not eeprom_addr_8bit
+#if Eeprom_Width = "eeprom_16bit" then
       EEARH := High_Byte (Unsigned_16 (Address));
       EEARL := Low_Byte  (Unsigned_16 (Address));
 #else

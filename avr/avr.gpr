@@ -75,6 +75,9 @@ project AVR is
 
          "-mmcu=" & MCU,       --  name of the micro controler
          "-gnateDMCU=" & MCU,  --  name of the micro controler for preprocessor
+         "-gnateDEeprom_Width=" & MCU.Eeprom_Width,
+         "-gnateDEeprom_We=" & MCU.Eeprom_WE,
+         "-gnateDUART=" & MCU.UART,
 
          "-fdata-sections",    --  create separate data sections
          "-ffunction-sections" --  create separate function sections

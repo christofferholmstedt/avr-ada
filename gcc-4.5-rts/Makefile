@@ -62,17 +62,11 @@ RANLIB  = avr-ranlib
 # ------------------------------------------
 -include ../config
 
-# excluded devices should be in sync with avr/avr_lib/Makefile:excluded_parts
-# include ../excldevs.mk
-
-# MCU_LIST := $(filter-out $(excluded_parts), $(shell (cd ../avr/avr_lib; ls -d at*)))
-# MCU_LIST := atmega169
-ARCH_LIST := avr2 avr25 avr3 avr35 avr4 avr5 avr6
+ARCH_LIST := avr2 avr25 avr3 avr31 avr35 avr4 avr5 avr51 avr6
 
 RTS_LIB_LIST := $(patsubst %, rts/%/adalib/libgnat.a, $(ARCH_LIST))
 RTS_INC_LIST := $(patsubst %, rts/%/adainclude, $(ARCH_LIST))
 RTS_SOURCE   := .
-# $(AVR_ADA_HOME)/gcc-$(major).$(minor)-rts
 
 
 ###############################################################
