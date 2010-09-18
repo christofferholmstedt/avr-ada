@@ -37,7 +37,6 @@ package AVR.UART is
    procedure Init (Baud_Divider : Unsigned_16;
                    Double_Speed : Boolean := False);
 
-   --  procedure OSCCAL_Calibration;
 
    --  used for interfacing with C
    --  can put out a C like zero ended string
@@ -87,8 +86,6 @@ package AVR.UART is
 
 
 private
-   --  procedure Init_Baud (Baud : Baud_Rate) renames Init;
-   --  pragma Inline (Init_Baud);
 
    pragma Inline (Get);
    pragma Inline (Put_Raw);

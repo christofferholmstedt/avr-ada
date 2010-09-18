@@ -23,9 +23,6 @@ with AVR.Interrupts;
 package body AVR.Timer2 is
 
 
-   -- Overflow_Count : Unsigned_16;
-   -- pragma Volatile (Overflow_Count);
-
 #if MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa" or else MCU = "atmega169" then
    Output_Compare_Reg : Unsigned_8 renames MCU.OCR2A;
 #elsif mcu = "atmega32" then
@@ -134,10 +131,6 @@ package body AVR.Timer2 is
 
       Output_Compare_Reg := Overflow;
 
-      --  clear interrupt-flags of timer/counter0
-      -- MCU.TIFR2 := 16#FF#;
-
-      --  reset all counters
       -- Clear_Overflow_Count;
       MCU.TCNT2 := 0;
 
@@ -179,10 +172,6 @@ package body AVR.Timer2 is
       --  enable Timer2 overflow interrupt
       Overflow_Interrupt_Enable := True;
 
-      --  clear interrupt-flags of timer/counter0
-      -- MCU.TIFR2 := 16#FF#;
-
-      --  reset all counters
       -- Clear_Overflow_Count;
       MCU.TCNT2 := 0;
 

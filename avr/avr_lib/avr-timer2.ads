@@ -21,11 +21,6 @@ with AVR.MCU;
 package AVR.Timer2 is
    pragma Preelaborate;
 
-   --     type Mode_Type is (Normal,              --  normal
-   --                        CTC,                 --  clear timer on compare
-   --                        Fast_PWM,            --  fast pulse width modulation
-   --                        Phase_Correct_PWM);  --  phase correct PWM
-
 
    subtype Scale_Type is Unsigned_8;
    function No_Clock_Source return Scale_Type;
