@@ -20,7 +20,7 @@ with Interfaces;                   use type Interfaces.Unsigned_8;
 with AVR.Real_Time.Clock;
 
 -- debug
---with Ada.Text_IO;
+-- with Ada.Text_IO;
 -- with AVR.Strings;
 
 package body AVR.Real_Time.Timing_Events is
@@ -143,7 +143,7 @@ package body AVR.Real_Time.Timing_Events is
    procedure Set_Handler
      (Event   : access Timing_Event;
       At_Time : Time;
-      Handler : access procedure (Event : access Timing_Event))
+      Handler : Timing_Event_Handler)
    is
    begin
       -- remove existing handler for this event
@@ -168,7 +168,7 @@ package body AVR.Real_Time.Timing_Events is
    procedure Set_Handler
      (Event   : access Timing_Event;
       In_Time : Time_Span;
-      Handler : access procedure (Event : access Timing_Event))
+      Handler : Timing_Event_Handler)
    is
    begin
       Set_Handler (Event, Clock + In_Time, Handler);
@@ -176,7 +176,7 @@ package body AVR.Real_Time.Timing_Events is
 
 
    function Current_Handler
-     (Event : Timing_Event) return access procedure (Event : access Timing_Event)
+     (Event : Timing_Event) return Timing_Event_Handler
    is
    begin
       return Event.Handler;

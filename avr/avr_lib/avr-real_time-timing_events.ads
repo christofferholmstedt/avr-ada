@@ -20,23 +20,23 @@ package AVR.Real_Time.Timing_Events is
    type Timing_Event_Handler
      is access procedure (Event : access Timing_Event);
 
---     procedure Set_Handler
---       (Event   : access Timing_Event;
---        At_Time : Time;
---        Handler : Timing_Event_Handler);
-
    procedure Set_Handler
      (Event   : access Timing_Event;
       At_Time : Time;
-      Handler : access procedure (Event : access Timing_Event));
+      Handler : Timing_Event_Handler);
+
+   --  procedure Set_Handler
+   --    (Event   : access Timing_Event;
+   --     At_Time : Time;
+   --     Handler : access procedure (Event : access Timing_Event));
 
    procedure Set_Handler
      (Event   : access Timing_Event;
       In_Time : Time_Span;
-      Handler : access procedure (Event : access Timing_Event));
+      Handler : Timing_Event_Handler);
 
    function Current_Handler
-     (Event : Timing_Event) return access procedure (Event : access Timing_Event);
+     (Event : Timing_Event) return Timing_Event_Handler;
 
    procedure Cancel_Handler
      (Event     : access Timing_Event;
@@ -58,7 +58,7 @@ private
       --  The time at which the user's handler should be invoked when the
       --  event is "set" (i.e., when Handler is not null).
 
-      Handler : access procedure (Event : access Timing_Event);
+      Handler : Timing_Event_Handler;
       --  An access value designating the protected procedure to be invoked
       --  at the Timeout time in the future.  When this value is null the event
       --  is said to be "cleared" and no timeout is processed.

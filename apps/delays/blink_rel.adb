@@ -15,61 +15,29 @@
 -- executable file might be covered by the GNU Public License.           --
 ---------------------------------------------------------------------------
 
---  Make the LED blink using relative delays (i.e. delay <duration>).
+--
+--  use standard Ada relative delays for blinking.
+--
+--  depending on the configuration settings in the AVR support library
+--  that either uses AVR.Real_Time is busy waits form AVR.Wait;
+--
 
-with AVR;                          use AVR;
-with AVR.MCU;
+with LED;
 
 procedure Blink_Rel is
 
-   JTD      : Boolean renames MCU.MCUCR_Bits (MCU.JTD_Bit);
-
-   LED1_Pin : constant AVR.Bit_Number := 6;
-   LED2_Pin : constant AVR.Bit_Number := 4;
-   LED1_DD  : Boolean renames AVR.MCU.DDRB_Bits (LED1_Pin);
-   LED2_DD  : Boolean renames AVR.MCU.DDRB_Bits (LED2_Pin);
-   LED1     : Boolean renames AVR.MCU.PortB_Bits (LED1_Pin);
-   LED2     : Boolean renames AVR.MCU.PortB_Bits (LED2_Pin);
-
-   Cycle : constant := 1.0;
-
-   procedure Wait_Long is
-   begin
-      delay Cycle;
-   end Wait_Long;
-
-   procedure LED_Off;
-   pragma Inline (LED_Off);
-
-   procedure LED_On;
-   pragma Inline (LED_On);
-
-   procedure LED_Off is
-   begin
-      LED1 := Low;
-      LED2 := High;
-   end LED_Off;
-
-   procedure LED_On is
-   begin
-      LED1 := High;
-      LED2 := Low;
-   end LED_On;
+   Off_Cycle : constant := 1.0;
+   On_Cycle  : constant := 1.0;
 
 begin
-   --  disable JTAG on Butterfly for enabling access to port F
-   -- JTD := True;
-   -- MCU.MCUCR := MCU.JTD_Mask;
-
    --  configure LED as output
-   LED1_DD := DD_Output;
-   LED2_DD := DD_Output;
+   LED.Init;
 
    loop
-      LED_Off;
-      Wait_Long;
-      LED_On;
-      Wait_Long;
+      LED.Off_1;
+      delay Off_Cycle;
+      LED.On_1;
+      delay On_Cycle;
    end loop;
 
 end Blink_Rel;

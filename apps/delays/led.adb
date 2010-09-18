@@ -15,36 +15,54 @@
 -- executable file might be covered by the GNU Public License.           --
 ---------------------------------------------------------------------------
 
---
---  use the Real_Time package and standard Ada delays for blinking
---
-
 with AVR;                          use AVR;
-with AVR.Real_Time;                use AVR.Real_Time; -- make "+" visible
-with AVR.Real_Time.Clock;
-with LED;
+with AVR.MCU;
 
-procedure Blink_Abs is
+package body LED is
 
-   Next      : AVR.Real_Time.Time;
-   Off_Cycle : constant := 1.0;
-   On_Cycle  : constant := 1.0;
+   --  there is a LED on the Arduino platform at Port B, pin 5 (digital pin 13)
+   LED1    : Boolean renames AVR.MCU.PORTB_Bits (5);
+   LED1_DD : Boolean renames AVR.MCU.DDRB_Bits (5);
 
-begin
-   --  configure LED as output
-   LED.Init;
+   LED2    : Boolean renames AVR.MCU.PORTB_Bits (2);
+   LED2_DD : Boolean renames AVR.MCU.DDRB_Bits (2);
 
-   loop
-      Next := Real_Time.Clock + Off_Cycle;
 
-      LED.Off_1;
-      delay until Next;
-      Next := Real_Time.Clock + On_Cycle;
+   procedure Init is
+      --  JTD : Boolean renames MCU.MCUCR_Bits (MCU.JTD_Bit);
+   begin
+      -- disable JTAG on Butterfly for enabling access to port F
+      -- JTD := True;
+      -- MCU.MCUCR := MCU.JTD_Mask;
 
-      LED.On_1;
-      delay until Next;
-   end loop;
+      LED1_DD := DD_Output;
+      LED2_DD := DD_Output;
+   end Init;
 
-end Blink_Abs;
+   --  check your actual wiring. The STK500 connects the LEDs between
+   --  the port pin and +5V. You switch them on by setting the pin to
+   --  Low.
+   procedure Off_1 is
+   begin
+      LED1 := True;
+   end Off_1;
+
+   procedure Off_2 is
+   begin
+      LED2 := True;
+   end Off_2;
+
+   procedure On_1 is
+   begin
+      LED1 := False;
+   end On_1;
+
+   procedure On_2 is
+   begin
+      LED2 := False;
+   end On_2;
+
+
+end LED;
 
 

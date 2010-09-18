@@ -16,35 +16,27 @@
 ---------------------------------------------------------------------------
 
 --
---  use the Real_Time package and standard Ada delays for blinking
---
+--  small package to switch on and off two LEDs.  For connection to
+--  the port pins see the body.
 
-with AVR;                          use AVR;
-with AVR.Real_Time;                use AVR.Real_Time; -- make "+" visible
-with AVR.Real_Time.Clock;
-with LED;
+package LED is
 
-procedure Blink_Abs is
+   procedure Init;
 
-   Next      : AVR.Real_Time.Time;
-   Off_Cycle : constant := 1.0;
-   On_Cycle  : constant := 1.0;
+   procedure Off_1;
+   procedure Off_2;
 
-begin
-   --  configure LED as output
-   LED.Init;
+   procedure On_1;
+   procedure On_2;
 
-   loop
-      Next := Real_Time.Clock + Off_Cycle;
+private
 
-      LED.Off_1;
-      delay until Next;
-      Next := Real_Time.Clock + On_Cycle;
+   pragma Inline (Init);
+   pragma Inline (Off_1);
+   pragma Inline (Off_1);
+   pragma Inline (On_1);
+   pragma Inline (On_2);
 
-      LED.On_1;
-      delay until Next;
-   end loop;
-
-end Blink_Abs;
+end LED;
 
 
