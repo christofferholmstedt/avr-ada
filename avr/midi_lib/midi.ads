@@ -279,16 +279,6 @@ package MIDI is
     D_Sharp_8 :     constant := 111;
     E_Flat_8 :      constant := 111;
 
-    ------------------------------------------------------------------
-    -- Shift Operations
-    ------------------------------------------------------------------
-    function Shift_Left(Value : Unsigned_8; Amount : Natural) return Unsigned_8;
-    function Shift_Right(Value : Unsigned_8; Amount : Natural) return Unsigned_8;
-    function Shift_Left(Value : Unsigned_16; Amount : Natural) return Unsigned_16;
-    function Shift_Right(Value : Unsigned_16; Amount : Natural) return Unsigned_16;
-    function Shift_Left(Value : Unsigned_32; Amount : Natural) return Unsigned_32;
-    function Shift_Right(Value : Unsigned_32; Amount : Natural) return Unsigned_32;
-
 private
 
     type Integer_16 is range -2 ** 15 .. 2 ** 15 - 1;
@@ -305,8 +295,5 @@ private
         end record;
 
     No_Cmd :            constant := 16#00#; -- Indicates no status byte in running status
-
-    pragma Inline(Shift_Left);
-    pragma Inline(Shift_Right);
 
 end MIDI;
