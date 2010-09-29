@@ -11,6 +11,7 @@
 
 
 with "avr.gpr";
+with "crc.gpr";
 with "debug_lib.gpr";
 
 project OneWire_Lib is
@@ -36,8 +37,7 @@ project OneWire_Lib is
                          "one_wire-search.ads",    "one_wire-search.adb",
                          "one_wire-commands.ads",
                          "one_wire-temperature_sensors.ads",
-                         "one_wire-temperature_sensors.adb",
-                         "crc8.ads",               "crc8.adb");
+                         "one_wire-temperature_sensors.adb");
 
 
 end OneWire_Lib;

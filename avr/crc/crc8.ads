@@ -23,6 +23,3 @@ function CRC8 (Data : Unsigned_8;
                Seed : Unsigned_8)
                return Unsigned_8;
 pragma Pure (CRC8);
-
-
-

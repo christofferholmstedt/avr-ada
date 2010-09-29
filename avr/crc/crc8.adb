@@ -38,4 +38,3 @@ begin
    end loop;
    return Result;
 end CRC8;
-

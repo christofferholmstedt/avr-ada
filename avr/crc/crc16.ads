@@ -28,5 +28,5 @@ private
     pragma Inline(CRC_High);
     pragma Inline(CRC_Low);
     pragma Inline(CRC_Make);
-    
+
 end CRC16;

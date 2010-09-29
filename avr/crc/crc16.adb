@@ -33,7 +33,7 @@ package body CRC16 is
     begin
         return Unsigned_8( Shift_Right(CRC,8) and 16#00FF# );
     end;
-    
+
     ------------------------------------------------------------------
     -- Return the Low Byte of the Computed CRC-16
     ------------------------------------------------------------------
@@ -41,7 +41,7 @@ package body CRC16 is
     begin
         return Unsigned_8( CRC and 16#00FF# );
     end;
-    
+
     ------------------------------------------------------------------
     -- Make a CRC-16 from Two Received CRC Bytes High and Low
     ------------------------------------------------------------------

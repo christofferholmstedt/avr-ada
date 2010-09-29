@@ -1,4 +1,3 @@
--- -*- mode: ada-gpr -*-
 ---------------------------------------------------------------------------
 -- The AVR-Ada Library is free software;  you can redistribute it and/or --
 -- modify it under terms of the  GNU General Public License as published --
@@ -10,23 +9,23 @@
 ---------------------------------------------------------------------------
 
 with "avr.gpr";
-with "debug_lib.gpr";
 
-project crc16_lib is
+library project crc_lib is
 
-   for Library_Name use "crc16";
-   for Library_Dir  use "crc16/lib";
+   for Library_Name use "crc";
+   for Library_Dir  use "crc/lib";
    for Library_Kind use "static";
 
    for Languages use ("Ada");
-   for Object_Dir use "crc16/obj";
+   for Object_Dir use "crc/obj";
 
    package Builder renames AVR.Builder;
    package Compiler renames AVR.Compiler;
    package Binder renames AVR.Binder;
    package Linker renames AVR.Linker;
 
-   for Source_Dirs use ("crc16");
-   for Source_Files use ("crc16.ads", "crc16.adb");
+   for Source_Dirs use ("crc");
+   for Source_Files use ("crc16.ads", "crc16.adb",
+                         "crc8.ads",  "crc8.adb");
 
-end crc16_lib;
+end crc_lib;
