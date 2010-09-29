@@ -1,2 +1,9 @@
 config
 build
+*.elf
+*.lss
+*.sym
+*.hex
+*.map
+*.eep
+obj
