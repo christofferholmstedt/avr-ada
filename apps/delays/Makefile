@@ -12,8 +12,8 @@
 # This makefile is adapted from the sample Makefile of WinAVR by Eric
 # B. Wedington, Jörg Wunsch and others.  As they released it to the
 # Public Domain, I could pretend that I wrote it myself.  Honestly, I
-# removed many (probably useful) parts to better fit the GNAT project makes. 
-# 
+# removed many (probably useful) parts to better fit the GNAT project makes.
+#
 
 # On command line:
 #
@@ -33,7 +33,7 @@
 
 # MCU name
 # MCU := at90s8515
-MCU := atmega32
+MCU := atmega328p
 
 
 # GNAT project file
@@ -41,7 +41,7 @@ GPR := blink.gpr
 
 
 #put the names of the target files here (without extension)
-ADA_TARGETS := blink_rel
+ADA_TARGETS := blink_rel blink_threads
 
 
 
@@ -52,9 +52,10 @@ PRJ_AVR := $(GCC_PREFIX)avr/ada
 
 # PRJ_PATH := '$(PRJ_AVR)'
 # PRJ_PATH := /k/Data/Development/AVR-Ada/avr
+PRJ_PATH := K:/Data/Development/AVR-Ada.git/avr-ada/avr
 
 #---------------- GNATMAKE Options ----------------
-MFLAGS = -XMCU=$(MCU) -p -P$(GPR) 
+MFLAGS = -XMCU=$(MCU) -p -P$(GPR)
 
 
 
@@ -65,7 +66,7 @@ FORMAT = ihex
 
 #---------------- Programming Options (avrdude) ----------------
 
-# Programming hardware: alf avr910 avrisp bascom bsd 
+# Programming hardware: alf avr910 avrisp bascom bsd
 # dt006 pavr picoweb pony-stk200 sp12 stk200 stk500
 #
 # Type: avrdude -c ?
@@ -90,7 +91,7 @@ AVRDUDE_WRITE_EEPROM = -U eeprom:w:
 #AVRDUDE_NO_VERIFY = -V
 
 # Increase verbosity level.  Please use this when submitting bug
-# reports about avrdude. See <http://savannah.nongnu.org/projects/avrdude> 
+# reports about avrdude. See <http://savannah.nongnu.org/projects/avrdude>
 # to submit bug reports.
 #AVRDUDE_VERBOSE = -v -v
 
@@ -155,11 +156,11 @@ sizeafter: $(ADA_TARGETS_SIZE)
 
 
 # Display compiler version information.
-gccversion : 
+gccversion :
 	@$(CC) --version
 
 
-# Program the device.  
+# Program the device.
 %.prog: %.hex %.eep
 	$(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_WRITE_FLASH)$*.hex
 # $(AVRDUDE_WRITE_EEPROM)
@@ -192,11 +193,11 @@ gccversion :
 
 # Compile: create assembler files from Ada source files.
 %.s : %.adb
-	ADA_PROJECT_PATH=$(PRJ_PATH) $(GNATMAKE) -f -u $(MFLAGS) $< -cargs -S 
+	ADA_PROJECT_PATH=$(PRJ_PATH) $(GNATMAKE) -f -u $(MFLAGS) $< -cargs -S
 
 
 %.s : %.ads
-	ADA_PROJECT_PATH=$(PRJ_PATH) $(GNATMAKE) -f -u $(MFLAGS) $< -cargs -S 
+	ADA_PROJECT_PATH=$(PRJ_PATH) $(GNATMAKE) -f -u $(MFLAGS) $< -cargs -S
 
 
 # Assemble: create object files from assembler source files.
@@ -233,5 +234,5 @@ FORCE:
 
 # Listing of phony targets.
 .PHONY : all finish sizebefore sizeafter gccversion \
-   build elf hex eep lss sym clean clean_list program 
+   build elf hex eep lss sym clean clean_list program
 

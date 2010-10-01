@@ -24,7 +24,6 @@ package body Test_Starterkit is
    -- this constants should be in <avr/io8515.h> !!
    TMC16_CK1024 : constant Nat8 := MCU.CS12_Mask or MCU.CS10_Mask;
 
-
    --  module global variables
    LED : Nat8 := 0;
    pragma Volatile (LED);
@@ -82,7 +81,7 @@ package body Test_Starterkit is
       MCU.TCNT1 := Timer_1_Cnt;
 
       -- enable TCNT1 overflow
-      MCU.TIMSK := MCU.TOIE1_Mask;
+      MCU.TIMSK1 := MCU.TOIE1_Mask;
 
       -- init variable representing the LED state
       LED := 1;
