@@ -15,7 +15,14 @@
 with Demo_Ada;
 
 procedure Demo is
-
 begin
-   Demo_Ada.Main;
+   Demo_Ada.IOinit;
+
+   loop
+      null;
+      --  The main loop of the program does nothing.
+      --  all the work is done by the interrupt routine!
+      --  If this was a real product, we'd probably put a SLEEP instruction
+      --  in this loop to conserve power.
+   end loop;
 end Demo;

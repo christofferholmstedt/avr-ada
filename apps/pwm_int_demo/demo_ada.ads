@@ -1,3 +1,3 @@
 package Demo_Ada is
-   procedure Main;
+   procedure IOinit;
 end Demo_Ada;

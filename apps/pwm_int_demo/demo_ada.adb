@@ -13,24 +13,21 @@
 --    value is either incremented or decremented, that's all.
 
 
-with Interfaces;                   use type Interfaces.Unsigned_8;
 with AVR;                          use AVR;
 with AVR.Interrupts;
+with AVR.Timer1;
 with AVR.MCU;
 
 
 package body Demo_Ada is
 
-   OCR    : Nat16 renames MCU.OCR1A;
-   -- OC1_Bit    : constant Bit_Number := MCU.PORTB3;
+   OCR    : Nat16 renames  MCU.OCR1A;   --  output compare register
    OC1    : Boolean renames MCU.PORTB_Bits (3);
-   DDROC  : Nat8 renames MCU.DDRB;
-   XCOM11 : constant := MCU.COM1A1_Mask;
+   DDR_OC : Boolean renames MCU.DDRB_Bits (3);
 
    type Direction_Type is (Up, Down);
-
    --  "volatile" makes sure that the content is stored in SRAM - not in
-   --  a register(its not realy necessary in this program)
+   --  a register (its not realy necessary in this program)
    pragma Volatile (Direction_Type);
 
 
@@ -42,25 +39,20 @@ package body Demo_Ada is
    PWM : PWM_10Bit;
    Direction : Direction_Type;
 
-   procedure Timer_Enable_Int (Ints : Nat8);
-   procedure IOinit;
-   procedure Overflow_1_Interrupt;
+   procedure Overflow_Interrupt;
 
    --  "signal" marks the procedure as an interrupt routine
    --  without a "sei" instruction in the prologue
-
-   pragma Machine_Attribute (Entity         => Overflow_1_Interrupt,
+   pragma Machine_Attribute (Entity         => Overflow_Interrupt,
                              Attribute_Name => "signal");
 
    --  Now export the procedure under the name "__vector_N"
-   --  see avr-<MCU> for details
-
    pragma Export (Convention    => C,
-                  Entity        => Overflow_1_Interrupt,
-                  External_Name => MCU.Sig_TIMER1_OVF1_String);
+                  Entity        => Overflow_Interrupt,
+                  External_Name => Timer1.Signal_Overflow);
 
    --  The interrupt procedure
-   procedure Overflow_1_Interrupt
+   procedure Overflow_Interrupt
    is
    begin
       --  this section determines the new value of the PWM.
@@ -88,15 +80,7 @@ package body Demo_Ada is
 
       OCR := Nat16 (PWM);
 
-   end Overflow_1_Interrupt;
-
-
-   procedure Timer_Enable_Int (Ints : Nat8)
-   is
-   begin
-      MCU.TIMSK := Ints;
-   end Timer_Enable_Int;
-   pragma Inline_Always (Timer_Enable_Int);
+   end Overflow_Interrupt;
 
 
    --  This routine gets called after a reset. It initializes the PWM
@@ -104,37 +88,18 @@ package body Demo_Ada is
    procedure IOinit
    is
    begin
-      --  tmr1 is 10-bit PWM
-      MCU.TCCR1A := MCU.PWM10_Mask or MCU.PWM11_Mask or XCOM11;
+      --  enable OC1 as output
+      DDR_OC := DD_Output;
 
-      --  tmr1 running on full MCU clock
-      MCU.TCCR1B := MCU.CS10_Mask;
+      --  tmr1 running on full MCU clock and 10bit PWM
+      Timer1.Init_PWM (Timer1.No_Prescaling,
+                       Timer1.Fast_PWM_10bit);
 
-      --  set PWM value to 0
-      OCR := Nat16'(0);
+      --  enable timer1 overflow interrupt
+      Timer1.Enable_Interrupt_Overflow;
 
-      --  enable OC1 and PB2 as output
-      DDROC := OC1;
-
-      Timer_Enable_Int (MCU.TOIE1);
-
-      --  enable interrupts
+      --  generally enable interrupts
       AVR.Interrupts.Enable_Interrupts;
-   end ioinit;
-
-
-   procedure Main
-   is
-   begin
-      IOinit;
-
-      loop
-         null;
-         --  The main loop of the program does nothing.
-         --  all the work is done by the interrupt routine!
-         --  If this was a real product, we'd probably put a SLEEP instruction
-         --  in this loop to conserve power.
-      end loop;
-   end Main;
+   end IOinit;
 
 end Demo_Ada;
