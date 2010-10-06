@@ -37,6 +37,10 @@ package AVR.UART is
    procedure Init (Baud_Divider : Unsigned_16;
                    Double_Speed : Boolean := False);
 
+   type Buffer_Ptr is access all Nat8_Array;
+   procedure Init_Interrupt_Read (Baud_Divider   : Unsigned_16;
+                                  Double_Speed   : Boolean := False;
+                                  Receive_Buffer : Buffer_Ptr);
 
    --  used for interfacing with C
    --  can put out a C like zero ended string
@@ -56,7 +60,8 @@ package AVR.UART is
    procedure Put_Line (S : AVR_String);
    procedure Put_Line (S : Chars_Ptr);
 
-   procedure New_Line;
+   procedure New_Line;  --  only line-feed (LF)
+   procedure CRLF;      --  DOS like CR & LF
 
    procedure Put (Data : Unsigned_8;
                   Base : Unsigned_8 := 10);
@@ -73,28 +78,23 @@ package AVR.UART is
    --  Input routines
    function Get return Character;
    function Get_Raw return Unsigned_8;
+   procedure Get_Raw (Byte : out Unsigned_8);
+   function Have_Input return Boolean;
 
    procedure Get_Line (S    : out AVR_String;
                        Last : out Unsigned_8);
-
-   --
-   --  LIN
-   --
-   procedure Sender_Mode;
-   procedure Receiver_Mode;
-   procedure Send_LIN_Break;
-
 
 private
 
    pragma Inline (Get);
    pragma Inline (Put_Raw);
+   pragma Inline (Have_Input);
 
    procedure Put_Char (Ch : Character) renames Put;
    pragma Inline (Put_Char);
 
-   pragma Inline (Sender_Mode);
-   pragma Inline (Receiver_Mode);
+   pragma Inline (New_Line);
+   pragma Inline (CRLF);
 
 end AVR.UART;
 

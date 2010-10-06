@@ -18,10 +18,24 @@
 with Ada.Unchecked_Conversion;
 with System;                            use type System.Address;
 with AVR.Int_Img;
+with Avr.Interrupts;
 with AVR.MCU;                           use AVR.MCU;
-with AVR.Config;
 
 package body AVR.UART is
+
+
+   ------------------------------------------------------------------------
+   --
+   --  set the buffer size to your needs and your available RAM.  The
+   --  size must not exceed 256.  Preferable are powers of 2 as we use
+   --  "mod" of this number.
+   --
+   --  Buffer_Size : constant := 8;
+
+   type Receive_Mode_T is (Polled, Interrupt);
+   Receive_Mode : Receive_Mode_T;
+
+
 
 #if UART = "usart0" then
    UCSRA      : Nat8 renames MCU.UCSR0A;
@@ -44,12 +58,22 @@ package body AVR.UART is
    UDR        : Nat8 renames MCU.UDR0;
    RXC_Bit    : constant AVR.Bit_Number := MCU.RXC0_Bit;
 
+#if MCU = "atmega162" then
+   Rx_Name    : constant String := MCU.Sig_USART0_RXC_String;
+#elsif MCU = "atmega328p" then
+   Rx_Name    : constant String := MCU.Sig_USART_RX_String;
+#else
+   Rx_Name    : constant String := MCU.Sig_USART0_RX_String;
+#end if;
+
 #elsif UART = "usart" then
 
    UCSZ0_Bit  : constant AVR.Bit_Number := MCU.UCSZ0_Bit;
    UCSZ1_Bit  : constant AVR.Bit_Number := MCU.UCSZ1_Bit;
 
    RXC_Bit    : constant AVR.Bit_Number := MCU.RXC_Bit;
+
+   Rx_Name    : constant String := MCU.Sig_USART_RX_String;
 
 #elsif UART = "uart" then
    UCSRA_Bits : Bits_In_Byte renames MCU.USR_Bits;
@@ -63,7 +87,10 @@ package body AVR.UART is
 
    RXC_Bit    : constant AVR.Bit_Number := MCU.RXC_Bit;
 
+   Rx_Name    : constant String := MCU.Sig_UART_RX_String;
+
 #end if;
+
 
    --
    --  Init
@@ -79,9 +106,8 @@ package body AVR.UART is
    --     Init (Ubrr, False);
    --  end Init;
 
-
-   procedure Init (Baud_Divider : Unsigned_16;
-                   Double_Speed : Boolean := False)
+   procedure Init_Common (Baud_Divider : Unsigned_16;
+                          Double_Speed : Boolean := False)
    is
    begin
       -- Set baud rate
@@ -91,7 +117,6 @@ package body AVR.UART is
       UBRR := Low_Byte (Baud_Divider);
 #end if;
 
-
 #if not UART = "uart" then
       -- Enable 2x speed
       if Double_Speed then
@@ -99,15 +124,10 @@ package body AVR.UART is
       else
          UCSRA := 0;
       end if;
-      -- UCSRA_Bits (U2X_Bit) := Double_Speed;
 #end if;
 
-      -- Enable receiver and transmitter
-      UCSRB := +(RXEN_Bit => True,
-                 TXEN_Bit => True,
-                 others => False);
 
-#if UART = "usart" then
+#if UART = "USART" then
       -- Async. mode, 8N1
       UCSRC := +(UCSZ0_Bit => True,
                  UCSZ1_Bit => True,
@@ -117,14 +137,63 @@ package body AVR.UART is
       --  at least on atmega8 UCSRC and UBRRH share the same address.
       --  When writing to the ACSRC register, the URSEL must be set,
       --  too.
-#elsif UART = "usart0" then
+#elsif UART = "USART0" then
       -- Async. mode, 8N1
       UCSRC := +(UCSZ0_Bit => True,
                  UCSZ1_Bit => True,
                  others => False);
 
 #end if;
+   end Init_Common;
+
+
+   procedure Init (Baud_Divider : Unsigned_16;
+                   Double_Speed : Boolean := False)
+   is
+   begin
+      Init_Common (Baud_Divider, Double_Speed);
+
+      -- Enable receiver and transmitter
+      UCSRB := +(RXEN_Bit => True,
+                 TXEN_Bit => True,
+                 others => False);
+      Receive_Mode := Polled;
    end Init;
+
+
+
+   Rx_Buf : Buffer_Ptr;
+   Rx_Inx, Rx_Outx : Unsigned_8;
+   pragma Volatile(Rx_Inx);
+
+
+   procedure Init_Interrupt_Read (Baud_Divider   : Unsigned_16;
+                                  Double_Speed   : Boolean := False;
+                                  Receive_Buffer : Buffer_Ptr)
+   is
+      Data : Unsigned_8;
+   begin
+      Init_Common (Baud_Divider, Double_Speed);
+
+      -- Enable receiver and transmitter
+      UCSRB := +(RXEN_Bit => True,
+                 TXEN_Bit => True,
+                 RXCIE0_Bit => True,     -- Enable Receiver interrupts
+                 others => False);
+
+
+      -- Clear UART input queue
+      while UCSRA_Bits(RXC_Bit) = True loop
+         Data := UDR;     -- Empty data buffer
+      end loop;
+      Rx_Buf := Receive_Buffer;
+      Rx_Inx := Rx_Buf.all'First;
+      Rx_Outx := Rx_Buf.all'First;
+
+      Interrupts.Enable_Interrupts;
+
+      Receive_Mode := Interrupt;
+   end Init_Interrupt_Read;
 
 
    function To_U8 is
@@ -242,6 +311,15 @@ package body AVR.UART is
    end New_Line;
 
 
+   procedure CRLF is
+      LF : constant := 16#0A#;
+      CR : constant := 16#0D#;
+   begin
+      Put_Raw (CR);
+      Put_Raw (LF);
+   end CRLF;
+
+
    procedure Put (Data : Unsigned_8;
                   Base : Unsigned_8 := 10)
    is
@@ -315,15 +393,36 @@ package body AVR.UART is
    is
       -- Img : AStr5;
       -- L   : Unsigned_8;
-      pragma Not_Referenced (Base);
+      pragma Unreferenced (Base);
+      type Four_Bytes is array (0..3) of Unsigned_8;
+      Bytes : Four_Bytes;
+      for Bytes'Address use Data'Address;
    begin
---      if Base = 16 then
-         Put (Unsigned_8 (Data / 256 / 256 / 256), 16);
-         Put (Unsigned_8 ((Data and 16#00FF0000#) / 256 / 256), 16);
-         Put (Unsigned_8 ((Data and 16#0000FF00#) / 256), 16);
-         Put (Unsigned_8 (Data and 16#000000FF#), 16);
---      end if;
+      --      if Base = 16 then
+      Put (Unsigned_8 (Data / 256 / 256 / 256), 16);
+      Put (Unsigned_8 ((Data and 16#00FF0000#) / 256 / 256), 16);
+      Put (Unsigned_8 ((Data and 16#0000FF00#) / 256), 16);
+      Put (Unsigned_8 (Data and 16#000000FF#), 16);
+      --      end if;
    end Put;
+
+
+   -- Receive ISR Routine
+   procedure Receiver_ISR;
+   pragma Machine_Attribute (Entity => Receiver_ISR, Attribute_Name => "signal");
+   pragma Export (C, Receiver_ISR, Rx_Name);
+
+   procedure Receiver_ISR is
+   begin
+      while UCSRA_Bits (RXC_Bit) = True loop
+         Rx_Buf (Rx_Inx) := UDR;
+         if Rx_Inx = Rx_Buf.all'Last then
+            Rx_Inx := Rx_Buf.all'First;
+         else
+            Rx_Inx := Rx_Inx + 1;
+         end if;
+      end loop;
+   end Receiver_ISR;
 
 
    function Get return Character is
@@ -336,14 +435,45 @@ package body AVR.UART is
 
    function Get_Raw return Unsigned_8 is
    begin
-      while UCSRA_Bits (RXC_Bit) = False loop null; end loop;
-      return UDR;
-      --     0:   80 91 c0 00     lds     r24, 0x00C0
-      --     4:   87 ff           sbrs    r24, 7
-      --     6:   fc cf           rjmp    .-8             ; 0x0
-      --     8:   80 91 c6 00     lds     r24, 0x00C6
-      --     c:   08 95           ret
+      if Receive_Mode = Polled then
+         while UCSRA_Bits (RXC_Bit) = False loop null; end loop;
+         return UDR;
+         --     0:   80 91 c0 00     lds     r24, 0x00C0
+         --     4:   87 ff           sbrs    r24, 7
+         --     6:   fc cf           rjmp    .-8             ; 0x0
+         --     8:   80 91 c6 00     lds     r24, 0x00C6
+         --     c:   08 95           ret
+      else -- interrupt
+         declare
+            Byte : Unsigned_8;
+         begin
+
+            while Rx_Outx = Rx_Inx loop null; end loop;
+
+            Byte := Rx_Buf (Rx_Outx);
+
+            if Rx_Outx = Rx_Buf.all'Last then
+               Rx_Outx := Rx_Buf.all'First;
+            else
+         Rx_Outx := Rx_Outx + 1;
+            end if;
+
+            return Byte;
+         end;
+      end if;
    end Get_Raw;
+
+
+   procedure Get_Raw (Byte : out Unsigned_8) is
+   begin
+      Byte := Get_Raw;
+   end Get_Raw;
+
+
+   function Have_Input return Boolean is
+   begin
+      return Rx_Outx /= Rx_Inx;
+   end;
 
 
    procedure Get_Line (S    : out AVR_String;
@@ -365,87 +495,4 @@ package body AVR.UART is
       return;
    end Get_Line;
 
-
-   procedure Sender_Mode
-   is
-   begin
-      -- Enable transmitter
-      UCSRB := +(TXEN_Bit => True,
-                 others => False);
-   end Sender_Mode;
-
-
-   procedure Receiver_Mode
-   is
-   begin
-      -- Enable receiver
-      UCSRB := +(RXEN_Bit => True,
-                 others => False);
-   end Receiver_Mode;
-
-
-   procedure Send_LIN_Break is
-#if not UART = "uart" then
-      Orig_Baud_Divider : constant Unsigned_16 := UBRR;
-#else
-      Orig_Baud_Divider : constant Unsigned_8 := UBRRL;
-#end if;
-   begin
-      --  We send a 16#00#. That will pull the line low for 9 bit
-      --  lengths.  In order to achieve a low of 13 bit times we have
-      --  to increase the bit time by about 50%, i.e. reduce the baud
-      --  rate by 2/3.
-      --
-      --  the Baud rate calculates as follows:
-      --               Freq
-      --  Baud = ---------------
-      --          16 (UBBR + 1)
-      --
-      --  after transformation we get
-      --
-      --  UBBR (2/3Baud) = 1.5(UBBR + 1) - 1
-      --
-      --  I consider that formula too complicated for what we need.
-      --  The pragmatic solution is to simply double the existing UBBR
-      --  value.
-      --
-      --  The current setting is in UBBR
-      --
-      --  Freq [MHz] | Baud rate | UBBR |
-      --      8.0    |      9600 |   51 |
-      --
-      UBRR := UBRR * 2;
-
-
-#if UART = "usart" then
-      -- Async. mode, 8N1
-      UCSRC := +(UCSZ0_Bit => True,
-                 UCSZ1_Bit => True,
-                 URSEL_Bit => True,
-                 others => False);
-
-      --  at least on atmega8 UCSRC and UBRRH share the same address.
-      --  When writing to the ACSRC register, the URSEL must be set,
-      --  too.
-#elsif UART = "usart0" then
-      -- Async. mode, 8N1
-      UCSRC := +(UCSZ0_Bit => True,
-                 UCSZ1_Bit => True,
-                 others => False);
-
-#end if;
-
-      --
-      Put_Raw (16#00#);
-
-      --  reset the baud divider
-      UBRR := Orig_Baud_Divider;
-
-   end Send_LIN_Break;
-
-
 end AVR.UART;
-
--- Local Variables:
--- mode:ada
--- End:
