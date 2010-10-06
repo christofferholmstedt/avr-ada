@@ -16,23 +16,23 @@
 ---------------------------------------------------------------------------
 
 
-with Blink_Threads_Pkg;            use Blink_Thread_Pkg;
+with Blink_Threads_Pkg;            use Blink_Threads_Pkg;
 with AVR;                          use AVR;
 with AVR.Timer2;
-with Threads;
+with AVR.Threads;
 with LED;
 
 procedure Blink_Threads is
 begin
    LED.Init;
 
-   Set_Timer (Timer2.Scale_By_256, 128);
+   Threads.Set_Timer (Timer2.Scale_By_256, 128);
 
-   Thread.Start (Context_2, Blinky_2'Access);
-   Thread.Start (Context_1, Blinky_1'Access);
+   Threads.Start (Context_2, Blinky_2'Access);
+   Threads.Start (Context_1, Blinky_1'Access);
 
    loop
-      Thread.Yield;
+      Threads.Yield;
    end loop;
 
 end Blink_Threads;

@@ -31,16 +31,14 @@ package body Blink_TE_Pkg is
    is
    begin
       LED.Off_1;
-      Set_Handler (E, 0.5, LED_On_Handler'Access);
+      Set_Handler (Ev, 0.5, LED_On_Handler'Access);
    end LED_Off_Handler;
 
    procedure LED_On_Handler (Ev : access Timing_Event)
    is
    begin
       LED.On_1;
-      Set_Handler (E, 0.5, LED_Off_Handler'Access);
+      Set_Handler (Ev, 0.5, LED_Off_Handler'Access);
    end LED_On_Handler;
 
 end Blink_TE_Pkg;
-
-

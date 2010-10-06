@@ -41,7 +41,7 @@ GPR := blink.gpr
 
 
 #put the names of the target files here (without extension)
-ADA_TARGETS := blink_rel blink_threads
+ADA_TARGETS := blink_rel blink_te blink_threads
 
 
 
@@ -136,7 +136,7 @@ ADA_TARGETS_SYM = $(addsuffix .sym, $(ADA_TARGETS))
 ADA_TARGETS_SIZE = $(addsuffix .size, $(ADA_TARGETS))
 
 # Create the necessary sub-directories
-SUBDIRS := obj owobj owlib
+SUBDIRS := obj
 
 
 

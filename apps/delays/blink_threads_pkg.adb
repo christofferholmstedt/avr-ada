@@ -17,14 +17,14 @@
 
 
 with AVR;                          use AVR;
-with AVR.MCU;
-with Threads;
+with AVR.Threads;
 with LED;
 
 package body Blink_Threads_Pkg is
 
    procedure Delay_MS (MS : Natural) is
-      Ticks : Natural := Natural'Max (MS/2, 1);
+      use Threads;
+      Ticks : constant Threads.Ticks_T := Ticks_T'Max (Ticks_T(MS)/2, 1);
    begin
       Threads.Sleep (Ticks);
    end;

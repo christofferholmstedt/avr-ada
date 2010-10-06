@@ -16,7 +16,8 @@
 ---------------------------------------------------------------------------
 
 
-with Threads;
+with AVR;                          use AVR;
+with AVR.Threads;
 
 package Blink_Threads_Pkg is
 

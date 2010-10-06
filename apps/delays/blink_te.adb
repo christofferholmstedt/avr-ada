@@ -36,5 +36,3 @@ begin
       AVR.Real_Time.Timing_Events.Process;
    end loop;
 end Blink_TE;
-
-
