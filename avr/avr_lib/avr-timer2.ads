@@ -15,6 +15,7 @@
 -- executable file might be covered by the GNU Public License.           --
 ---------------------------------------------------------------------------
 
+
 with Interfaces;                   use Interfaces;
 with AVR.MCU;
 
@@ -22,6 +23,12 @@ package AVR.Timer2 is
    pragma Preelaborate;
 
 
+   --
+   --  Different scaling factors for timer clock input.
+   --
+   --  Verify in the data sheet that the scaling factor is available
+   --  at all for your mcu.
+   --
    subtype Scale_Type is Unsigned_8;
    function No_Clock_Source return Scale_Type;
    function No_Prescaling   return Scale_Type;
@@ -34,12 +41,18 @@ package AVR.Timer2 is
 
    procedure Init_Normal (Prescaler : Scale_Type);
    procedure Init_CTC (Prescaler : Scale_Type; Overflow : Unsigned_8 := 0);
+   procedure Set_Overflow_At (Overflow : Unsigned_8);
+
+   procedure Set_Output_Compare_Mode_Normal;
+   procedure Set_Output_Compare_Mode_Toggle;
+   procedure Set_Output_Compare_Mode_Clear;
+   procedure Set_Output_Compare_Mode_Set;
+
    procedure Stop;  --  set prescaler to No_Clock_Source, disable timer interrupts
    procedure Enable_Interrupt_Compare;
    procedure Enable_Interrupt_Overflow;
-   procedure Set_Overflow_At (Overflow : Unsigned_8);
 
-#if MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa" then
+#if MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa" or else MCU = "atmega328p" then
    Signal_Compare  : constant String := MCU.Sig_Timer2_CompA_String;
 #elsif MCU = "atmega169" or else MCU = "atmega32" then
    Signal_Compare  : constant String := MCU.Sig_Timer2_Comp_String;

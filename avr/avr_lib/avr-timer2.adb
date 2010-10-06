@@ -23,21 +23,21 @@ with AVR.Interrupts;
 package body AVR.Timer2 is
 
 
-#if MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa" or else MCU = "atmega169" then
+#if MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa" or else MCU = "atmega169" or else MCU = "atmega328p" then
    Output_Compare_Reg : Unsigned_8 renames MCU.OCR2A;
 #elsif mcu = "atmega32" then
    Output_Compare_Reg : Unsigned_8 renames MCU.OCR2;
 #end if;
 
 
-#if MCU = "attiny13" or else MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa" or else MCU = "atmega169" then
+#if MCU = "attiny13" or else MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa" or else MCU = "atmega169" or else MCU = "atmega328p" then
    Ctrl_Reg       : Bits_In_Byte renames MCU.TCCR2A_Bits;
 #elsif MCU = "atmega32" then
    Ctrl_Reg       : Bits_In_Byte renames MCU.TCCR2_Bits;
 #end if;
 
 
-#if MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa"
+#if MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa" or else MCU = "atmega328p" then
    Prescale_Reg   : Unsigned_8 renames MCU.TCCR2B;
 #elsif MCU = "atmega169" then
    Prescale_Reg   : Unsigned_8 renames MCU.TCCR2A;
@@ -45,7 +45,7 @@ package body AVR.Timer2 is
    Prescale_Reg   : Unsigned_8 renames MCU.TCCR2;
 #end if;
 
-#if MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa" or else MCU = "atmega169" then
+#if MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa" or else MCU = "atmega169" or else MCU = "atmega328p" then
    Interrupt_Mask : Bits_In_Byte renames MCU.TIMSK2_Bits;
    Output_Compare_Interrupt_Enable : Boolean renames MCU.TIMSK2_Bits (MCU.OCIE2A_Bit);
    Overflow_Interrupt_Enable       : Boolean renames MCU.TIMSK2_Bits (MCU.TOIE2_Bit);
@@ -105,7 +105,7 @@ package body AVR.Timer2 is
 
       --  set the control register with the prescaler and mode flags to
       --  timer output compare mode and clear timer on compare match
-#if MCU = "attiny13" or else MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa" or else MCU = "atmega169" then
+#if MCU = "attiny13" or else MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa" or else MCU = "atmega169" or else MCU = "atmega328p" then
       Ctrl_Reg := (MCU.COM2A0_Bit => False, --  \  normal operation,
                    MCU.COM2A1_Bit => False, --  /  OC0 disconnected
 
@@ -148,7 +148,7 @@ package body AVR.Timer2 is
 
       --  set the control register with the prescaler and mode flags to
       --  timer output compare mode and clear timer on compare match
-#if MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa" or else MCU = "atmega169" then
+#if MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa" or else MCU = "atmega169" or else MCU = "atmega328p" then
       Ctrl_Reg := (MCU.COM2A0_Bit => False, --  \  normal operation,
                    MCU.COM2A1_Bit => False, --  /  OC0 disconnected
 
@@ -178,6 +178,39 @@ package body AVR.Timer2 is
       Interrupts.Restore (Interrupt_Status);
 
    end Init_Normal;
+
+
+#if MCU = "attiny13" or else MCU = "atmega168" or else MCU = "atmega169" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" then
+   Com0 : Boolean renames Ctrl_Reg (MCU.COM2A0_Bit);
+   Com1 : Boolean renames Ctrl_Reg (MCU.COM2A1_Bit);
+#elsif MCU = "atmega32" then
+   Com0 : Boolean renames Ctrl_Reg (MCU.COM20_Bit);
+   Com1 : Boolean renames Ctrl_Reg (MCU.COM21_Bit);
+#end if;
+
+   procedure Set_Output_Compare_Mode_Normal is
+   begin
+      Com0 := False;
+      Com1 := False;
+   end Set_Output_Compare_Mode_Normal;
+
+   procedure Set_Output_Compare_Mode_Toggle is
+   begin
+      Com0 := True;
+      Com1 := False;
+   end Set_Output_Compare_Mode_Toggle;
+
+   procedure Set_Output_Compare_Mode_Set is
+   begin
+      Com0 := True;
+      Com1 := True;
+   end Set_Output_Compare_Mode_Set;
+
+   procedure Set_Output_Compare_Mode_Clear is
+   begin
+      Com0 := False;
+      Com1 := True;
+   end Set_Output_Compare_Mode_Clear;
 
 
    procedure Stop is

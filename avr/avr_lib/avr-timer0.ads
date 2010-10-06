@@ -22,10 +22,6 @@ with AVR.MCU;
 package AVR.Timer0 is
    pragma Preelaborate;
 
-   type Mode_Type is (Normal,              --  normal
-                      CTC,                 --  clear timer on compare
-                      Fast_PWM,            --  fast pulse width modulation
-                      Phase_Correct_PWM);  --  phase correct PWM
 
    --
    --  Different scaling factors for timer clock input.
