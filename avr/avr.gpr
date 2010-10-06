@@ -1,4 +1,3 @@
--- -*- Mode: Ada-GPR -*-
 ---------------------------------------------------------------------------
 -- The AVR-Ada Library is free software;  you can redistribute it and/or --
 -- modify it under terms of the  GNU General Public License as published --
@@ -91,23 +90,6 @@ project AVR is
       for Default_Switches ("Ada") use
         ("-freestanding");       -- small binder file
    end Binder;
-
-
-   package Linker is
-      for Default_Switches ("Ada") use
-        (--  the following line does not solve the problem that
-         --  avr-gnatlink does not find the target parameters in
-         --  system.ads
-         --  "--RTS=rts/" & Arch,     -- tell the linker about the RTS
-         --
-         "-Wl,--gc-sections",    -- remove sections of unused code
-         "-gdwarf-2",            -- keep binder file
-         "-Wl,--relax",          -- linker relaxation
-         "--GCC=avr-gcc -Os -mmcu=" & MCU
-          & " --RTS=rts/" & Arch
-          & " -fdata-sections -ffunction-sections"
-        );
-   end Linker;
 
 
    for Source_Dirs use ("avr_lib/" & MCU,  --  first look in the MCU specific dir
@@ -221,15 +203,24 @@ project AVR is
 
    Power_Sources    := ("avr-power.ads",         "avr-power.adb");
 
+   Threads_Sources  := ("avr-threads.ads",       "avr-threads.adb");
+
    case MCU.MCU is
       when "at90s2313" | "at90s8515" =>
          for Source_Files use Std_Sources & UART_Sources & EEPROM_Sources
                               & Time_No_Clock_Sources;
 
-      when "atmega168" | "atmega32" | "atmega328p" | "atmega644" | "atmega644p" =>
+      when "atmega32" =>
          for Source_Files use
            Std_Sources & UART_Sources & EEPROM_Sources & Sleep_Sources
            & ADC_Sources & Timer0_Sources & Time_1ms_Sources;
+
+      when "atmega168" | "atmega328p" | "atmega644" | "atmega644p" =>
+         for Source_Files use
+           Std_Sources & UART_Sources & EEPROM_Sources & Sleep_Sources
+           & ADC_Sources & Timer0_Sources & Timer1_Sources & Timer2_Sources
+           & Time_1ms_Sources & Threads_Sources;
+
 
       when "atmega8" | "atmega162" =>
          for Source_Files use Std_Sources & UART_Sources & EEPROM_Sources

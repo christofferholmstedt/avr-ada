@@ -1,4 +1,3 @@
--- -*- Mode: Ada-GPR -*-
 ---------------------------------------------------------------------------
 -- The AVR-Ada Library is free software;  you can redistribute it and/or --
 -- modify it under terms of the  GNU General Public License as published --
@@ -13,6 +12,7 @@
 --  in your own application
 
 with "avr.gpr";
+with "mcu.gpr";
 
 project AVR_App is
 
@@ -29,8 +29,20 @@ project AVR_App is
       --  in the parent directory of the build directory which happens
       --  to be ./obj.
       Mapfile_Opt := "-Wl,-Map=../" & Main_Name & ".map,--cref";
-      for Default_Switches ("Ada") use AVR.Linker'Default_Switches ("Ada")
-        & Mapfile_Opt;
+
+      for Default_Switches ("Ada") use
+        (--  the following line does not solve the problem that
+         --  avr-gnatlink does not find the target parameters in
+         --  system.ads
+         --  "--RTS=rts/" & MCU.Arch,     -- tell the linker about the RTS
+         --
+         "-Wl,--gc-sections",    -- remove sections of unused code
+         "-gdwarf-2",            -- keep binder file
+         "-Wl,--relax",          -- linker relaxation
+         "--GCC=avr-gcc -Os -mmcu=" & MCU.MCU
+          & " --RTS=rts/" & MCU.Arch
+          & " -fdata-sections -ffunction-sections",
+         Mapfile_Opt);
    end Linker;
 
 

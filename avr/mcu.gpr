@@ -252,7 +252,7 @@ abstract project MCU is
    case MCU is
    when "at90s2313"  | "at90s8515"
      => UART := "uart";
-   when "atmega8"    | "atmega32"
+   when "atmega8"    | "atmega32"   | "atmega168"
      => UART := "usart";
    when others
      => UART := "usart0";

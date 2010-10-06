@@ -22,7 +22,7 @@ PREFIX = $(INSTALL_BASE)
 #
 INSTALL_DIR = $(INSTALL_BASE)/lib/gnat
 
-libraries := debug lcd sensirion onewire
+libraries := debug lcd sensirion onewire slip threads
 library_objs := $(patsubst %,%/obj, $(libraries))
 library_libs := $(patsubst %,%/lib, $(libraries))
 library_gprs := $(patsubst %,%_lib.gpr, $(libraries))
@@ -44,7 +44,7 @@ avr_lib/stamp-libs:
 ../config:
 	make -C .. config
 
-install: $(INSTALL_DIR) $(library_objs) $(library_libs) copy_libs $(OBJ_DIRS) 
+install: $(INSTALL_DIR) $(library_objs) $(library_libs) copy_libs $(OBJ_DIRS)
 #   restrict_permissions
 
 restrict_permissions:

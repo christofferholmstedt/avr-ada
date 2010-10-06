@@ -60,7 +60,8 @@ package AVR.Strings is
 
    --  Progmem_String and PStr are not part of the ARM.
    type Progmem_String is new AVR_String;
-   pragma Linker_Section (Progmem_String, ".progmem.data");
+   --  pragma Linker_Section (Progmem_String, ".progmem.data");
+   --  gcc-4.5.1: "pragma "LINKER_SECTION" applies only to objects"
    subtype PStr is Progmem_String;
 
 

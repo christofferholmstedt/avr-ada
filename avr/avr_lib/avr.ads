@@ -28,7 +28,7 @@ package AVR is
 
    --  Version information.  Named numbers are optimzed away if not used.
    AVR_Ada_Version_Major : constant := 1;
-   AVR_Ada_Version_Minor : constant := 0;
+   AVR_Ada_Version_Minor : constant := 2;
    AVR_Ada_Version_Patch : constant := 0;
 
 
