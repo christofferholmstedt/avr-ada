@@ -90,8 +90,8 @@ private
    --  Phase_Freq_Correct_PWM_OCR : constant PWM_Type :=  9; --  TOP = MCU.OCR1A
 
    type PWM_Type is array (0..3) of Boolean;
-   pragma Pack (PWM_Type);
-   for PWM_Type'Size use 8;
+   -- pragma Pack (PWM_Type);
+   -- for PWM_Type'Size use 8;
    Fast_PWM_8bit              : constant PWM_Type := (0 => True,  1 => False, 2 => True,  3 => False); --  TOP = 00FF
    Fast_PWM_9bit              : constant PWM_Type := (0 => False, 1 => True,  2 => True,  3 => False); --  TOP = 01FF
    Fast_PWM_10bit             : constant PWM_Type := (0 => True,  1 => True,  2 => True,  3 => False); --  TOP = 03FF

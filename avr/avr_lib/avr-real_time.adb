@@ -272,10 +272,7 @@ package body AVR.Real_Time is
       Year       : out Year_Number;
       Month      : out Month_Number;
       Day        : out Day_Number)
-     -- Seconds    : out Day_Duration)
    is
-      pragma Unreferenced (Date);
-      -- D : Day_Count := Date.Days;
       Julian_Day_Of_2000_01_01 : constant := 2451545;
    begin
       Julian_Date (Integer_32 (Date.Days) + Julian_Day_Of_2000_01_01,

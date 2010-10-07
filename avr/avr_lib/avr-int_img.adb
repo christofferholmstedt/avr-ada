@@ -38,6 +38,7 @@ package body AVR.Int_Img is
       Result := Dividend / 10;
       Remainder := Dividend rem 10;
    end U8_Div_10;
+   pragma Unreferenced (U8_Div_10);
 
 
    procedure Nibble_Hex_Img (Data : Unsigned_8; Target : out Character)
@@ -51,7 +52,7 @@ package body AVR.Int_Img is
    end Nibble_Hex_Img;
 
 
-   Dig_8  : constant AVR.Nat8_Array  := (100, 10);
+   Dig_8  : constant AVR.Nat8_Array  := (100, 10); pragma Unreferenced (Dig_8);
    Dig_16 : constant AVR.Nat16_Array  := (10_000, 1_000, 100, 10);
    Dig_32 : constant AVR.Nat32_Array :=
      (1_000_000_000, 100_000_000, 10_000_000,
@@ -133,7 +134,7 @@ package body AVR.Int_Img is
    --  put text representation of decimal number Data into Target
    --  string beginning at the left most character.
    procedure U16_Img_orig (Data : Unsigned_16;
-                      Target : out AStr5; Last : out Unsigned_8) is
+                           Target : out AStr5; Last : out Unsigned_8) is
       Val     : Unsigned_16 := Data;
       D       : Unsigned_8;
       Is_Zero : Boolean := True;
@@ -153,7 +154,7 @@ package body AVR.Int_Img is
       end loop;
       Target (Last) := Character'Val (48 + Val);
    end U16_Img_orig;
-
+   pragma Unreferenced (U16_Img_Orig);
 
    procedure U16_Img (Data : Unsigned_16;
                       Target : out AStr5; Last : out Unsigned_8) is
@@ -177,7 +178,7 @@ package body AVR.Int_Img is
       Last := Target'Last - L + 1;
       Target (Target'First .. Last) := Tmp_Img (L .. 5);
    end U16_Img_New;
-
+   pragma Unreferenced (U16_Img_New);
 
    --  put text representation of decimal number Data into Target
    --  string right aligned.  Leading characters are filled with
@@ -199,7 +200,7 @@ package body AVR.Int_Img is
          end loop;
       end if;
    end U16_Img_Right_Old;
-
+   pragma Unreferenced (U16_Img_Right_Old);
 
    procedure U16_Img_Right (Data : Unsigned_16; Target : out AStr5)
    is

@@ -176,7 +176,7 @@ abstract project MCU is
    when "atmega103"
      => Arch := "avr31";
 
-   when "at90usb82"  | "at90usb162"  | "atmega8u2"  | "atmega16u2"  | "atmega32u2"
+   when "at90usb82"  | "at90usb162" | "atmega8u2"  | "atmega16u2" | "atmega32u2"
       | "attiny167"
      => Arch := "avr35";
 
@@ -197,7 +197,7 @@ abstract project MCU is
       | "atmega6490" | "atmega64c1" | "atmega64m1"
      => Arch := "avr5";
 
-   when "at90can128" | "at90usb1286"| "at90usb1287" | "atmega128"  | "atmega1280"
+   when "at90can128" | "at90usb1286"| "at90usb1287"| "atmega128"  | "atmega1280"
       | "atmega1281" | "atmega1284p"
      => Arch := "avr51";
 
@@ -252,7 +252,7 @@ abstract project MCU is
    case MCU is
    when "at90s2313"  | "at90s8515"
      => UART := "uart";
-   when "atmega8"    | "atmega32"   | "atmega168"
+   when "atmega8"    | "atmega32"
      => UART := "usart";
    when others
      => UART := "usart0";

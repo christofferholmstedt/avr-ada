@@ -13,28 +13,25 @@ with Interfaces;                   use Interfaces;
 with AVR;                          use AVR;
 with AVR.MCU;
 with AVR.Interrupts;
+with AVR.Timer1;
 
 package body Test_Starterkit is
 
    -- constant definitions
    Timer_1_Cnt : constant := 16#F0BE#;
    -- 1 sec, use AVRcalc to calculate these values
-   -- ((TCNT1H=0xf0, TCNT1L=0xbe)
 
-   -- this constants should be in <avr/io8515.h> !!
-   TMC16_CK1024 : constant Nat8 := MCU.CS12_Mask or MCU.CS10_Mask;
 
-   --  module global variables
    LED : Nat8 := 0;
    pragma Volatile (LED);
-   --  use volatile when variable is accessed from interrupts and in
+   --  use volatile if variable is accessed from interrupts and in
    --  the main program
 
 
    procedure Timer;
    pragma Machine_Attribute (Entity         => Timer,
                              Attribute_Name => "signal");
-   pragma Export (C, Timer, MCU.Sig_TIMER1_COMPA_String);
+   pragma Export (C, Timer, Timer1.Signal_Overflow);
 
    -- signal handler for tcnt1 overflow interrupt
    procedure Timer is
@@ -72,16 +69,11 @@ package body Test_Starterkit is
       -- activate internal pull-up
       MCU.PORTD := 16#FF#;
 
-      -- disable PWM and Compare Output Mode
-      MCU.TCCR1A := 0;
+      --  init timer1, set prescaling, enable overflow interrupt
+      Timer1.Init_Normal (Prescaler => Timer1.Scale_By_1024);
 
-      -- use CLK/1024 prescale value
-      MCU.TCCR1B := TMC16_CK1024;
       -- reset TCNT1
       MCU.TCNT1 := Timer_1_Cnt;
-
-      -- enable TCNT1 overflow
-      MCU.TIMSK1 := MCU.TOIE1_Mask;
 
       -- init variable representing the LED state
       LED := 1;

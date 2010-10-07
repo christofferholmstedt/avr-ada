@@ -213,7 +213,8 @@ project AVR is
       when "atmega32" =>
          for Source_Files use
            Std_Sources & UART_Sources & EEPROM_Sources & Sleep_Sources
-           & ADC_Sources & Timer0_Sources & Time_1ms_Sources;
+           & ADC_Sources & Timer0_Sources & Timer1_Sources
+           & Time_1ms_Sources;
 
       when "atmega168" | "atmega328p" | "atmega644" | "atmega644p" =>
          for Source_Files use

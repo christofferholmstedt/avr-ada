@@ -22,6 +22,7 @@ with Interfaces;                   use Interfaces;
 with AVR;                          use AVR;
 with AVR.MCU;
 with AVR.Wait;
+with AVR.Timer1;
 
 procedure PWM_Demo is
 
@@ -33,9 +34,6 @@ procedure PWM_Demo is
    begin
       AVR.Wait.Wait_4_Cycles (10_000);
    end Wait_10ms;
-
-   CTC1_Mask  : constant Nat8 := MCU.WGM12_Mask; -- on ATmega8
-   PWM10_Mask : constant Nat8 := MCU.WGM10_Mask; -- on ATmega8
 
    OC1A_Pin  : constant Bit_Number := MCU.PORTD5_Bit;
    OC1A_DDR  : Bits_In_Byte renames MCU.DDRD_Bits;
@@ -50,12 +48,11 @@ begin
    OC1A_Port (OC1A_Pin) := False;    -- clear pin5
 
    -- enable 8 bit PWM, select inverted PWM
-   MCU.TCCR1A := PWM10_Mask or MCU.COM1A1_Mask or MCU.COM1A0_Mask;
+   Timer1.Init_PWM (Timer1.Scale_By_8, Timer1.Fast_PWM_8bit, Inverted => True);
 
    --  timer1 running on 1/8 MCU clock with clear timer/counter1 on
    --  Compare Match -- PWM frequency will be MCU clock / 8 / 512,
    --  e.g. with 4Mhz Crystal 977 Hz.
-   MCU.TCCR1B := MCU.CS11_Mask or CTC1_Mask;
 
 
    --

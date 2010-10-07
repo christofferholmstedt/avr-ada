@@ -55,7 +55,7 @@ PRJ_AVR := $(GCC_PREFIX)avr/ada
 
 # PRJ_PATH := '$(PRJ_AVR)'
 # PRJ_PATH := /c/Devel/AVR-Ada/avr
-PRJ_PATH := /k/Data/Development/AVR-Ada.git/avr-ada/avr
+PRJ_PATH := k:/Data/Development/AVR-Ada.git/avr-ada/avr
 
 #---------------- GNATMAKE Options ----------------
 MFLAGS = -XMCU=$(MCU) -p -P$(GPR)
@@ -215,6 +215,9 @@ clean: clean_gnat clean_list
 
 clean_gnat:
 	ADA_PROJECT_PATH=$(PRJ_PATH) avr-gnatclean -XMCU=$(MCU) -P$(GPR)
+
+clean_gnat_recursive:
+	ADA_PROJECT_PATH=$(PRJ_PATH) avr-gnatclean -r -XMCU=$(MCU) -P$(GPR)
 
 clean_list :
 	$(REMOVE) *.hex

@@ -49,6 +49,7 @@ package body AVR.UART is
 
    RXEN_Bit   : constant AVR.Bit_Number := RXEN0_Bit;
    TXEN_Bit   : constant AVR.Bit_Number := TXEN0_Bit;
+   RXCIE_Bit  : constant AVR.Bit_Number := RXCIE0_Bit;
    UCSZ0_Bit  : constant AVR.Bit_Number := UCSZ00_Bit;
    UCSZ1_Bit  : constant AVR.Bit_Number := UCSZ01_Bit;
    U2X_Mask   : constant                := U2X0_Mask;
@@ -73,7 +74,12 @@ package body AVR.UART is
 
    RXC_Bit    : constant AVR.Bit_Number := MCU.RXC_Bit;
 
+#if MCU = "atmega32" then
+   Rx_Name    : constant String := MCU.Sig_USART_RXC_String;
+#else
    Rx_Name    : constant String := MCU.Sig_USART_RX_String;
+#end if;
+
 
 #elsif UART = "uart" then
    UCSRA_Bits : Bits_In_Byte renames MCU.USR_Bits;
@@ -178,7 +184,7 @@ package body AVR.UART is
       -- Enable receiver and transmitter
       UCSRB := +(RXEN_Bit => True,
                  TXEN_Bit => True,
-                 RXCIE0_Bit => True,     -- Enable Receiver interrupts
+                 RXCIE_Bit => True,     -- Enable Receiver interrupts
                  others => False);
 
 
