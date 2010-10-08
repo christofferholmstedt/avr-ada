@@ -153,6 +153,10 @@ project AVR is
 
    UART_Sources     := ("avr-uart.ads",         "avr-uart.adb");
 
+   SPI_Sources      := ("avr-spi.ads",          "avr-spi.adb",
+                        "avr-spi-master.ads",   "avr-spi-master.adb",
+                        "avr-spi-slave.ads",    "avr-spi-slave.adb");
+
    EEPROM_Sources   := ("avr-eeprom.ads",       "avr-eeprom.adb");
 
    WDT_Sources      := ("avr-watchdog.ads",     "avr-watchdog.adb");
@@ -220,7 +224,7 @@ project AVR is
          for Source_Files use
            Std_Sources & UART_Sources & EEPROM_Sources & Sleep_Sources
            & ADC_Sources & Timer0_Sources & Timer1_Sources & Timer2_Sources
-           & Time_1ms_Sources & Threads_Sources;
+           & Time_1ms_Sources & Threads_Sources & SPI_Sources;
 
 
       when "atmega8" | "atmega162" =>

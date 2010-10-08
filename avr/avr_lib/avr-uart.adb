@@ -61,7 +61,7 @@ package body AVR.UART is
 
 #if MCU = "atmega162" then
    Rx_Name    : constant String := MCU.Sig_USART0_RXC_String;
-#elsif MCU = "atmega328p" then
+#elsif MCU = "atmega168" or else MCU = "atmega328p" then
    Rx_Name    : constant String := MCU.Sig_USART_RX_String;
 #else
    Rx_Name    : constant String := MCU.Sig_USART0_RX_String;

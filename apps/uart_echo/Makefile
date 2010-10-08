@@ -21,7 +21,7 @@
 #
 # make clean = Clean out built project files.
 #
-# make file.prog = Download the hex file to the device, using avrdude.
+# make file.prog = Upload the hex file to the device, using avrdude.
 #                Please customize the avrdude settings below first!
 #
 # make filename.s = Just compile filename.adb into the assembler code only.

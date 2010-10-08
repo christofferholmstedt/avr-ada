@@ -40,9 +40,9 @@
 --
 ---------------------------------------------------------------------------
 
+with AVR;                          use AVR;
 with AVR.MCU;
 
-use AVR;
 
 package AVR.SPI is
 
@@ -166,9 +166,14 @@ private
    ------------------------------------------------------------------
    -- PRR - Power Reduction Register
    ------------------------------------------------------------------
+#if MCU = "atmega644p" then
+   PRR :           Nat8 renames MCU.PRR0;
+   BV_PRSPI :      Boolean renames MCU.PRR0_Bits(MCU.PRSPI_Bit);
+#else
    PRR :           Nat8 renames MCU.PRR;
-
    BV_PRSPI :      Boolean renames MCU.PRR_Bits(MCU.PRSPI_Bit);
+#end if;
+
 
    function SPI_Shutdown return Boolean renames True;
    function SPI_Operating return Boolean renames False;
