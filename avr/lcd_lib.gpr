@@ -19,7 +19,7 @@
 
 with "avr.gpr";
 
-project LCD_Lib is
+library project LCD_Lib is
 
    for Library_Name use "lcd";
    for Library_Dir  use "lcd/lib";
@@ -31,7 +31,6 @@ project LCD_Lib is
    package Builder renames AVR.Builder;
    package Compiler renames AVR.Compiler;
    package Binder renames AVR.Binder;
-   package Linker renames AVr.Linker;
 
    for Source_Dirs use ("lcd");
    for Source_Files use ("lcd.ads", "lcd.adb",

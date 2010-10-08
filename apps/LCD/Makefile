@@ -21,7 +21,7 @@
 #
 # make clean = Clean out built project files.
 #
-# make file.prog = Download the hex file to the device, using avrdude.
+# make file.prog = Upload the hex file to the device, using avrdude.
 #                Please customize the avrdude settings below first!
 #
 # make filename.s = Just compile filename.adb into the assembler code only.
@@ -38,11 +38,11 @@ MCU := atmega32
 
 
 # GNAT project file
-GPR := lcd_test.gpr
+GPR := build.gpr
 
 
 # put the names of the target files here (without extension)
-ADA_TARGETS := lcd_test
+ADA_TARGETS := main
 
 
 
@@ -52,7 +52,7 @@ GCC_PREFIX := $(dir $(shell avr-gcc -print-libgcc-file-name))../../../../
 PRJ_AVR := $(GCC_PREFIX)avr/ada
 
 # PRJ_PATH := '$(PRJ_AVR)'
-# PRJ_PATH := /k/Data/Development/AVR-Ada/avr
+PRJ_PATH := k:/Data/Development/AVR-Ada.git/avr-ada/avr
 
 #---------------- GNATMAKE Options ----------------
 MFLAGS = -XMCU=$(MCU) -p -P$(GPR) 
@@ -111,7 +111,7 @@ OBJCOPY  := avr-objcopy
 OBJDUMP  := avr-objdump
 SIZE     := avr-size
 NM       := avr-nm
-AVRDUDE  := /c/Programme/Atmel/AVRDude/avrdude
+AVRDUDE  := avrdude
 REMOVE   := rm -f
 COPY     := cp
 RENAME   := mv

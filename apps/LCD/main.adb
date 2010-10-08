@@ -21,7 +21,7 @@ with AVR.MCU;                      use AVR.MCU;
 
 with LCD;
 
-procedure LCD_Test is
+procedure Main is
 
    procedure Wait_Until_Key_Pressed is
       pragma Inline (Wait_Until_Key_Pressed);
@@ -55,4 +55,4 @@ begin
 
       Wait_Until_Key_Pressed;
    end loop;
-end LCD_Test;
+end Main;
