@@ -44,19 +44,19 @@
 
 package AVR.SPI.Slave is
 
-    type Idle_Proc is access
-        procedure;
+   type Idle_Proc is access
+     procedure;
 
-    type Data_Buffer_Ptr is access all SPI_Data_Type;
+   type Data_Buffer_Ptr is access all SPI_Data_Type;
 
-    ------------------------------------------------------------------
-    -- Ready Slave SPI for Communication with Master Device
-    ------------------------------------------------------------------
-    procedure Slave_IO(
-        Data_Buffer :   in      Data_Buffer_Ptr;    -- Input/Output buffer
-        Count :         in out  Natural;            -- How many bytes to send
-        Error :            out  Boolean;            -- Indicates message truncation or error
-        Idle :          in      Idle_Proc := null   -- Idle procedure (for thread yield etc.)
-    );
+   ------------------------------------------------------------------
+   -- Ready Slave SPI for Communication with Master Device
+   ------------------------------------------------------------------
+   procedure Slave_IO
+     (Data_Buffer : in     Data_Buffer_Ptr;   -- Input/Output buffer
+      Count :       in out Natural;           -- How many bytes to send
+      Error :          out Boolean;           -- Indicates message truncation or error
+      Idle :        in     Idle_Proc := null  -- Idle procedure (for thread yield etc.)
+     );
 
 end AVR.SPI.Slave;

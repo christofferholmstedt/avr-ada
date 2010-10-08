@@ -32,25 +32,25 @@
 --      (if any).
 --  (6) This functionality operates with SPI interrupts off.
 --
----------------------------------------------------------------------------
+---------------------------------------------------------------------
 
 package AVR.SPI.Master is
 
-    type SS_Status_Proc is access
-        procedure(Activate_Select : Boolean);
+   type SS_Status_Proc is access
+     procedure (Activate_Select : Boolean);
 
-    ------------------------------------------------------------------
-    -- Drive the Built-in Slave Select Pin (Optional)
-    ------------------------------------------------------------------
-    procedure SS_Proc(Activate_Select : Boolean);   -- Drives the SS Pin
+   ------------------------------------------------------------------
+   -- Drive the Built-in Slave Select Pin (Optional)
+   ------------------------------------------------------------------
+   procedure SS_Proc (Activate_Select : Boolean);   -- Drives the SS Pin
 
-    ------------------------------------------------------------------
-    -- Initiate SPI Communication as Master
-    ------------------------------------------------------------------
-    procedure Master_IO(
-        Data_Buffer :   in out  SPI_Data_Type;      -- Input/Output buffer
-        SS_Status :     in      SS_Status_Proc      -- Proc to set Slave Select status (or use SS_Proc)
-    );
+   ------------------------------------------------------------------
+   -- Initiate SPI Communication as Master
+   ------------------------------------------------------------------
+   procedure Master_IO
+     (Data_Buffer : in out SPI_Data_Type; -- Input/Output buffer
+      SS_Status :   in     SS_Status_Proc -- Proc to set Slave Select status (or use SS_Proc)
+     );
 
 end AVR.SPI.Master;
 

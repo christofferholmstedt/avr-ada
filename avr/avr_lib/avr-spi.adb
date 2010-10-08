@@ -21,204 +21,200 @@ with AVR.Interrupts;
 
 package body AVR.SPI is
 
-    ------------------------------------------------------------------
-    -- INTERNAL - Configure the SPI Device
-    ------------------------------------------------------------------
-    procedure Config_Device is
-    begin
+   ------------------------------------------------------------------
+   -- INTERNAL - Configure the SPI Device
+   ------------------------------------------------------------------
+   procedure Config_Device is
+   begin
 
-        BV_MSTR := False;          -- For now
+      BV_MSTR := False;          -- For now
 
-        --------------------------------------------------------------
-        -- Disable I/O Pins until we go Master or Slave
-        --------------------------------------------------------------
+      --------------------------------------------------------------
+      -- Disable I/O Pins until we go Master or Slave
+      --------------------------------------------------------------
 
-        BV_DD_SCK  := DD_Input;
-        BV_DD_MISO := DD_Input;
-        BV_DD_MOSI := DD_Input;
-        BV_DD_SS   := DD_Input;
+      BV_DD_SCK  := DD_Input;
+      BV_DD_MISO := DD_Input;
+      BV_DD_MOSI := DD_Input;
+      BV_DD_SS   := DD_Input;
 
-        --------------------------------------------------------------
-        -- However, if Config_SS_Pin, then set up for slave select
-        --------------------------------------------------------------
-        if Config_SS_Pin then           -- Use the SS pin?
-            BV_SS := True;              -- Yes, then set it high for now (inactive)
-            BV_DD_SS  := DD_Output;     -- Make it an output pin
-        end if;
+      --------------------------------------------------------------
+      -- However, if Config_SS_Pin, then set up for slave select
+      --------------------------------------------------------------
+      if Config_SS_Pin then          -- Use the SS pin?
+         BV_SS := True;              -- Yes, then set it high for now (inactive)
+         BV_DD_SS  := DD_Output;     -- Make it an output pin
+      end if;
 
-        --------------------------------------------------------------
-        -- Set the clock mode
-        --------------------------------------------------------------
-        case Config_Clock_Mode is
-            when Sample_Rising_Setup_Falling =>
-                BV_CPOL := False;
-                BV_CPHA := False;
-            when Setup_Rising_Sample_Falling =>
-                BV_CPOL := False;
-                BV_CPHA := True;
-            when Sample_Falling_Setup_Rising =>
-                BV_CPOL := True;
-                BV_CPHA := False;
-            when Setup_Falling_Sample_Rising =>
-                BV_CPOL := True;
-                BV_CPHA := True;
-        end case;
+      --------------------------------------------------------------
+      -- Set the clock mode
+      --------------------------------------------------------------
+      case Config_Clock_Mode is
+         when Sample_Rising_Setup_Falling =>
+            BV_CPOL := False;
+            BV_CPHA := False;
+         when Setup_Rising_Sample_Falling =>
+            BV_CPOL := False;
+            BV_CPHA := True;
+         when Sample_Falling_Setup_Rising =>
+            BV_CPOL := True;
+            BV_CPHA := False;
+         when Setup_Falling_Sample_Rising =>
+            BV_CPOL := True;
+            BV_CPHA := True;
+      end case;
 
-        --------------------------------------------------------------
-        -- Set the clock divisor
-        --------------------------------------------------------------
-        case Config_Clock_Divisor is
-            when By_2 =>            -- Fosc / 2
-                BV_SPI2X := True;
-                BV_SPR1 := False;
-                BV_SPR0 := False;
-            when By_4 =>            -- Fosc / 4
-                BV_SPI2X := False;
-                BV_SPR1 := False;
-                BV_SPR0 := False;
-            when By_8 =>            -- Fosc / 8
-                BV_SPI2X := True;
-                BV_SPR1 := False;
-                BV_SPR0 := True;
-            when By_16 =>           -- Fosc / 16
-                BV_SPI2X := False;
-                BV_SPR1 := False;
-                BV_SPR0 := True;
-            when By_32 =>           -- Fosc / 32
-                BV_SPI2X := True;
-                BV_SPR1 := True;
-                BV_SPR0 := False;
-            when By_64 =>           -- Fosc / 64
-                BV_SPI2X := False;
-                BV_SPR1 := True;
-                BV_SPR0 := False;
-            when By_128 =>          -- Fosc / 128
-                BV_SPI2X := False;
-                BV_SPR1 := True;
-                BV_SPR0 := True;
-            when By_64_2X =>        -- Fosc / 64 in double mode
-                BV_SPI2X := True;
-                BV_SPR1 := True;
-                BV_SPR0 := True;
-        end case;
+      --------------------------------------------------------------
+      -- Set the clock divisor
+      --------------------------------------------------------------
+      case Config_Clock_Divisor is
+         when By_2 =>            -- Fosc / 2
+            BV_SPI2X := True;
+            BV_SPR1 := False;
+            BV_SPR0 := False;
+         when By_4 =>            -- Fosc / 4
+            BV_SPI2X := False;
+            BV_SPR1 := False;
+            BV_SPR0 := False;
+         when By_8 =>            -- Fosc / 8
+            BV_SPI2X := True;
+            BV_SPR1 := False;
+            BV_SPR0 := True;
+         when By_16 =>           -- Fosc / 16
+            BV_SPI2X := False;
+            BV_SPR1 := False;
+            BV_SPR0 := True;
+         when By_32 =>           -- Fosc / 32
+            BV_SPI2X := True;
+            BV_SPR1 := True;
+            BV_SPR0 := False;
+         when By_64 =>           -- Fosc / 64
+            BV_SPI2X := False;
+            BV_SPR1 := True;
+            BV_SPR0 := False;
+         when By_128 =>          -- Fosc / 128
+            BV_SPI2X := False;
+            BV_SPR1 := True;
+            BV_SPR0 := True;
+         when By_64_2X =>        -- Fosc / 64 in double mode
+            BV_SPI2X := True;
+            BV_SPR1 := True;
+            BV_SPR0 := True;
+      end case;
 
-        --------------------------------------------------------------
-        -- Set data order (endianness)
-        --------------------------------------------------------------
+      --------------------------------------------------------------
+      -- Set data order (endianness)
+      --------------------------------------------------------------
 
-        BV_DORD := Config_MSB_First xor True; -- 1=LSB first, 0=MSB first
-        
-    end Config_Device;
+      BV_DORD := Config_MSB_First xor True; -- 1=LSB first, 0=MSB first
 
-    ------------------------------------------------------------------
-    -- INTERNAL - Enable / Disable SPI Device
-    ------------------------------------------------------------------
-    procedure Enable_Device(Enable : Boolean; Master_Mode : Boolean) is
-    begin
+   end Config_Device;
 
-        if Enable then
-            BV_MSTR := Master_Mode;
+   ------------------------------------------------------------------
+   -- INTERNAL - Enable / Disable SPI Device
+   ------------------------------------------------------------------
+   procedure Enable_Device (Enable : Boolean; Master_Mode : Boolean) is
+   begin
 
-            if Master_Mode then
-                ------------------------------------------------------
-                -- Configure the SS pin if we are using it
-                ------------------------------------------------------
-                if Config_SS_Pin then           -- Use the SS pin?
-                    BV_SS := True;              -- Yes, then set it high for now (inactive)
-                    BV_DD_SS  := DD_Output;     -- Make it an output pin
-                end if;
+      if Enable then
+         BV_MSTR := Master_Mode;
 
-                ------------------------------------------------------
-                -- Configure the SPI Data Pin Directions
-                ------------------------------------------------------
-                BV_DD_SCK  := DD_Output;        -- We must configure this
---              BV_DD_MISO := DD_Input;         -- SPI auto overrides this as shown
-                BV_DD_MOSI := DD_Output;        -- We must configure this
-
-                ------------------------------------------------------
-                -- Set 
-                ------------------------------------------------------
-                BV_SPIE := False;               -- Don't use interrupts in master mode
-            else
---              BV_DD_SCK  := DD_Input;         -- SPI auto overrides this as shown
-                BV_DD_MISO := DD_Output;        -- We must set this to output mode
---              BV_DD_MOSI := DD_Input;         -- SPI auto overrides this as shown
---              BV_DD_SS   := DD_Input;         -- SPI auto overrides this as shown
-
-                BV_SPIE := True;                -- Use receiver interrupts
+         if Master_Mode then
+            ------------------------------------------------------
+            -- Configure the SS pin if we are using it
+            ------------------------------------------------------
+            if Config_SS_Pin then           -- Use the SS pin?
+               BV_SS := True;              -- Yes, then set it high for now (inactive)
+               BV_DD_SS  := DD_Output;     -- Make it an output pin
             end if;
-        else
-            if Config_SS_Pin then               -- Use the SS pin?
-                BV_SS := True;                  -- Yes, then set it high for now (inactive)
-                BV_DD_SS  := DD_Output;         -- Make it an output pin
-            end if;
-            BV_SPIE := False;                   -- Turn off interrupts when disabled
-        end if;
 
-        BV_SPE := Enable;                       -- Enable/Disable SPI Device
+            ------------------------------------------------------
+            -- Configure the SPI Data Pin Directions
+            ------------------------------------------------------
+            BV_DD_SCK  := DD_Output;        -- We must configure this
+            --  BV_DD_MISO := DD_Input;         -- SPI auto overrides this as shown
+            BV_DD_MOSI := DD_Output;        -- We must configure this
 
-    end Enable_Device;
+            ------------------------------------------------------
+            -- Set
+            ------------------------------------------------------
+            BV_SPIE := False;               -- Don't use interrupts in master mode
+         else
+            --  BV_DD_SCK  := DD_Input;         -- SPI auto overrides this as shown
+            BV_DD_MISO := DD_Output;        -- We must set this to output mode
+            --  BV_DD_MOSI := DD_Input;         -- SPI auto overrides this as shown
+            --  BV_DD_SS   := DD_Input;         -- SPI auto overrides this as shown
 
-    ------------------------------------------------------------------
-    -- INTERNAL - Start Device in Configured Mode
-    ------------------------------------------------------------------
-    procedure Start_Device(Master_Mode : Boolean) is
-    begin
-        AVR.Interrupts.Disable_Interrupts;
-        Enable_Device(True,Master_Mode);
-        AVR.Interrupts.Enable_Interrupts;
-    end Start_Device;
+            BV_SPIE := True;                -- Use receiver interrupts
+         end if;
+      else
+         if Config_SS_Pin then              -- Use the SS pin?
+            BV_SS := True;                  -- Yes, then set it high for now (inactive)
+            BV_DD_SS  := DD_Output;         -- Make it an output pin
+         end if;
+         BV_SPIE := False;                   -- Turn off interrupts when disabled
+      end if;
 
-    ------------------------------------------------------------------
-    -- INTERNAL - Stop Device
-    ------------------------------------------------------------------
-    procedure Stop_Device is
-    begin
-        AVR.Interrupts.Disable_Interrupts;
-        Enable_Device(False,False);
-        AVR.Interrupts.Enable_Interrupts;
-    end Stop_Device;
+      BV_SPE := Enable;                       -- Enable/Disable SPI Device
 
-    ------------------------------------------------------------------
-    -- Initialize SPI Device and Perform Most of the Configuration
-    ------------------------------------------------------------------
-    procedure Startup(
-        Clock_Divisor :     in      Clock_Divisor_Type;
-        Clock_Mode :        in      Clock_Mode_Type;
-        MSB_First :         in      Boolean := True;
-        Use_SS_Pin :        in      Boolean := True
-    ) is
-    begin
+   end Enable_Device;
 
-        AVR.Interrupts.Disable_Interrupts;
+   ------------------------------------------------------------------
+   -- INTERNAL - Start Device in Configured Mode
+   ------------------------------------------------------------------
+   procedure Start_Device (Master_Mode : Boolean) is
+   begin
+      Interrupts.Disable_Interrupts;
+      Enable_Device (True, Master_Mode);
+      Interrupts.Enable_Interrupts;
+   end Start_Device;
 
-        BV_PRSPI := SPI_Operating;      -- Make sure it has not been shut down for power savings
+   ------------------------------------------------------------------
+   -- INTERNAL - Stop Device
+   ------------------------------------------------------------------
+   procedure Stop_Device is
+   begin
+      Interrupts.Disable_Interrupts;
+      Enable_Device (False, False);
+      Interrupts.Enable_Interrupts;
+   end Stop_Device;
 
-        Config_Clock_Divisor := Clock_Divisor;
-        Config_Clock_Mode    := Clock_Mode;
-        Config_MSB_First     := MSB_First;
-        Config_SS_Pin        := Use_SS_Pin;
+   ------------------------------------------------------------------
+   -- Initialize SPI Device and Perform Most of the Configuration
+   ------------------------------------------------------------------
+   procedure Startup
+     (Clock_Divisor :     in      Clock_Divisor_Type;
+      Clock_Mode :        in      Clock_Mode_Type;
+      MSB_First :         in      Boolean := True;
+      Use_SS_Pin :        in      Boolean := True)
+   is
+   begin
 
-        Enable_Device(False,False);     -- Disable the device for now
-        Config_Device;                  -- but otherwise configure it
+      Interrupts.Disable_Interrupts;
 
-        AVR.Interrupts.Enable_Interrupts;
+      BV_PRSPI := SPI_Operating;      -- Make sure it has not been shut down for power savings
 
-    end Startup;
+      Config_Clock_Divisor := Clock_Divisor;
+      Config_Clock_Mode    := Clock_Mode;
+      Config_MSB_First     := MSB_First;
+      Config_SS_Pin        := Use_SS_Pin;
 
-    ------------------------------------------------------------------
-    -- Shutdown SPI Device to save power (Inlined)
-    ------------------------------------------------------------------
-    procedure Shutdown is
-    begin
+      Enable_Device (False, False);   -- Disable the device for now
+      Config_Device;                  -- but otherwise configure it
 
-        AVR.Interrupts.Disable_Interrupts;
-        Enable_Device(False,False);     -- Disable the device for now
-        BV_PRSPI := SPI_Shutdown;       -- Power SPI off to save power
-        AVR.Interrupts.Enable_Interrupts;
+      Interrupts.Enable_Interrupts;
 
-    end Shutdown;
+   end Startup;
+
+   ------------------------------------------------------------------
+   -- Shutdown SPI Device to save power (Inlined)
+   ------------------------------------------------------------------
+   procedure Shutdown is
+   begin
+      Interrupts.Disable_Interrupts;
+      Enable_Device (False, False);   -- Disable the device for now
+      BV_PRSPI := SPI_Shutdown;       -- Power SPI off to save power
+      Interrupts.Enable_Interrupts;
+   end Shutdown;
 
 end AVR.SPI;
-
-
