@@ -41,28 +41,26 @@ package body LED is
 
    --  check your actual wiring. The STK500 connects the LEDs between
    --  the port pin and +5V. You switch them on by setting the pin to
-   --  Low.
+   --  Low.  The Arduino 2009 has a LED between B5 and ground.  You
+   --  have to set the pin high to switch on.
    procedure Off_1 is
    begin
-      LED1 := True;
+      LED1 := Low;
    end Off_1;
 
    procedure Off_2 is
    begin
-      LED2 := True;
+      LED2 := Low;
    end Off_2;
 
    procedure On_1 is
    begin
-      LED1 := False;
+      LED1 := High;
    end On_1;
 
    procedure On_2 is
    begin
-      LED2 := False;
+      LED2 := High;
    end On_2;
 
-
 end LED;
-
-

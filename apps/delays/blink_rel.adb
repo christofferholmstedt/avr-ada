@@ -19,8 +19,20 @@
 --  use standard Ada relative delays for blinking.
 --
 --  depending on the configuration settings in the AVR support library
---  that either uses AVR.Real_Time is busy waits form AVR.Wait;
+--  that either uses AVR.Real_Time or busy waits from AVR.Wait;
+with AVR.Real_Time.Clock;
+--  we have to explicitely import this function as it gets called via
+--  the delay statement. The avr-gnatbind does not yet know that the
+--  Ada.Calendar.Delay-routines call Clock and that it must be
+--  included in the elaboration code. Alle the timer and clock
+--  infrastructure gets initialized by elaborating the body of
+--  AVR.Real_Time.Clock_Impl.
 --
+--  AVR.Real_Time.Clock uses AVR.Config (for the quartz frequency) and
+--  AVR.Timer0 to generate interrupts at 1000Hz, ie. every 1ms.  The
+--  delay routine continuously compares the current time with the end
+--  of the delay time for returning. To save power the mcu is put into
+--  sleep mode after every tick.
 
 with LED;
 

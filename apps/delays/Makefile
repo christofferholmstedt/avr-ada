@@ -41,7 +41,7 @@ GPR := blink.gpr
 
 
 #put the names of the target files here (without extension)
-ADA_TARGETS := blink_rel blink_te blink_threads
+ADA_TARGETS := blink_rel blink_te blink_clock blink_threads
 
 
 
@@ -72,10 +72,11 @@ FORMAT = ihex
 # Type: avrdude -c ?
 # to get a full listing.
 #
-AVRDUDE_PROGRAMMER = stk500v2
+AVRDUDE_PROGRAMMER = stk500v1
 
 # com1 = serial port. Use lpt1 to connect to parallel port.
-AVRDUDE_PORT = com4    # programmer connected to serial device
+# programmer connected to serial device, add -b 57600 for Arduinos
+AVRDUDE_PORT = com5 -b 57600 -v -v
 
 AVRDUDE_WRITE_FLASH = -U flash:w:
 AVRDUDE_WRITE_EEPROM = -U eeprom:w:
