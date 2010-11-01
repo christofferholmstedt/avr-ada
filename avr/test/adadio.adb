@@ -1,3 +1,9 @@
+-- Support Harness for fatfs test program
+-- Warren Gay
+--
+-- This module fakes the I/O to a SD memory card 
+-- or hard disk. It is implemented using Ada.Direct_IO.
+
 with Interfaces;
 with Ada.Direct_IO;
 with ADA.IO_Exceptions;

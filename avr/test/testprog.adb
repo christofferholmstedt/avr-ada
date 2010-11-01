@@ -1,3 +1,9 @@
+-- Test Main Program for fatfs tests.
+-- Warren Gay
+--
+-- This module fakes the I/O to a SD memory card 
+-- or hard disk. It is implemented using Ada.Direct_IO.
+
 with FAT_Tests;         use FAT_Tests;
 with Ada.Text_IO;       use Ada.Text_IO;
 with Interfaces;        use Interfaces;
