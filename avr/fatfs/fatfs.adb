@@ -1,3 +1,9 @@
+-- fatfs.ads - Mon Nov  1 10:09:32 2010
+--
+-- Author: Warren W. Gay VE3WWG  ve3wwg@gmail.com
+--
+-- Protected under the GNU GENERAL PUBLIC LICENSE v2, June 1991
+
 package body FATFS is
 
    ------------------------------------------------------------------

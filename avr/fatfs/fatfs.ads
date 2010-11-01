@@ -1,3 +1,21 @@
+-- fatfs.ads - Mon Nov  1 10:09:32 2010
+--
+-- Author: Warren W. Gay VE3WWG  ve3wwg@gmail.com
+--
+-- Protected under the GNU GENERAL PUBLIC LICENSE v2, June 1991
+
+----------------------------------------------------------------------
+-- 
+-- 
+-- This package provides a FAT16/32 file system capability, 
+-- targeted for SD/MMC memory cards (although it may also be used
+-- in other ways as well).
+-- 
+-- See "Implementation Notes" at the end of this file for more
+-- details.
+-- 
+----------------------------------------------------------------------
+
 with Interfaces;
 use Interfaces;
 
@@ -9,7 +27,6 @@ package FATFS is
    
    type U8_Array is array(Unsigned_16 range <>) of Unsigned_8;
    for U8_Array'Component_Size use 8;
--- for U8_Array'alignment use 4;
    
    type U16_Array is array(Unsigned_16 range <>) of Unsigned_16;
    for U16_Array'Component_Size use 16;
@@ -399,6 +416,36 @@ private
 
 end FATFS;
    
+----------------------------------------------------------------------
+-- IMPLEMENTATION NOTES
+----------------------------------------------------------------------
+-- 
+-- This is _not_ an efficient implementation since it is targeted
+-- at small RAM footprint architectures.  It is designed to
+-- operate with as little as 1K of RAM (targeted for ATmega168).
+-- This allows the use of _one_ sector buffer of size 512 bytes,
+-- leaving 512 bytes for stack and other program variables.
+-- 
+-- To successfully operate with one buffer, the application
+-- programmer should only create a sector buffer when  required
+-- by use of a declare block:
+-- 
+--    declare
+--       Buffer : Block_512;  -- Sector buffer
+--    begin
+--       ...operation...
+--    end;
+-- 
+-- Sometimes the called operation requires sector buffers, so it
+-- too will create them only when required. Write routines will
+-- first write your buffer, then use it internally, and finish by
+-- restoring the application content to it, prior to returning.
+-- In this way, all FAT operations are handled with a maximum of
+-- one 512 byte sector buffer (Block_512).
+-- 
+-- Architectures containing more abundant RAM, need not be
+-- concerned about this.
+
 ----------------------------------------------------------------------
 -- MEDIA DESCRIPTOR BYTE
 ----------------------------------------------------------------------

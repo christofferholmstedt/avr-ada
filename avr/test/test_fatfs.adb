@@ -8,7 +8,7 @@ with FAT_Tests;         use FAT_Tests;
 with Ada.Text_IO;       use Ada.Text_IO;
 with Interfaces;        use Interfaces;
 
-procedure testprog is
+procedure test_fatfs is
 begin
 
    Put_Line("Starting FAT File System Tests:");
@@ -140,4 +140,4 @@ begin
    New_Line;
    Put_Line("End of all tests.");
 
-end testprog;
+end test_fatfs;
