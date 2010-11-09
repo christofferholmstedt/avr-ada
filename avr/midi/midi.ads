@@ -4,7 +4,8 @@
 --
 -- $Id: midi.ads,v 1.1 2010-08-25 01:09:15 Warren Gray Exp $
 --
--- Protected under the GNU GENERAL PUBLIC LICENSE v2, June 1991
+-- Protected under:
+-- The GNU Lesser General Public License version 2.1 (LGPLv2.1)
 
 ----------------------------------------------------------------------
 -- This module implements Top Level for MIDI I/O
