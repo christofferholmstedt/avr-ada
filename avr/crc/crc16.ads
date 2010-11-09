@@ -1,3 +1,12 @@
+-- crc16.ads - Tue Nov  9 16:03:01 2010
+--
+-- (c) Warren W. Gay VE3WWG  ve3wwg@gmail.com
+--
+-- $Id$
+--
+-- Protected under:
+-- The GNU Lesser General Public License version 2.1 (LGPLv2.1)
+
 with Interfaces;
 use Interfaces;
 
