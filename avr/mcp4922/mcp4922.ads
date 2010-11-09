@@ -26,7 +26,8 @@
 --      Format silently returns if the length is less. Larger buffers
 --      are accepted, but only the first two bytes are estabilished.
 ---------------------------------------------------------------------------
-
+-- Protected under:
+-- The GNU Lesser General Public License version 2.1 (LGPLv2.1)
 
 package MCP4922 is
 
