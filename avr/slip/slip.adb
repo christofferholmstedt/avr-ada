@@ -1,3 +1,12 @@
+-- slip.adb - Mon Aug  9 19:32:58 2010
+--
+-- (c) Warren W. Gay VE3WWG  ve3wwg@gmail.com
+--
+-- $Id$
+--
+-- Protected under:
+-- The GNU Lesser General Public License version 2.1 (LGPLv2.1)
+
 with CRC16;
 
 package body Slip is

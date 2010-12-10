@@ -31,6 +31,8 @@
 --  collecting buffer. The buffer is only allocated on the stack when
 --  a Sysex message is received.
 ----------------------------------------------------------------------
+-- Protected under:
+-- The GNU Lesser General Public License version 2.1 (LGPLv2.1)
 
 package MIDI.Receiver is
 

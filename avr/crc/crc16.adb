@@ -1,3 +1,12 @@
+-- crc16.adb - Tue Nov  9 16:03:34 2010
+--
+-- (c) Warren W. Gay VE3WWG  ve3wwg@gmail.com
+--
+-- $Id$
+--
+-- Protected under:
+-- The GNU Lesser General Public License version 2.1 (LGPLv2.1)
+
 package body CRC16 is
 
     ------------------------------------------------------------------

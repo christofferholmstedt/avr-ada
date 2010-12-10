@@ -16,6 +16,8 @@
 ---------------------------------------------------------------------------
 -- Written by Warren W. Gay VE3WWG
 ---------------------------------------------------------------------------
+-- Protected under:
+-- The GNU Lesser General Public License version 2.1 (LGPLv2.1)
 
 package MIDI.Transmitter is
 

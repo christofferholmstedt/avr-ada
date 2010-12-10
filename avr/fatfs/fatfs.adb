@@ -2,7 +2,8 @@
 --
 -- Author: Warren W. Gay VE3WWG  ve3wwg@gmail.com
 --
--- Protected under the GNU GENERAL PUBLIC LICENSE v2, June 1991
+-- Protected under:
+-- The GNU Lesser General Public License version 2.1 (LGPLv2.1)
 
 package body FATFS is
 
