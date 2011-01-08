@@ -72,7 +72,7 @@ build_rts install_rts rtsclean:
 #  make the AVR library
 #
 build_libs: build_rts
-	make -C avr all
+	$(MAKE) -C avr all
 
 
 ###############################################################
@@ -80,7 +80,7 @@ build_libs: build_rts
 #  install the AVR library
 #
 install_libs:
-	make -C avr install
+	$(MAKE) -C avr install
 
 ###############################################################
 #
@@ -106,7 +106,7 @@ $(DOC_DIRS):
 #
 
 samples:
-	make -C apps all
+	$(MAKE) -C apps all
 
 
 ###############################################################
@@ -142,9 +142,9 @@ clean:
 	-rm -fr build
 
 distclean:  clean
-	-make -C $(RTS_SOURCE) clean
-	-make -C avr clean
-	-make -C apps clean
+	-$(MAKE) -C $(RTS_SOURCE) clean
+	-$(MAKE) -C avr clean
+	-$(MAKE) -C apps clean
 	-rm config
 
 

@@ -36,13 +36,13 @@ all:	avr_lib/stamp-links
 # avr_lib/stamp-libs
 
 avr_lib/stamp-links:
-	make -C avr_lib stamp-links
+	$(MAKE) -C avr_lib stamp-links
 
 avr_lib/stamp-libs:
-	make -C avr_lib stamp-libs
+	$(MAKE) -C avr_lib stamp-libs
 
 ../config:
-	make -C .. config
+	$(MAKE) -C .. config
 
 install: $(INSTALL_DIR) $(library_objs) $(library_libs) copy_libs $(OBJ_DIRS)
 #   restrict_permissions
@@ -75,7 +75,7 @@ clean:
 	$(RM) b~*.*
 	$(RM) -rf obj lib
 	$(RM) sensirion/obj/*
-	make -C avr_lib clean
+	$(MAKE) -C avr_lib clean
 
 # always run these commands
 .PHONY: clean install copy_libs restrict_permissions
