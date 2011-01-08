@@ -154,7 +154,7 @@ distclean:  clean
 #
 
 avrlibclean:
-	-chmod a+w -R $(PREFIX)/avr/ada
+	-chmod -R a+w $(PREFIX)/avr/ada
 	-rm -rf $(PREFIX)/avr/ada
 
 
