@@ -33,9 +33,7 @@ package AVR.Timer0 is
    function No_Clock_Source return Scale_Type;
    function No_Prescaling   return Scale_Type;
    function Scale_By_8      return Scale_Type;
-   function Scale_By_32     return Scale_Type;
    function Scale_By_64     return Scale_Type;
-   function Scale_By_128    return Scale_Type;
    function Scale_By_256    return Scale_Type;
    function Scale_By_1024   return Scale_Type;
 
@@ -52,10 +50,10 @@ package AVR.Timer0 is
    procedure Enable_Interrupt_Compare;
    procedure Enable_Interrupt_Overflow;
 
-#if MCU = "attiny13" then
+#if MCU = "attiny13" or else MCU = "attiny13a" then
    Signal_Compare  : constant String := MCU.Sig_Tim0_CompA_String;
    Signal_Overflow : constant String := MCU.Sig_Tim0_OVF_String;
-#elsif MCU = "atmega168" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" then
+#elsif MCU = "attiny2313" or else MCU = "atmega168" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" or else MCU = "atmega2560" then
    Signal_Compare  : constant String := MCU.Sig_Timer0_CompA_String;
    Signal_Overflow : constant String := MCU.Sig_Timer0_OVF_String;
 #elsif MCU = "atmega169" or else MCU = "atmega32" then
@@ -71,9 +69,7 @@ private
    pragma Inline (No_Clock_Source);
    pragma Inline (No_Prescaling);
    pragma Inline (Scale_By_8);
-   pragma Inline (Scale_By_32);
    pragma Inline (Scale_By_64);
-   pragma Inline (Scale_By_128);
    pragma Inline (Scale_By_256);
    pragma Inline (Scale_By_1024);
    pragma Inline (Stop);
