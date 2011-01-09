@@ -52,7 +52,7 @@ package AVR.Timer2 is
    procedure Enable_Interrupt_Compare;
    procedure Enable_Interrupt_Overflow;
 
-#if MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa" or else MCU = "atmega328p" or else MCU = "atmega644p" then
+#if MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa" or else MCU = "atmega328p" or else MCU = "atmega644p" or else MCU = "atmega2560" then
    Signal_Compare  : constant String := MCU.Sig_Timer2_CompA_String;
 #elsif MCU = "atmega169" or else MCU = "atmega32" then
    Signal_Compare  : constant String := MCU.Sig_Timer2_Comp_String;
