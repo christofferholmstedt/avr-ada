@@ -4,7 +4,7 @@
 all clean:
 	for m in */Makefile ; do \
 		dir=`dirname $$m`; \
-		make -C $$dir $@ ; \
+		$(MAKE) -C $$dir $@ ; \
                 if [ $$? -ne 0 ]; then \
                   echo "make failed!"; \
                   exit 2; \

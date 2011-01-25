@@ -23,21 +23,21 @@ with AVR.Interrupts;
 package body AVR.Timer2 is
 
 
-#if MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa" or else MCU = "atmega169" or else MCU = "atmega328p" or else MCU = "atmega644p" then
+#if MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa" or else MCU = "atmega169" or else MCU = "atmega328p" or else MCU = "atmega644p" or else MCU = "atmega2560" then
    Output_Compare_Reg : Unsigned_8 renames MCU.OCR2A;
 #elsif mcu = "atmega32" then
    Output_Compare_Reg : Unsigned_8 renames MCU.OCR2;
 #end if;
 
 
-#if MCU = "attiny13" or else MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa" or else MCU = "atmega169" or else MCU = "atmega328p" or else MCU = "atmega644p" then
+#if MCU = "attiny13" or else MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa" or else MCU = "atmega169" or else MCU = "atmega328p" or else MCU = "atmega644p" or else MCU = "atmega2560" then
    Ctrl_Reg       : Bits_In_Byte renames MCU.TCCR2A_Bits;
 #elsif MCU = "atmega32" then
    Ctrl_Reg       : Bits_In_Byte renames MCU.TCCR2_Bits;
 #end if;
 
 
-#if MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa" or else MCU = "atmega328p" or else MCU = "atmega644p" then
+#if MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa" or else MCU = "atmega328p" or else MCU = "atmega644p" or else MCU = "atmega2560" then
    Prescale_Reg   : Unsigned_8 renames MCU.TCCR2B;
 #elsif MCU = "atmega169" then
    Prescale_Reg   : Unsigned_8 renames MCU.TCCR2A;
@@ -45,7 +45,7 @@ package body AVR.Timer2 is
    Prescale_Reg   : Unsigned_8 renames MCU.TCCR2;
 #end if;
 
-#if MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa" or else MCU = "atmega169" or else MCU = "atmega328p" or else MCU = "atmega644p" then
+#if MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa" or else MCU = "atmega169" or else MCU = "atmega328p" or else MCU = "atmega644p" or else MCU = "atmega2560" then
    Interrupt_Mask : Bits_In_Byte renames MCU.TIMSK2_Bits;
    Output_Compare_Interrupt_Enable : Boolean renames Interrupt_Mask (MCU.OCIE2A_Bit);
    Overflow_Interrupt_Enable       : Boolean renames Interrupt_Mask (MCU.TOIE2_Bit);
@@ -105,7 +105,7 @@ package body AVR.Timer2 is
 
       --  set the control register with the prescaler and mode flags to
       --  timer output compare mode and clear timer on compare match
-#if MCU = "attiny13" or else MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa" or else MCU = "atmega169" or else MCU = "atmega328p" then
+#if MCU = "attiny13" or else MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa" or else MCU = "atmega169" or else MCU = "atmega328p" or else MCU = "atmega2560" then
       Ctrl_Reg := (MCU.COM2A0_Bit => False, --  \  normal operation,
                    MCU.COM2A1_Bit => False, --  /  OC0 disconnected
 
@@ -148,7 +148,7 @@ package body AVR.Timer2 is
 
       --  set the control register with the prescaler and mode flags to
       --  timer output compare mode and clear timer on compare match
-#if MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa" or else MCU = "atmega169" or else MCU = "atmega328p" then
+#if MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa" or else MCU = "atmega169" or else MCU = "atmega328p" or else MCU = "atmega2560" then
       Ctrl_Reg := (MCU.COM2A0_Bit => False, --  \  normal operation,
                    MCU.COM2A1_Bit => False, --  /  OC0 disconnected
 
@@ -180,7 +180,7 @@ package body AVR.Timer2 is
    end Init_Normal;
 
 
-#if MCU = "attiny13" or else MCU = "atmega168" or else MCU = "atmega169" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" then
+#if MCU = "atmega168" or else MCU = "atmega169" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" or else MCU = "atmega2560" then
    Com0 : Boolean renames Ctrl_Reg (MCU.COM2A0_Bit);
    Com1 : Boolean renames Ctrl_Reg (MCU.COM2A1_Bit);
 #elsif MCU = "atmega32" then
