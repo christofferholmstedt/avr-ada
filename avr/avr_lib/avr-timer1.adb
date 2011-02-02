@@ -35,7 +35,7 @@ package body AVR.Timer1 is
 -- #end if;
 
 
-#if MCU = "atmega168" or else MCU = "atmega169" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" then
+#if MCU = "atmega168" or else MCU = "atmega169" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" or else MCU = "atmega2560" then
    Interrupt_Mask : Bits_In_Byte renames MCU.TIMSK1_Bits;
 #elsif MCU = "atmega32" then
    Interrupt_Mask : Bits_In_Byte renames MCU.TIMSK_Bits;
@@ -43,14 +43,14 @@ package body AVR.Timer1 is
    Output_Compare_Interrupt_Enable : Boolean renames Interrupt_Mask (MCU.OCIE1A_Bit);
    Overflow_Interrupt_Enable       : Boolean renames Interrupt_Mask (MCU.TOIE1_Bit);
 
-#if MCU = "atmega32" or else MCU = "atmega168" or else MCU = "atmega168a" or else MCU = "atmega328p" or else MCU = "atmega644p" then
+#if MCU = "atmega32" or else MCU = "atmega168" or else MCU = "atmega168a" or else MCU = "atmega328p" or else MCU = "atmega644p" or else MCU = "atmega2560" then
    WGM0 : Boolean renames MCU.TCCR1A_Bits (MCU.WGM10_Bit);
    WGM1 : Boolean renames MCU.TCCR1A_Bits (MCU.WGM11_Bit);
    WGM2 : Boolean renames MCU.TCCR1B_Bits (MCU.WGM12_Bit);
    WGM3 : Boolean renames MCU.TCCR1B_Bits (MCU.WGM13_Bit);
 #end if;
 
-#if MCU = "attiny13" or else MCU = "atmega32" or else MCU = "atmega168" or else MCU = "atmega169" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" then
+#if MCU = "attiny13" or else MCU = "atmega32" or else MCU = "atmega168" or else MCU = "atmega169" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" or else MCU = "atmega2560" then
    Com0 : Boolean renames Ctrl_Reg (MCU.COM1A0_Bit);
    Com1 : Boolean renames Ctrl_Reg (MCU.COM1A1_Bit);
 --  #elsif MCU = "atmega32" then
@@ -133,7 +133,7 @@ package body AVR.Timer1 is
    begin
       --  set the control register with the prescaler and mode flags to
       --  timer output compare mode and clear timer on compare match
-#if MCU = "attiny13" or else MCU = "atmega32" or else MCU = "atmega168" or else MCU = "atmega169" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" then
+#if MCU = "attiny13" or else MCU = "atmega32" or else MCU = "atmega168" or else MCU = "atmega169" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" or else MCU = "atmega2560" then
       Ctrl_Reg := (MCU.COM1A0_Bit => False, --  \  normal operation,
                    MCU.COM1A1_Bit => False, --  /  OC0 disconnected
 
