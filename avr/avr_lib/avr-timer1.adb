@@ -43,7 +43,7 @@ package body AVR.Timer1 is
    Output_Compare_Interrupt_Enable : Boolean renames Interrupt_Mask (MCU.OCIE1A_Bit);
    Overflow_Interrupt_Enable       : Boolean renames Interrupt_Mask (MCU.TOIE1_Bit);
 
-#if MCU = "atmega32" or else MCU = "atmega168" or else MCU = "atmega168a" or else MCU = "atmega328p" or else MCU = "atmega644p" or else MCU = "atmega2560" then
+#if MCU = "atmega32" or else MCU = "atmega168" or else MCU = "atmega168a" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" or else MCU = "atmega2560" then
    WGM0 : Boolean renames MCU.TCCR1A_Bits (MCU.WGM10_Bit);
    WGM1 : Boolean renames MCU.TCCR1A_Bits (MCU.WGM11_Bit);
    WGM2 : Boolean renames MCU.TCCR1B_Bits (MCU.WGM12_Bit);
