@@ -74,7 +74,7 @@ package body AVR.UART is
 
    RXC_Bit    : constant AVR.Bit_Number := MCU.RXC_Bit;
 
-#if MCU = "atmega32" then
+#if MCU = "atmega32" or MCU = "atmega8" then
    Rx_Name    : constant String := MCU.Sig_USART_RXC_String;
 #else
    Rx_Name    : constant String := MCU.Sig_USART_RX_String;
