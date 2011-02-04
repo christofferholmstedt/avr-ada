@@ -220,7 +220,8 @@ project AVR is
            & ADC_Sources & Timer0_Sources & Timer1_Sources
            & Time_1ms_Sources;
 
-      when "atmega168" | "atmega328p" | "atmega644" | "atmega644p" =>
+      when   "atmega168" | "atmega328p" | "atmega644" | "atmega644p" 
+           | "atmega2560" =>
          for Source_Files use
            Std_Sources & UART_Sources & EEPROM_Sources & Sleep_Sources
            & ADC_Sources & Timer0_Sources & Timer1_Sources & Timer2_Sources
@@ -255,7 +256,7 @@ project AVR is
            & Time_Sources & Sleep_Sources & Timer0_Sources & Timer2_Sources;
            --  & Power_Sources;
 
-      when   "attiny13" =>
+      when   "attiny13" | "attiny13a" =>
          for Source_Files use
            Std_Sources & EEPROM_Sources & WDT_Sources
            & Timer0_Sources & Time_No_Clock_Sources;
