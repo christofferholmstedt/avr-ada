@@ -166,7 +166,7 @@ private
    ------------------------------------------------------------------
    -- PRR - Power Reduction Register
    ------------------------------------------------------------------
-#if MCU = "atmega644p" then
+#if MCU = "atmega644p" or MCU = "atmega2560" then
    PRR :           Nat8 renames MCU.PRR0;
    BV_PRSPI :      Boolean renames MCU.PRR0_Bits(MCU.PRSPI_Bit);
 #else
