@@ -137,7 +137,9 @@ package body AVR.UART is
       -- Async. mode, 8N1
       UCSRC := +(UCSZ0_Bit => True,
                  UCSZ1_Bit => True,
+#if MCU = "atmega8" or else MCU = "atmega32" then
                  URSEL_Bit => True,
+#end if;
                  others => False);
 
       --  at least on atmega8 UCSRC and UBRRH share the same address.

@@ -237,7 +237,7 @@ project MCU is
 
    case MCU is
    when "atmega168"  | "atmega328p" | "atmega644"  | "atmega644p"
-      | "atmega2560"
+      | "atmega2560" | "attiny2313"
      => Eeprom_WE := "eeprom_pe";
    when others
      => Eeprom_WE := "eeprom_we";
@@ -253,7 +253,7 @@ project MCU is
    case MCU is
    when "at90s2313"  | "at90s8515"
      => UART := "uart";
-   when "atmega8"    | "atmega32"
+   when "atmega8"    | "atmega32" | "attiny2313"
      => UART := "usart";
    when others
      => UART := "usart0";
