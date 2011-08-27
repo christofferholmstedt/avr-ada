@@ -109,22 +109,22 @@ package Dataflash is
    end Commands;
 
 
-   procedure CS_Active;
-   pragma Inline (CS_Active);
-   procedure CS_Inactive;
-   pragma Inline (CS_Inactive);
+   --  procedure CS_Active;
+   --  pragma Inline (CS_Active);
+   --  procedure CS_Inactive;
+   --  pragma Inline (CS_Inactive);
 
 
-   --  Set up the HW SPI in Master mode, Mode 3.
-   --  Note -> Uses the SS line to control the DF CS-line.
-   procedure DF_SPI_Init;
+   --  --  Set up the HW SPI in Master mode, Mode 3.
+   --  --  Note -> Uses the SS line to control the DF CS-line.
+   --  procedure DF_SPI_Init;
 
-   --  Read and write one byte from/to SPI master
-   function DF_SPI_RW (Output : Nat8) return Nat8;
+   --  --  Read and write one byte from/to SPI master
+   --  function DF_SPI_RW (Output : Nat8) return Nat8;
 
-   --  Write one byte from SPI master
-   procedure DF_SPI_Write (Output : Nat8);
-   pragma Inline (DF_SPI_Write);
+   --  --  Write one byte from SPI master
+   --  procedure DF_SPI_Write (Output : Nat8);
+   --  pragma Inline (DF_SPI_Write);
 
    --  Status info concerning the Dataflash is busy or not.
    --  Status info concerning compare between buffer and flash page.

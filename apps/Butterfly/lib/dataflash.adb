@@ -52,14 +52,43 @@
 --*****************************************************************************
 
 with Interfaces;                   use type Interfaces.Unsigned_8;
+with AVR;                          use AVR;
 with AVR.MCU;
-
+with AVR.SPI;
+with AVR.SPI.Master;
 -- with Debug;
 -- with AVR.Strings;
 -- with AVR.Int_Img;
 
 package body Dataflash is
 
+
+   procedure CS_Active;
+   pragma Inline (CS_Active);
+   procedure CS_Inactive;
+   pragma Inline (CS_Inactive);
+
+
+   --  Set up the HW SPI in Master mode, Mode 3.
+   --  Note -> Uses the SS line to control the DF CS-line.
+   procedure DF_SPI_Init;
+
+   --  Read and write one byte from/to SPI master
+   function DF_SPI_RW (Output : Nat8) return Nat8
+     renames SPI.Master.Read_Write;
+
+   --  Write one byte from SPI master
+   procedure DF_SPI_Write (Output : Nat8)
+     renames SPI.Master.Write;
+
+
+   --
+   --  pin equivalence atmega169
+   --
+   --  B.0 = /SS
+   --  B.1 = SCK
+   --  B.2 = MOSI
+   --  B.3 = MISO
 
 --     procedure Debug_Out (B : Nat8) is
 --        use Debug;
@@ -108,6 +137,10 @@ package body Dataflash is
       --  Set MOSI, SCK AND SS as outputs
       --  DDRB |= (1<<PORTB2) | (1<<PORTB1) | (1<<PORTB0);
       MCU.DDRB := MCU.DDRB or 16#07#;
+      MCU.DDRB_Bits := MCU.DDRB_Bits or (MOSI => DD_Output,
+                                         SCK  => DD_Output,
+                                         SS   => DD_Output,
+                                         others => False);
 
       --  SPI double speed settings
       --  SPSR = (1<<SPI2X);
@@ -120,6 +153,11 @@ package body Dataflash is
       --  Enable SPI in Master mode, mode 3, Fosc/2
       --  SPCR = (1<<SPE) | (1<<MSTR) | (1<<CPHA) | (1<<CPOL)
       --         | (1<<SPR1) | (1<<SPR0);
+      SPI.Startup
+        (Clock_Divisor => SPI.By_2;
+         Clock_Mode    => SPI.Setup_Rising_Sample_Falling;
+         Use_SS_Pin    => True);
+
    end DF_SPI_Init;
 
 
@@ -132,28 +170,27 @@ package body Dataflash is
    --  * Purpose :       Read and writes one byte from/to SPI master
    --  *
    --  ***********************************************************************
-   function DF_SPI_RW (Output : Nat8) return Nat8 is
-      Input : Nat8;
-   begin
-      --  put byte 'output' in SPI data register
-      MCU.SPDR := Output;
+   --  function DF_SPI_RW (Output : Nat8) return Nat8 is
+   --     Input : Nat8;
+   --  begin
+   --     --  put byte 'output' in SPI data register
+   --     MCU.SPDR := Output;
 
-      --  wait for transfer complete, poll SPIF-flag
-      while (MCU.SPSR and 16#80#) = 0 loop null; end loop;
+   --     --  wait for transfer complete, poll SPIF-flag
+   --     while (MCU.SPSR and 16#80#) = 0 loop null; end loop;
 
-      --  read value in SPI data reg.
-      Input := MCU.SPDR;
+   --     --  read value in SPI data reg.
+   --     Input := MCU.SPDR;
 
-      --  return the byte clocked in from SPI slave
-      return Input;
-   end DF_SPI_RW;
+   --     --  return the byte clocked in from SPI slave
+   --     return Input;
+   --  end DF_SPI_RW;
 
-
-   procedure DF_SPI_Write (Output : Nat8) is
-      Dummy : Nat8;
-   begin
-      Dummy := DF_SPI_RW (Output);
-   end DF_SPI_Write;
+   --  procedure DF_SPI_Write (Output : Nat8) is
+   --     Dummy : Nat8;
+   --  begin
+   --     Dummy := DF_SPI_RW (Output);
+   --  end DF_SPI_Write;
 
 
 
@@ -331,7 +368,6 @@ package body Dataflash is
 
       if 1 = BufferNo then
          --  read byte(s) from buffer 1
-
          --  buffer 1 read op-code
          DF_SPI_Write (Commands.Buf1Read);
       elsif USE_BUFFER2 and then 2 = BufferNo then

@@ -52,6 +52,15 @@ package AVR.SPI.Master is
       SS_Status :   in     SS_Status_Proc -- Proc to set Slave Select status (or use SS_Proc)
      );
 
+   --------------------------------------------------------------------
+   -- Send out a single byte as master and return a received input byte
+   --------------------------------------------------------------------
+   function Read_Write (Output : Nat8) return Nat8;
+
+   --------------------------------------------------------------------
+   -- just send out a single byte as master
+   --------------------------------------------------------------------
+   procedure Write (Output : Nat8);
+   pragma Inline (Write);
+
 end AVR.SPI.Master;
-
-

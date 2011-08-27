@@ -29,6 +29,29 @@ package body AVR.SPI.Master is
       BV_SS := Activate_Select xor True;   -- SS is Active Low
    end SS_Proc;
 
+   --------------------------------------------------------------------
+   -- Send out a single byte as master and return a received input byte
+   --------------------------------------------------------------------
+   function Read_Write (Output : Nat8) return Nat8
+   is
+   begin
+      SPDR := Output;        --  Send byte on it's way
+      loop
+         exit when BV_SPIF;  --  Transmission complete?
+      end loop;
+      return SPDR;           --  Read slave data, if any
+   end Read_Write;
+
+   --------------------------------------------------------------------
+   -- just send out a single byte as master
+   --------------------------------------------------------------------
+   procedure Write (Output : Nat8)
+   is
+      Dummy : Nat8;
+   begin
+      Dummy := Read_Write (Output);
+   end Write;
+
    ------------------------------------------------------------------
    -- Master I/O with Slave
    ------------------------------------------------------------------
@@ -51,11 +74,7 @@ package body AVR.SPI.Master is
          for X in Data_Buffer'Range loop
             exit when BV_WCOL;             -- Quit if Write Collision
 
-            SPDR := Data_Buffer(X);        -- Send byte on it's way
-            loop
-               exit when BV_SPIF;          -- Transmission complete?
-            end loop;
-            Data_Buffer(X) := SPDR;        -- Read slave data, if any
+            Data_Buffer(X) := Read_Write (Data_Buffer(X));
          end loop;
 
          if not BV_WCOL then
