@@ -1,4 +1,3 @@
-# Hey Emacs, this is a -*- makefile -*-
 ###########################################################################
 ## The AVR-Ada Library is free software;  you can redistribute it and/or ##
 ## modify it under terms of the  GNU General Public License as published ##
@@ -21,8 +20,8 @@
 #
 # make clean = Clean out built project files.
 #
-# make file.prog = upload the hex file to the device, using avrdude.
-#                  Please customize the avrdude settings below first!
+# make file.prog = Upload the hex file to the device, using avrdude.
+#                Please customize the avrdude settings below first!
 #
 # make filename.s = Just compile filename.adb into the assembler code only.
 #
@@ -33,8 +32,6 @@
 
 # MCU name
 MCU := atmega328p
-# MCU := atmega32
-# MCU := attiny13
 
 
 # GNAT project file
@@ -54,8 +51,8 @@ GCC_PREFIX := $(dir $(shell avr-gcc -print-libgcc-file-name))../../../../
 PRJ_AVR := $(GCC_PREFIX)avr/ada
 
 # PRJ_PATH := '$(PRJ_AVR)'
-# PRJ_PATH := /c/Devel/AVR-Ada/avr
-PRJ_PATH := k:/Data/Development/AVR-Ada.git/avr-ada/avr
+# PRJ_PATH := k:/Data/Development/AVR-Ada.git/avr-ada/avr
+PRJ_PATH := c:/Devel/AVR-Ada.git/avr-ada/avr
 
 #---------------- GNATMAKE Options ----------------
 MFLAGS = -XMCU=$(MCU) -p -P$(GPR)
@@ -128,7 +125,7 @@ ALL_ASFLAGS = -mmcu=$(MCU) -I. -x assembler-with-cpp $(ASFLAGS)
 
 
 # Default target.
-all: gccversion build sizeafter
+all: build
 
 
 ADA_TARGETS_ELF = $(addsuffix .elf, $(ADA_TARGETS))
@@ -143,16 +140,9 @@ SUBDIRS := obj
 
 
 
-# where is the runtime system.  The path is relative to the compiler gnat1
-ADA_RTS := rts/$(MCU)
-
-
 build: $(ADA_TARGETS_ELF) $(ADA_TARGETS_HEX) $(ADA_TARGETS_EEP) \
-   $(ADA_TARGETS_LSS) $(ADA_TARGETS_SYM)
+   $(ADA_TARGETS_LSS) $(ADA_TARGETS_SYM) $(ADA_TARGETS_SIZE)
 
-
-# Display size of file.
-sizeafter: $(ADA_TARGETS_SIZE)
 
 %.size: %.elf FORCE
 	$(SIZE) --format=avr --mcu=$(MCU) $<
@@ -204,6 +194,10 @@ sizeafter: $(ADA_TARGETS_SIZE)
 	@echo $(MSG_ASSEMBLING) $<
 	$(CC) -c $(ALL_ASFLAGS) $< -o $@
 
+gccversion:
+	-ADA_PROJECT_PATH=$(PRJ_PATH) avr-gnat ls -v
+	-ADA_PROJECT_PATH=$(PRJ_PATH) $(GNATMAKE) -v -gnatv -vP1 -n $(MFLAGS)
+
 # create the subdirectories
 $(SUBDIRS):
 	$(REMOVE) -r $@
@@ -232,8 +226,6 @@ clean_list :
 
 FORCE:
 
-
 # Listing of phony targets.
-.PHONY : all finish sizebefore sizeafter gccversion \
+.PHONY : all finish gccversion \
    build elf hex eep lss sym clean clean_list program
-

@@ -1,4 +1,3 @@
-# Hey Emacs, this is a -*- makefile -*-
 ###########################################################################
 ## The AVR-Ada Library is free software;  you can redistribute it and/or ##
 ## modify it under terms of the  GNU General Public License as published ##
@@ -12,8 +11,8 @@
 # This makefile is adapted from the sample Makefile of WinAVR by Eric
 # B. Wedington, Jörg Wunsch and others.  As they released it to the
 # Public Domain, I could pretend that I wrote it myself.  Honestly, I
-# removed many (probably useful) parts to better fit the GNAT project makes. 
-# 
+# removed many (probably useful) parts to better fit the GNAT project makes.
+#
 
 # On command line:
 #
@@ -32,9 +31,7 @@
 
 
 # MCU name
-# MCU := atmega328p
-MCU := atmega8
-# MCU := atmega644p
+MCU := atmega328p
 
 
 # GNAT project file
@@ -42,7 +39,7 @@ GPR := build.gpr
 
 
 # put the names of the target files here (without extension)
-ADA_TARGETS := main
+ADA_TARGETS := main table
 
 
 
@@ -52,11 +49,11 @@ GCC_PREFIX := $(dir $(shell avr-gcc -print-libgcc-file-name))../../../../
 PRJ_AVR := $(GCC_PREFIX)avr/ada
 
 # PRJ_PATH := '$(PRJ_AVR)'
-# PRJ_PATH := /k/Data/Development/AVR-Ada/avr
+PRJ_PATH := k:/Data/Development/AVR-Ada.git/avr-ada/avr
 
 #---------------- GNATMAKE Options ----------------
-MFLAGS = -XMCU=$(MCU) -p -P$(GPR) 
-
+MFLAGS = -XMCU=$(MCU) -p -P$(GPR)
+# -p : Create missing obj, lib and exec dirs
 
 
 #---------------- Programming Options (avrdude) ----------------
@@ -66,16 +63,16 @@ FORMAT = ihex
 
 #---------------- Programming Options (avrdude) ----------------
 
-# Programming hardware: alf avr910 avrisp bascom bsd 
+# Programming hardware: alf avr910 avrisp bascom bsd
 # dt006 pavr picoweb pony-stk200 sp12 stk200 stk500
 #
 # Type: avrdude -c ?
 # to get a full listing.
 #
-AVRDUDE_PROGRAMMER = stk500v2
+AVRDUDE_PROGRAMMER = stk500v1 -b 57600
 
 # com1 = serial port. Use lpt1 to connect to parallel port.
-AVRDUDE_PORT = com4    # programmer connected to serial device
+AVRDUDE_PORT = com5    # programmer connected to serial device
 
 AVRDUDE_WRITE_FLASH = -U flash:w:
 AVRDUDE_WRITE_EEPROM = -U eeprom:w:
@@ -91,7 +88,7 @@ AVRDUDE_WRITE_EEPROM = -U eeprom:w:
 #AVRDUDE_NO_VERIFY = -V
 
 # Increase verbosity level.  Please use this when submitting bug
-# reports about avrdude. See <http://savannah.nongnu.org/projects/avrdude> 
+# reports about avrdude. See <http://savannah.nongnu.org/projects/avrdude>
 # to submit bug reports.
 #AVRDUDE_VERBOSE = -v -v
 
@@ -125,7 +122,7 @@ ALL_ASFLAGS = -mmcu=$(MCU) -I. -x assembler-with-cpp $(ASFLAGS)
 
 
 # Default target.
-all: gccversion build sizeafter
+all: build
 
 
 ADA_TARGETS_ELF = $(addsuffix .elf, $(ADA_TARGETS))
@@ -148,19 +145,11 @@ build: $(ADA_TARGETS_ELF) $(ADA_TARGETS_HEX) $(ADA_TARGETS_EEP) \
    $(ADA_TARGETS_LSS) $(ADA_TARGETS_SYM)
 
 
-# Display size of file.
-sizeafter: $(ADA_TARGETS_SIZE)
-
 %.size: %.elf FORCE
 	$(SIZE) --format=avr --mcu=$(MCU) $<
 
 
-# Display compiler version information.
-gccversion : 
-	@$(CC) --version
-
-
-# Program the device.  
+# Program the device.
 %.prog: %.hex %.eep
 	$(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_WRITE_FLASH)$*.hex
 # $(AVRDUDE_WRITE_EEPROM)
@@ -193,11 +182,11 @@ gccversion :
 
 # Compile: create assembler files from Ada source files.
 %.s : %.adb
-	ADA_PROJECT_PATH=$(PRJ_PATH) $(GNATMAKE) -f -u $(MFLAGS) $< -cargs -S 
+	ADA_PROJECT_PATH=$(PRJ_PATH) $(GNATMAKE) -f -u $(MFLAGS) $< -cargs -S
 
 
 %.s : %.ads
-	ADA_PROJECT_PATH=$(PRJ_PATH) $(GNATMAKE) -f -u $(MFLAGS) $< -cargs -S 
+	ADA_PROJECT_PATH=$(PRJ_PATH) $(GNATMAKE) -f -u $(MFLAGS) $< -cargs -S
 
 
 # Assemble: create object files from assembler source files.
@@ -218,6 +207,9 @@ clean: clean_gnat clean_list
 clean_gnat:
 	ADA_PROJECT_PATH=$(PRJ_PATH) avr-gnatclean -XMCU=$(MCU) -P$(GPR)
 
+clean_gnat_recursive:
+	ADA_PROJECT_PATH=$(PRJ_PATH) avr-gnatclean -r -XMCU=$(MCU) -P$(GPR)
+
 clean_list :
 	$(REMOVE) *.hex
 	$(REMOVE) *.eep
@@ -233,6 +225,6 @@ FORCE:
 
 
 # Listing of phony targets.
-.PHONY : all finish sizebefore sizeafter gccversion \
-   build elf hex eep lss sym clean clean_list program 
+.PHONY : all finish \
+   build elf hex eep lss sym clean clean_list program
 

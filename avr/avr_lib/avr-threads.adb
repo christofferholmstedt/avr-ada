@@ -123,6 +123,18 @@ package body AVR.Threads is
     end Get_Context;
 
     ------------------------------------------------------------------
+    -- Stop the Current Thread
+    ------------------------------------------------------------------
+    procedure Stop is
+        procedure avr_thread_stop;
+        pragma import(C,avr_thread_stop,"avr_thread_stop");
+    begin
+
+        avr_thread_stop;
+
+    end Stop;
+
+    ------------------------------------------------------------------
     -- INTERNAL - Trampoline from C code into Ada procedure
     ------------------------------------------------------------------
     procedure Thread_Thunk;
@@ -186,18 +198,6 @@ package body AVR.Threads is
         return 0;                   -- This exit should never happen
 
     end Stack_Used;
-
-    ------------------------------------------------------------------
-    -- Stop the Current Thread
-    ------------------------------------------------------------------
-    procedure Stop is
-        procedure avr_thread_stop;
-        pragma import(C,avr_thread_stop,"avr_thread_stop");
-    begin
-
-        avr_thread_stop;
-
-    end Stop;
 
     ------------------------------------------------------------------
     -- Yield for Some Milliseconds

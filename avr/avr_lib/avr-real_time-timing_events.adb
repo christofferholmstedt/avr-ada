@@ -37,6 +37,11 @@ package body AVR.Real_Time.Timing_Events is
    --  ascending order by timeout value.
    pragma Inline (Sooner);
 
+   function Sooner (Left, Right : access Timing_Event) return Boolean is
+   begin
+      return Right.Timeout > Left.Timeout;
+   end Sooner;
+
 
    package body Event_Queue is
 
@@ -197,11 +202,5 @@ package body AVR.Real_Time.Timing_Events is
    begin
       return Event.Timeout;
    end Time_Of_Event;
-
-
-   function Sooner (Left, Right : access Timing_Event) return Boolean is
-   begin
-      return Right.Timeout > Left.Timeout;
-   end Sooner;
 
 end AVR.Real_Time.Timing_Events;

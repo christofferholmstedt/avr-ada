@@ -6,8 +6,7 @@
 --                                 S p e c                                  --
 --                                                                          --
 -- This specification is derived from the Ada Reference Manual for use with --
--- AVR-Ada. The copyright notice above, and the license provisions that follow --
--- apply solely to the contents of the part following the private keyword.  --
+-- AVR-Ada.                                                                 --
 --                                                                          --
 --                                                                          --
 ------------------------------------------------------------------------------

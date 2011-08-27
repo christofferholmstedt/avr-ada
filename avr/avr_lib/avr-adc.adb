@@ -18,7 +18,7 @@
 
 with Interfaces;                   use Interfaces;
 with Ada.Unchecked_Conversion;
-With AVR.MCU;
+with AVR.MCU;
 
 package body AVR.ADC is
 

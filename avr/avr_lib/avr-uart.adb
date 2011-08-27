@@ -43,8 +43,8 @@ package body AVR.UART is
    UCSRB      : Nat8 renames MCU.UCSR0B;
    UCSRC      : Nat8 renames MCU.UCSR0C;
 
-   UBRRL      : Nat8 renames MCU.UBRR0L;
-   UBRRH      : Nat8 renames MCU.UBRR0H;
+   -- UBRRL      : Nat8 renames MCU.UBRR0L;
+   -- UBRRH      : Nat8 renames MCU.UBRR0H;
    UBRR       : Nat16 renames MCU.UBRR0;
 
    RXEN_Bit   : constant AVR.Bit_Number := RXEN0_Bit;
@@ -238,9 +238,16 @@ package body AVR.UART is
       --     0:   98 2f           mov     r25, r24
       --     2:   80 91 c0 00     lds     r24, 0x00C0
       --     6:   85 ff           sbrs    r24, 5
-      --     8:   00 c0           rjmp    .+0
+      --     8:   00 c0           rjmp    .-8
       --     a:   90 93 c6 00     sts     0x00C6, r25
 
+      --  avr-gcc 4.4.5 -Os -mmcu=atmega8
+      --     0:   9b b1           in      r25, 0x0b
+      --     2:   92 95           swap    r25
+      --     4:   96 95           lsr     r25
+      --     6:   91 70           andi    r25, 0x01
+      --     8:   01 f0           breq    .+0
+      --     a:   8c b9           out     0x0c, r24
    end Put_Raw;
 
 

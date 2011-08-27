@@ -18,7 +18,6 @@
 --   See also Atmel AVR Application Note AVR130
 
 
-with Interfaces;                   use Interfaces;
 with AVR;                          use AVR;
 with AVR.MCU;
 with AVR.Wait;

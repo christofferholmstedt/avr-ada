@@ -1,7 +1,7 @@
 with Interfaces;                   use Interfaces;
 -- with Ada.Unchecked_Conversion;
 with AVR.Wait;                     use AVR.Wait;
-with Temperatures;                 use Temperatures;
+-- with Temperatures;                 use Temperatures;
 with SHT.LL;                       use SHT.LL;
 
 

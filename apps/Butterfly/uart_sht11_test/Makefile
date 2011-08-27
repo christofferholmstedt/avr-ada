@@ -8,94 +8,222 @@
 ## PURPOSE. See the GNU General Public License for more details.         ##
 ###########################################################################
 
+# This makefile is adapted from the sample Makefile of WinAVR by Eric
+# B. Wedington, Jörg Wunsch and others.  As they released it to the
+# Public Domain, I could pretend that I wrote it myself.  Honestly, I
+# removed many (probably useful) parts to better fit the GNAT project makes.
+#
+
+# On command line:
+#
+# make all = Make software.
+#
+# make clean = Clean out built project files.
+#
+# make file.prog = Upload the hex file to the device, using avrdude.
+#                Please customize the avrdude settings below first!
+#
+# make filename.s = Just compile filename.adb into the assembler code only.
+#
+#
+# To rebuild project do "make clean" then "make all".
+#----------------------------------------------------------------------------
+
+
+# MCU name
 MCU := atmega169
 
-AVR_ADA := /k/Data/Development/AVR-Ada/avr
-#/mingw/avr/avr/ada
 
-#put the name of the target files here (without extension)
-TRGS	  := main
+# GNAT project file
+GPR := build.gpr
 
-# source files
-SRCS      := $(addsuffix .adb, $(TRGS))
 
-# GNAT project
-PRJ	  := build.gpr
+# put the names of the target files here (without extension)
+ADA_TARGETS := main
 
-# switches for gnatmake
-MFLAGS    := -p -XMCU=$(MCU)
 
-###### define some programs #######
-RM	  := rm -rf
-RN	  := mv
-BIN	  := avr-objcopy
-DUMP	  := avr-objdump
-SIZE      := avr-size
-GNATMAKE  := avr-gnatmake
 
-###### output format can be srec, ihex (avrobj is always created) #######
+#------------------------ Ada Project PATHs -------
+## where is the AVR library installed
+GCC_PREFIX := $(dir $(shell avr-gcc -print-libgcc-file-name))../../../../
+PRJ_AVR := $(GCC_PREFIX)avr/ada
+
+# PRJ_PATH := '$(PRJ_AVR)'
+PRJ_PATH := k:/Data/Development/AVR-Ada.git/avr-ada/avr
+
+#---------------- GNATMAKE Options ----------------
+MFLAGS = -XMCU=$(MCU) -p -P$(GPR)
+# -p : Create missing obj, lib and exec dirs
+
+
+#---------------- Programming Options (avrdude) ----------------
+# Output format. (can be srec, ihex, binary)
 FORMAT = ihex
-# ------------------------------------------	
-
-# other intersting file formats
-TRGS_ELF  := $(addsuffix .elf, $(TRGS))
-TRGS_ROM  := $(addsuffix .hex, $(TRGS))
-TRGS_EEP  := $(addsuffix .eep, $(TRGS))
-TRGS_LSS  := $(addsuffix .lss, $(TRGS))
-
-# --- this defines the targets of the make process ---
-all:	$(TRGS_ELF) $(TRGS_ROM) $(TRGS_EEP) $(TRGS_LSS) size ok 
 
 
-%.prog:
-	avrdude.exe -p m169 -c butterfly -P com4 -U flash:w:$(TRGS_ROM)
+#---------------- Programming Options (avrdude) ----------------
+
+# Programming hardware: alf avr910 avrisp bascom bsd
+# dt006 pavr picoweb pony-stk200 sp12 stk200 stk500
+#
+# Type: avrdude -c ?
+# to get a full listing.
+#
+AVRDUDE_PROGRAMMER = stk500v2
+
+# com1 = serial port. Use lpt1 to connect to parallel port.
+AVRDUDE_PORT = com4    # programmer connected to serial device
+
+AVRDUDE_WRITE_FLASH = -U flash:w:
+AVRDUDE_WRITE_EEPROM = -U eeprom:w:
 
 
-.PHONY: main.elf
+# Uncomment the following if you want avrdude's erase cycle counter.
+# Note that this counter needs to be initialized first using -Yn,
+# see avrdude manual.
+#AVRDUDE_ERASE_COUNTER = -y
+
+# Uncomment the following if you do /not/ wish a verification to be
+# performed after programming the device.
+#AVRDUDE_NO_VERIFY = -V
+
+# Increase verbosity level.  Please use this when submitting bug
+# reports about avrdude. See <http://savannah.nongnu.org/projects/avrdude>
+# to submit bug reports.
+#AVRDUDE_VERBOSE = -v -v
+
+AVRDUDE_FLAGS = -p $(MCU) -P $(AVRDUDE_PORT) -c $(AVRDUDE_PROGRAMMER)
+AVRDUDE_FLAGS += $(AVRDUDE_NO_VERIFY)
+AVRDUDE_FLAGS += $(AVRDUDE_VERBOSE)
+AVRDUDE_FLAGS += $(AVRDUDE_ERASE_COUNTER)
 
 
-# --- build and link using gnatmake ---
-$(TRGS_ELF): $(SRCS) $(PRJ) obj
-	export ADA_PROJECT_PATH=$(AVR_ADA); $(GNATMAKE) $(MFLAGS) -P$(PRJ) --RTS=rts/$(MCU)
+#============================================================================
 
-# --- create bin (.hex and .eep) files from elf output file ---
+
+# Define programs and commands.
+SHELL    := sh
+CC       := avr-gcc
+OBJCOPY  := avr-objcopy
+OBJDUMP  := avr-objdump
+SIZE     := avr-size
+NM       := avr-nm
+AVRDUDE  := avrdude
+REMOVE   := rm -f
+COPY     := cp
+RENAME   := mv
+WINSHELL := cmd
+GNATMAKE := avr-gnatmake
+
+
+# Combine all necessary flags and optional flags.
+# Add target processor to flags.
+ALL_ASFLAGS = -mmcu=$(MCU) -I. -x assembler-with-cpp $(ASFLAGS)
+
+
+# Default target.
+all: build
+
+
+ADA_TARGETS_ELF = $(addsuffix .elf, $(ADA_TARGETS))
+ADA_TARGETS_HEX = $(addsuffix .hex, $(ADA_TARGETS))
+ADA_TARGETS_EEP = $(addsuffix .eep, $(ADA_TARGETS))
+ADA_TARGETS_LSS = $(addsuffix .lss, $(ADA_TARGETS))
+ADA_TARGETS_SYM = $(addsuffix .sym, $(ADA_TARGETS))
+ADA_TARGETS_SIZE = $(addsuffix .size, $(ADA_TARGETS))
+
+# Create the necessary sub-directories
+SUBDIRS := obj
+
+
+
+# where is the runtime system.  The path is relative to the compiler gnat1
+ADA_RTS := rts/$(MCU)
+
+
+build: $(ADA_TARGETS_ELF) $(ADA_TARGETS_HEX) $(ADA_TARGETS_EEP) \
+   $(ADA_TARGETS_LSS) $(ADA_TARGETS_SYM)
+
+
+%.size: %.elf FORCE
+	$(SIZE) --format=avr --mcu=$(MCU) $<
+
+
+# Program the device.
+%.prog: %.hex %.eep
+	$(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_WRITE_FLASH)$*.hex
+# $(AVRDUDE_WRITE_EEPROM)
+
+
+# Create final output files (.hex, .eep) from ELF output file.
 %.hex: %.elf
-	$(BIN) -O $(FORMAT) -R .eeprom $< $@
+	$(OBJCOPY) -O $(FORMAT) -R .eeprom $< $@
 
 %.eep: %.elf
-	-$(BIN) -j .eeprom --set-section-flags=.eeprom="alloc,load" \
+	-$(OBJCOPY) -j .eeprom --set-section-flags=.eeprom="alloc,load" \
 	--change-section-lma .eeprom=0 -O $(FORMAT) $< $@
 
-# --- create a symbol table
-%.sym: %.elf
-	avr-nm -n $< > $@
-
-# --- create extended listing
+# Create extended listing file from ELF output file.
 %.lss: %.elf
-	$(DUMP) -h -S $< > $@
+	$(OBJDUMP) -h -S $< > $@
 
-# --- what is the size of the various sections
-size:  $(TRGS_ELF)
-	$(SIZE) -x -C --mcu=$(MCU) $^
+# Create a symbol table from ELF output file.
+%.sym: %.elf
+	$(NM) -n $< > $@
 
 
-obj:
-	$(RM) obj
-	mkdir obj
+# Link: create ELF output file from object files.
 
-# --- make instruction to delete created files ---
-clean:
-	$(RM) *.o
-	$(RM) *.ali
-	$(RM) *.map
-	$(RM) *.elf
-	$(RM) *.eep
-	$(RM) *.lss
-	$(RM) *.rom
-	$(RM) *.obj
-	$(RM) *.hex
-	$(RM) b_*.c
-	$(RM) obj/*
-#	$(RM) *.bak
-#	$(RM) *.log
+# --- build and link using gnatmake, force rebuilding by gnatmake to
+#     make sure dependencies are resolved
+%.elf: $(GPR) $(SUBDIRS) FORCE
+	ADA_PROJECT_PATH=$(PRJ_PATH) $(GNATMAKE) $(MFLAGS) -XAVRADA_MAIN=$*
 
+
+# Compile: create assembler files from Ada source files.
+%.s : %.adb
+	ADA_PROJECT_PATH=$(PRJ_PATH) $(GNATMAKE) -f -u $(MFLAGS) $< -cargs -S
+
+
+%.s : %.ads
+	ADA_PROJECT_PATH=$(PRJ_PATH) $(GNATMAKE) -f -u $(MFLAGS) $< -cargs -S
+
+
+# Assemble: create object files from assembler source files.
+%.o : %.S
+	@echo
+	@echo $(MSG_ASSEMBLING) $<
+	$(CC) -c $(ALL_ASFLAGS) $< -o $@
+
+# create the subdirectories
+$(SUBDIRS):
+	$(REMOVE) -r $@
+	mkdir $@
+
+
+# Target: clean project.
+clean: clean_gnat clean_list
+
+clean_gnat:
+	ADA_PROJECT_PATH=$(PRJ_PATH) avr-gnatclean -XMCU=$(MCU) -P$(GPR)
+
+clean_gnat_recursive:
+	ADA_PROJECT_PATH=$(PRJ_PATH) avr-gnatclean -r -XMCU=$(MCU) -P$(GPR)
+
+clean_list :
+	$(REMOVE) *.hex
+	$(REMOVE) *.eep
+	$(REMOVE) *.elf
+	$(REMOVE) *.map
+	$(REMOVE) *.sym
+	$(REMOVE) *.lss
+	$(REMOVE) *.ali
+	$(REMOVE) b~*.ad?
+	$(REMOVE) -rf $(SUBDIRS)
+
+FORCE:
+
+
+# Listing of phony targets.
+.PHONY : all finish \
+   build elf hex eep lss sym clean clean_list program

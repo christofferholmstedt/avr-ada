@@ -47,7 +47,6 @@ at%/avr-mcu.ads     : MCU = $(patsubst %/avr-mcu.ads,%, $@)
 at%/lib/libavrada.a: stamp-links at%/obj at%/lib ../avr.gpr ../mcu.gpr at%/avr-mcu.ads
 	avr-gnatmake -P../avr -XMCU=$(MCU)
 
-
 avr-real_time.ads: avr-real_time.ads.gp
 	$(GNATPREP) -b -DTICK=tick_1ms $< $@
 
@@ -56,7 +55,6 @@ avr-real_time_1s.ads: avr-real_time.ads.gp
 
 avr-real_time_5us.ads: avr-real_time.ads.gp
 	$(GNATPREP) -b -DTICK=tick_5us $< $@
-
 
 at%/avr-mcu.ads:
 	echo "pragma Style_Checks (Off);"  > $@
@@ -74,6 +72,13 @@ stamp-links: $(mcu_specs)
 
 stamp-libs: $(libs)
 	touch $@
+
+# Compile: create assembler files from Ada source files.
+%.s : %.adb
+	avr-gnatmake -f -u -P../avr -XMCU=$(MCU) $< -cargs -S
+
+%.s : %.ads
+	avr-gnatmake -f -u -P../avr -XMCU=$(MCU) $< -cargs -S
 
 clean:
 	$(RM) stamp-*
