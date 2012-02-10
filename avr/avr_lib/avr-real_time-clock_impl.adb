@@ -39,13 +39,18 @@ package body AVR.Real_Time.Clock_Impl is
    pragma Export (C, Tick, Timer0.Signal_Compare);
 
    procedure Tick is
+      Local_Secs : Day_Duration := Now.Secs;
    begin
-      Now.Secs := Now.Secs + Tick_Delta;
-      if Now.Secs = Day_Duration'Last then
+      Local_Secs := Local_Secs + Tick_Delta;
+      if Local_Secs = Day_Duration'Last then
          Now.Days := Now.Days + 1;
-         Now.Secs := 0.0;
+         Local_Secs := 0.0;
       end if;
+      Now.Secs := Local_Secs;
    end Tick;
+   --  inside the interrupt routine we don't need to always read and
+   --  write from/to RAM. Having the seconds in a local variable in
+   --  registers saves 24 bytes on a mega328p (120 vs. 144 bytes).
 
 
    procedure Init is
@@ -66,21 +71,33 @@ package body AVR.Real_Time.Clock_Impl is
 
       if AVR.Config.Clock_Frequency = 1_000_000 then
          Timer0.Init_CTC (Timer0.Scale_By_8, Overflow => 124);
+         pragma Compile_Time_Warning
+           (True, "t0 scale: 8, overflow 124");
 
       elsif AVR.Config.Clock_Frequency = 2_000_000 then
          Timer0.Init_CTC (Timer0.Scale_By_8, Overflow => 249);
+         pragma Compile_Time_Warning
+           (True, "t0 scale: 8, overflow 249");
 
       elsif AVR.Config.Clock_Frequency = 4_000_000 then
          Timer0.Init_CTC (Timer0.Scale_By_64, Overflow => 62);
+         pragma Compile_Time_Warning
+           (True, "t0 scale: 64, overflow 62");
 
       elsif AVR.Config.Clock_Frequency = 8_000_000 then
          Timer0.Init_CTC (Timer0.Scale_By_64, Overflow => 124);
+         pragma Compile_Time_Warning
+           (True, "t0 scale: 64, overflow 124");
 
       elsif AVR.Config.Clock_Frequency = 12_000_000 then
          Timer0.Init_CTC (Timer0.Scale_By_64, Overflow => 187);
+         pragma Compile_Time_Warning
+           (True, "t0 scale: 64, overflow 187");
 
       elsif AVR.Config.Clock_Frequency = 16_000_000 then
          Timer0.Init_CTC (Timer0.Scale_By_64, Overflow => 249);
+         pragma Compile_Time_Warning
+           (True, "t0 scale: 64, overflow 249");
 
       else
          pragma Compile_Time_Warning

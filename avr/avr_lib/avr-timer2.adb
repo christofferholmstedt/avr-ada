@@ -25,14 +25,14 @@ package body AVR.Timer2 is
 
 #if MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa" or else MCU = "atmega169" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" or else MCU = "atmega2560" then
    Output_Compare_Reg : Unsigned_8 renames MCU.OCR2A;
-#elsif mcu = "atmega32" then
+#elsif mcu = "atmega8" or else mcu = "atmega32" then
    Output_Compare_Reg : Unsigned_8 renames MCU.OCR2;
 #end if;
 
 
 #if MCU = "attiny13" or else MCU = "atmega168" or else MCU = "atmega168p" or else MCU = "atmega168pa" or else MCU = "atmega169" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" or else MCU = "atmega2560" then
    Ctrl_Reg       : Bits_In_Byte renames MCU.TCCR2A_Bits;
-#elsif MCU = "atmega32" then
+#elsif MCU = "atmega8" or else MCU = "atmega32" then
    Ctrl_Reg       : Bits_In_Byte renames MCU.TCCR2_Bits;
 #end if;
 
@@ -41,7 +41,7 @@ package body AVR.Timer2 is
    Prescale_Reg   : Unsigned_8 renames MCU.TCCR2B;
 #elsif MCU = "atmega169" then
    Prescale_Reg   : Unsigned_8 renames MCU.TCCR2A;
-#elsif MCU = "atmega32" then
+#elsif MCU = "atmega8" or else MCU = "atmega32" then
    Prescale_Reg   : Unsigned_8 renames MCU.TCCR2;
 #end if;
 
@@ -49,7 +49,7 @@ package body AVR.Timer2 is
    Interrupt_Mask : Bits_In_Byte renames MCU.TIMSK2_Bits;
    Output_Compare_Interrupt_Enable : Boolean renames Interrupt_Mask (MCU.OCIE2A_Bit);
    Overflow_Interrupt_Enable       : Boolean renames Interrupt_Mask (MCU.TOIE2_Bit);
-#elsif MCU = "atmega32" then
+#elsif MCU = "atmega8" or else MCU = "atmega32" then
    Interrupt_Mask : Bits_In_Byte renames MCU.TIMSK_Bits;
    Output_Compare_Interrupt_Enable : Boolean renames MCU.TIMSK_Bits (MCU.OCIE2_Bit);
 #end if;
@@ -113,7 +113,7 @@ package body AVR.Timer2 is
                    MCU.WGM21_Bit => True,   --  /  Match (CTC)
 
                    others    => False);
-#elsif MCU = "atmega32" then
+#elsif MCU = "atmega8" or else MCU = "atmega32" then
       Ctrl_Reg := (MCU.COM20_Bit => False, --  \  normal operation,
                    MCU.COM21_Bit => False, --  /  OC0 disconnected
 
@@ -156,7 +156,7 @@ package body AVR.Timer2 is
                    MCU.WGM21_Bit => False,  --  /
 
                    others    => False);
-#elsif MCU = "atmega32" then
+#elsif MCU = "atmega8" or else MCU = "atmega32" then
       Ctrl_Reg := (MCU.COM20_Bit => False, --  \  normal operation,
                    MCU.COM21_Bit => False, --  /  OC0 disconnected
 
@@ -180,10 +180,27 @@ package body AVR.Timer2 is
    end Init_Normal;
 
 
-#if MCU = "atmega168" or else MCU = "atmega169" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" or else MCU = "atmega2560" then
+   --  PWM modes
+   procedure Init_PWM (Prescaler      : Scale_Type;
+                       PWM_Resolution : PWM_Type;
+                       Inverted       : Boolean := False)
+   is
+   begin
+      --  select the clock
+      Prescale_Reg := Prescale_Reg or Prescaler;
+
+      MCU.TCNT2 := 0;
+
+      MCU.TCCR2A_Bits(MCU.WGM20_Bit) := PWM_Resolution(WGM0);
+      MCU.TCCR2A_Bits(MCU.WGM21_Bit) := PWM_Resolution(WGM1);
+      MCU.TCCR2B_Bits(MCU.WGM22_Bit) := PWM_Resolution(WGM2);
+   end Init_PWM;
+
+
+#if MCU = "attiny13" or else MCU = "atmega168" or else MCU = "atmega169" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" or else MCU = "atmega2560" then
    Com0 : Boolean renames Ctrl_Reg (MCU.COM2A0_Bit);
    Com1 : Boolean renames Ctrl_Reg (MCU.COM2A1_Bit);
-#elsif MCU = "atmega32" then
+#elsif MCU = "atmega8" or else MCU = "atmega32" then
    Com0 : Boolean renames Ctrl_Reg (MCU.COM20_Bit);
    Com1 : Boolean renames Ctrl_Reg (MCU.COM21_Bit);
 #end if;

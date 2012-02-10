@@ -24,16 +24,6 @@ package AVR.EEprom is
    pragma Preelaborate;
 
 
-   --  indicate, if EEprom is ready for a new read/write operation
-   function Is_Ready return Boolean;
-   --  ??? is it necessary to make this public?
-
-
-   --  loops until EEprom is no longer busy
-   procedure Busy_Wait;
-   --  ??? is it necessary to make this public?
-
-
    subtype EEprom_Address is System.Address
      range 0 .. AVR.MCU.E2end;
 
@@ -41,20 +31,19 @@ package AVR.EEprom is
    --  read a value from the specified address
    function Get (Address : EEprom_Address) return Unsigned_8;
    function Get (Address : EEprom_Address) return Unsigned_16;
+   function Get (Address : EEprom_Address) return Unsigned_32;
+   function Get (Address : EEprom_Address) return Integer_8;
+   function Get (Address : EEprom_Address) return Integer_16;
+   function Get (Address : EEprom_Address) return Integer_32;
    procedure Get (Address : EEprom_Address; Data : out Nat8_Array);
 
    --  store a value at the address
    procedure Put (Address : EEprom_Address; Data : Unsigned_8);
    procedure Put (Address : EEprom_Address; Data : Unsigned_16);
+   procedure Put (Address : EEprom_Address; Data : Unsigned_32);
+   procedure Put (Address : EEprom_Address; Data : Integer_8);
+   procedure Put (Address : EEprom_Address; Data : Integer_16);
+   procedure Put (Address : EEprom_Address; Data : Integer_32);
    procedure Put (Address : EEprom_Address; Data : Nat8_Array);
-
-private
-   --  dirty hack to force 8-bit EEprom_address if E2end fits in 8 bit
-   --   Ee_Addr_Size : constant := Boolean'Pos (not MCU.EEprom_8bit_Addr) * 8 + 8;
-   --   for EEprom_Address'Size use Ee_Addr_Size;
-   --  does only work if EEprom_Address is separate type, not a subtype
-
-   pragma Inline (Is_Ready);
-   pragma Inline (Busy_Wait);
 
 end AVR.EEprom;

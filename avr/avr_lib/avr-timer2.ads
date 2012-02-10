@@ -39,9 +39,20 @@ package AVR.Timer2 is
    function Scale_By_256    return Scale_Type;
    function Scale_By_1024   return Scale_Type;
 
+   type PWM_Type is private;
+   Fast_PWM            : constant PWM_Type; --  TOP = FF
+   Phase_Correct_PWM   : constant PWM_Type;
+
+   --  normal mode
    procedure Init_Normal (Prescaler : Scale_Type);
+   --  clear timer on compare match
    procedure Init_CTC (Prescaler : Scale_Type; Overflow : Unsigned_8 := 0);
    procedure Set_Overflow_At (Overflow : Unsigned_8);
+   --  PWM modes
+   procedure Init_PWM (Prescaler      : Scale_Type;
+                       PWM_Resolution : PWM_Type;
+                       Inverted       : Boolean := False);
+
 
    procedure Set_Output_Compare_Mode_Normal;
    procedure Set_Output_Compare_Mode_Toggle;
@@ -61,6 +72,16 @@ package AVR.Timer2 is
 
 private
 
+   type PWM_Bits is (WGM0, WGM1, WGM2);
+
+   type PWM_Type is array (PWM_Bits) of Boolean;
+
+   Fast_PWM          : constant PWM_Type :=
+     (WGM0 => True,  WGM1 => True,  WGM2 => True);  --  TOP = FF
+   Phase_Correct_PWM : constant PWM_Type :=
+     (WGM0 => True,  WGM1 => False, WGM2 => False); --  TOP = FF
+
+
    pragma Inline (No_Clock_Source);
    pragma Inline (No_Prescaling);
    pragma Inline (Scale_By_8);
@@ -75,4 +96,3 @@ private
    pragma Inline (Enable_Interrupt_Overflow);
 
 end AVR.Timer2;
-

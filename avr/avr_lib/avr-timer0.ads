@@ -23,6 +23,8 @@ package AVR.Timer0 is
    pragma Preelaborate;
 
 
+   Count : Unsigned_8 renames MCU.TCNT0;
+
    --
    --  Different scaling factors for timer clock input.
    --
@@ -33,7 +35,9 @@ package AVR.Timer0 is
    function No_Clock_Source return Scale_Type;
    function No_Prescaling   return Scale_Type;
    function Scale_By_8      return Scale_Type;
+   function Scale_By_32     return Scale_Type;
    function Scale_By_64     return Scale_Type;
+   function Scale_By_128    return Scale_Type;
    function Scale_By_256    return Scale_Type;
    function Scale_By_1024   return Scale_Type;
 
@@ -69,7 +73,9 @@ private
    pragma Inline (No_Clock_Source);
    pragma Inline (No_Prescaling);
    pragma Inline (Scale_By_8);
+   pragma Inline (Scale_By_32);
    pragma Inline (Scale_By_64);
+   pragma Inline (Scale_By_128);
    pragma Inline (Scale_By_256);
    pragma Inline (Scale_By_1024);
    pragma Inline (Stop);

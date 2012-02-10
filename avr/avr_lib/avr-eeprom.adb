@@ -22,7 +22,8 @@
 
 
 with System;                       use System;
-with AVR.Interrupts;
+with Ada.Unchecked_Conversion;
+With AVR.Interrupts;
 with AVR.MCU;
 
 use AVR;
@@ -38,6 +39,13 @@ package body AVR.EEprom is
    EE_Write_Enable        : Boolean renames MCU.EECR_Bits (MCU.EEPE_Bit);
 #end if;
    EE_Read_Enable         : Boolean renames MCU.EECR_Bits (MCU.EERE_Bit);
+
+
+   --  indicate, if EEprom is ready for a new read/write operation
+   function Is_Ready return Boolean;
+
+   --  loops until EEprom is no longer busy
+   procedure Busy_Wait;
 
 
    function Is_Ready return Boolean is
@@ -82,6 +90,14 @@ package body AVR.EEprom is
    end Put;
 
 
+   procedure Put (Address : EEprom_Address; Data : Unsigned_32) is
+      Bytes : Nat8_Array(1..4);
+      for Bytes'Address use Data'Address;
+   begin
+      Put (Address, Bytes);
+   end Put;
+
+
    procedure Put (Address : EEprom_Address; Data : Nat8_Array) is
       Local : EEprom_Address := Address;
    begin
@@ -118,6 +134,17 @@ package body AVR.EEprom is
    end Get;
 
 
+   function Get (Address : EEprom_Address) return Unsigned_32
+   is
+      Result : Unsigned_32;
+      Bytes : Nat8_Array (1..4);
+      for Bytes'Address use Result'Address;
+   begin
+      Get (Address, Bytes);
+      return Result;
+   end Get;
+
+
    procedure Get (Address : EEprom_Address; Data : out Nat8_Array) is
       Local : EEprom_Address := Address;
    begin
@@ -126,6 +153,64 @@ package body AVR.EEprom is
          Local := Local + 1;
       end loop;
    end Get;
+
+
+   function "+" is new Ada.Unchecked_Conversion (Source => Integer_32,
+                                                 Target => Unsigned_32);
+   function "+" is new Ada.Unchecked_Conversion (Source => Integer_16,
+                                                 Target => Unsigned_16);
+   function "+" is new Ada.Unchecked_Conversion (Source => Integer_8,
+                                                 Target => Unsigned_8);
+
+
+   procedure Put (Address : EEprom_Address; Data : Integer_8) is
+      U : constant Unsigned_8 := +Data;
+   begin
+      Put (Address, U);
+   end Put;
+
+   procedure Put (Address : EEprom_Address; Data : Integer_16) is
+      U : constant Unsigned_16 := +Data;
+   begin
+      Put (Address, U);
+   end Put;
+
+   procedure Put (Address : EEprom_Address; Data : Integer_32) is
+      U : constant Unsigned_32 := +Data;
+   begin
+      Put (Address, U);
+   end Put;
+
+
+   function "+" is new Ada.Unchecked_Conversion (Source => Unsigned_32,
+                                                 Target => Integer_32);
+   function "+" is new Ada.Unchecked_Conversion (Source => Unsigned_16,
+                                                 Target => Integer_16);
+   function "+" is new Ada.Unchecked_Conversion (Source => Unsigned_8,
+                                                 Target => Integer_8);
+
+
+   function Get (Address : EEprom_Address) return Integer_8
+   is
+      U : constant Unsigned_8 := Get (Address);
+   begin
+      return +U;
+   end Get;
+
+   function Get (Address : EEprom_Address) return Integer_16
+   is
+      U : constant Unsigned_16 := Get (Address);
+   begin
+      return +U;
+   end Get;
+
+   function Get (Address : EEprom_Address) return Integer_32
+   is
+      U : constant Unsigned_32 := Get (Address);
+   begin
+      return +U;
+   end Get;
+
 
 end AVR.EEprom;
 

@@ -43,8 +43,6 @@ package body AVR.UART is
    UCSRB      : Nat8 renames MCU.UCSR0B;
    UCSRC      : Nat8 renames MCU.UCSR0C;
 
-   -- UBRRL      : Nat8 renames MCU.UBRR0L;
-   -- UBRRH      : Nat8 renames MCU.UBRR0H;
    UBRR       : Nat16 renames MCU.UBRR0;
 
    RXEN_Bit   : constant AVR.Bit_Number := RXEN0_Bit;
@@ -112,15 +110,15 @@ package body AVR.UART is
    --     Init (Ubrr, False);
    --  end Init;
 
-   procedure Init_Common (Baud_Divider : Unsigned_16;
+   procedure Init_Common (Baud_Divider : Serial_Speed;
                           Double_Speed : Boolean := False)
    is
    begin
       -- Set baud rate
 #if not UART = "uart" then
-      UBRR := Baud_Divider;
+      UBRR := Unsigned_16(Baud_Divider);
 #else
-      UBRR := Low_Byte (Baud_Divider);
+      UBRR := Low_Byte(Unsigned_16(Baud_Divider));
 #end if;
 
 #if not UART = "uart" then
@@ -155,7 +153,7 @@ package body AVR.UART is
    end Init_Common;
 
 
-   procedure Init (Baud_Divider : Unsigned_16;
+   procedure Init (Baud_Divider : Serial_Speed;
                    Double_Speed : Boolean := False)
    is
    begin
@@ -169,13 +167,11 @@ package body AVR.UART is
    end Init;
 
 
-
    Rx_Buf : Buffer_Ptr;
    Rx_Inx, Rx_Outx : Unsigned_8;
    pragma Volatile(Rx_Inx);
 
-
-   procedure Init_Interrupt_Read (Baud_Divider   : Unsigned_16;
+   procedure Init_Interrupt_Read (Baud_Divider   : Serial_Speed;
                                   Double_Speed   : Boolean := False;
                                   Receive_Buffer : Buffer_Ptr)
    is
@@ -188,7 +184,6 @@ package body AVR.UART is
                  TXEN_Bit => True,
                  RXCIE_Bit => True,     -- Enable Receiver interrupts
                  others => False);
-
 
       -- Clear UART input queue
       while UCSRA_Bits(RXC_Bit) = True loop
@@ -470,7 +465,7 @@ package body AVR.UART is
             if Rx_Outx = Rx_Buf.all'Last then
                Rx_Outx := Rx_Buf.all'First;
             else
-         Rx_Outx := Rx_Outx + 1;
+               Rx_Outx := Rx_Outx + 1;
             end if;
 
             return Byte;

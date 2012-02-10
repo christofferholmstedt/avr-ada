@@ -15,6 +15,15 @@
 -- executable file might be covered by the GNU Public License.           --
 ---------------------------------------------------------------------------
 
+--
+--  supported MCUs:
+--
+--  ATTINY
+--  attiny13    attiny13a   attiny2313
+--
+--  ATMEGA
+--  atmega168   atmega169   atmega2560  atmega32    atmega328p  atmega644
+--  atmega644p  _atmega8_(partly)
 
 with Interfaces;                   use Interfaces;
 with AVR;                          use AVR;
@@ -22,9 +31,6 @@ with AVR.MCU;
 
 package body AVR.Timer0 is
 
-
-   -- Overflow_Count : Unsigned_16;
-   -- pragma Volatile (Overflow_Count);
 
 #if MCU = "attiny13" or else MCU = "attiny13a" or else MCU = "attiny2313" or else MCU = "atmega168" or else MCU = "atmega169" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" or else MCU = "atmega2560" then
    Output_Compare_Reg : Unsigned_8 renames MCU.OCR0A;
@@ -39,13 +45,13 @@ package body AVR.Timer0 is
    Ctrl_Reg       : Bits_In_Byte renames MCU.TCCR0_Bits;
 #end if;
 
-
+   Prescale_Reg   : Unsigned_8 renames
 #if MCU = "attiny13" or else MCU = "attiny13a" or else MCU = "attiny2313" or else MCU = "atmega328p" or else MCU = "atmega168" or else MCU = "atmega2560" then
-   Prescale_Reg   : Unsigned_8 renames MCU.TCCR0B;
-#elsif MCU = "atmega169" or else MCU = "atmega644" or else MCU = "atmega644" or else MCU = "atmega644p" then
-   Prescale_Reg   : Unsigned_8 renames MCU.TCCR0A;
+    MCU.TCCR0B;
+#elsif MCU = "atmega169" or else MCU = "atmega644" or else MCU = "atmega644p" then
+    MCU.TCCR0A;
 #elsif MCU = "atmega8" or else MCU = "atmega32" then
-   Prescale_Reg   : Unsigned_8 renames MCU.TCCR0;
+    MCU.TCCR0;
 #end if;
 
 
@@ -82,19 +88,41 @@ package body AVR.Timer0 is
       return MCU.CS01_Mask;
    end Scale_By_8;
 
-   function Scale_By_64     return Scale_Type is
+   function Scale_By_32     return Scale_Type is
    begin
       return MCU.CS01_Mask or MCU.CS00_Mask;
+   end Scale_By_32;
+
+   function Scale_By_64     return Scale_Type is
+   begin
+#if MCU = "atmega32" then
+      return MCU.CS01_Mask or MCU.CS00_Mask;
+#else
+      return MCU.CS02_Mask;
+#end if;
    end Scale_By_64;
+
+   function Scale_By_128    return Scale_Type is
+   begin
+      return MCU.CS02_Mask or MCU.CS00_Mask;
+   end Scale_By_128;
 
    function Scale_By_256    return Scale_Type is
    begin
+#if MCU = "atmega32" or else MCU = "atmega8" then
       return MCU.CS02_Mask;
+#else
+      return MCU.CS02_Mask or MCU.CS01_Mask;
+#end if;
    end Scale_By_256;
 
    function Scale_By_1024   return Scale_Type is
    begin
+#if MCU = "atmega32" then
       return MCU.CS02_Mask or MCU.CS00_Mask;
+#else
+      return MCU.CS02_Mask or MCU.CS01_Mask or MCU.CS00_Mask;
+#end if;
    end Scale_By_1024;
 
 
@@ -120,8 +148,8 @@ package body AVR.Timer0 is
                    others    => False);
 
 #elsif MCU = "atmega32" then
-      Ctrl_Reg := (MCU.COM00_Bit => False, --  \  normal operation,
-                   MCU.COM01_Bit => False, --  /  OC0 disconnected
+      Ctrl_Reg := (MCU.COM00_Bit => False,  --  \  normal operation,
+                   MCU.COM01_Bit => False,  --  /  OC0 disconnected
 
                    MCU.WGM00_Bit => False,  --  \  NORMAL MODE
                    MCU.WGM01_Bit => False,  --  /
@@ -166,8 +194,8 @@ package body AVR.Timer0 is
                    others    => False);
 
 #elsif MCU = "atmega32" then
-      Ctrl_Reg := (MCU.COM00_Bit => False, --  \  normal operation,
-                   MCU.COM01_Bit => False, --  /  OC0 disconnected
+      Ctrl_Reg := (MCU.COM00_Bit => False,  --  \  normal operation,
+                   MCU.COM01_Bit => False,  --  /  OC0 disconnected
 
                    MCU.WGM00_Bit => False,  --  \  Clear Timer on Compare
                    MCU.WGM01_Bit => True,   --  /  Match (CTC)
@@ -193,7 +221,7 @@ package body AVR.Timer0 is
    end Init_CTC;
 
 
-#if MCU = "attiny13" or else MCU = "attiny13a" or else MCU = "attiny2313" or else MCU = "atmega168" or else MCU = "atmega169" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" or else MCU = "atmega2560" then
+#if MCU = "attiny13" or else MCU = "attiny13a" or else MCU = "attiny2313" or else MCU = "atmega168" or else MCU = "atmega169" or else MCU = "atmega2560" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" then
    Com0 : Boolean renames Ctrl_Reg (MCU.COM0A0_Bit);
    Com1 : Boolean renames Ctrl_Reg (MCU.COM0A1_Bit);
 #elsif MCU = "atmega32" then

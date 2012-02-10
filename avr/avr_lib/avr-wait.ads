@@ -25,7 +25,7 @@
 with Interfaces;                   use Interfaces;
 
 package AVR.Wait is
-   pragma Preelaborate (AVR.Wait);
+   pragma Preelaborate;
 
 
    procedure Wait_3_Cycles (Count : Unsigned_8);

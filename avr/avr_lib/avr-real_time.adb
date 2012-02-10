@@ -24,9 +24,7 @@
 --  duration.
 --
 
---with Ada.Unchecked_Conversion;
 with Interfaces;                   use Interfaces;
-
 with AVR.Int_Img;
 
 package body AVR.Real_Time is
@@ -215,12 +213,20 @@ package body AVR.Real_Time is
       Sub_Second : Second_Duration := 0.0)
      return Day_Duration
    is
-      S : Day_Duration;
-   begin
-      S := Day_Duration ((((Integer_32(Hour) * 60) + Integer_32(Minute)) * 60)
-                         + Integer_32(Second))
-        + Sub_Second;
-      return S;
+      SS : Day_Duration := 0.0;
+      H : constant Integer_32 := Integer_32(Hour);
+      M : constant Integer_32 := Integer_32(Minute);
+      S : constant Integer_32 := Integer_32(Minute);
+      T : Integer_32;
+   Begin
+      T := H * 60 + M;
+      T := T * 60 + S;
+      -- Ss := Day_Duration (T); <<-- generate compiler error
+
+      --  SS := Day_Duration ((((Integer_32(Hour) * 60) + Integer_32(Minute)) * 60)
+      --  + Integer_32(Second))
+      --  + Sub_Second;
+      return SS;
    end Seconds_Of;
 
 
@@ -414,10 +420,12 @@ package body AVR.Real_Time is
 
    function Microseconds (US : Integer) return Duration is
    begin
-      return Milliseconds (US / 1000);
+      return Duration (US) / 1_000_000.0;
    end Microseconds;
 
-
+   --  avoid front end inlining by placing milliseconds after
+   --  microsends. With front end inlining enabled (-gnatN) we get a
+   --  gnat bug box.
    function Milliseconds (MS : Integer) return Duration is
    begin
       return Duration (MS) / 1000.0;
@@ -426,7 +434,9 @@ package body AVR.Real_Time is
 
    function Seconds (S  : Integer) return Duration is
    begin
-      return Duration (S);
+      -- GNAT bug box in gcc-4.4.5
+      -- return Duration (S);
+      return Minutes (S) / 60.0;
    end Seconds;
 
 

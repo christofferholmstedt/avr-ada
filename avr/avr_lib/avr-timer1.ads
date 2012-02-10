@@ -37,18 +37,18 @@ package AVR.Timer1 is
    function Scale_By_1024   return Scale_Type;
 
    type PWM_Type is private;
-   Fast_PWM_8bit              : constant PWM_Type; --  TOP = 00FF
-   Fast_PWM_9bit              : constant PWM_Type; --  TOP = 01FF
-   Fast_PWM_10bit             : constant PWM_Type; --  TOP = 03FF
-   --  Fast_PWM_ICR               : constant PWM_Type; --  TOP = MCU.ICR1
-   --  Fast_PWM_OCR               : constant PWM_Type; --  TOP = MCU.OCR1A
-   --  Phase_Correct_PWM_8Bit     : constant PWM_Type; --  TOP = 00FF
-   --  Phase_Correct_PWM_9Bit     : constant PWM_Type; --  TOP = 01FF
-   --  Phase_Correct_PWM_10Bit    : constant PWM_Type; --  TOP = 03FF
-   --  Phase_Correct_PWM_ICR      : constant PWM_Type; --  TOP = MCU.ICR1
-   --  Phase_Correct_PWM_OCR      : constant PWM_Type; --  TOP = MCU.OCR1A
-   --  Phase_Freq_Correct_PWM_ICR : constant PWM_Type; --  TOP = MCU.ICR1
-   --  Phase_Freq_Correct_PWM_OCR : constant PWM_Type; --  TOP = MCU.OCR1A
+   Fast_PWM_8bit              : constant PWM_Type; --  top = 00FF
+   Fast_PWM_9bit              : constant PWM_Type; --  top = 01FF
+   Fast_PWM_10bit             : constant PWM_Type; --  top = 03FF
+   --  Fast_PWM_ICR               : constant PWM_Type; --  top = MCU.ICR1
+   --  Fast_PWM_OCR               : constant PWM_Type; --  top = MCU.OCR1A
+   Phase_Correct_PWM_8Bit     : constant PWM_Type; --  top = 00FF
+   --  Phase_Correct_PWM_9Bit     : constant PWM_Type; --  top = 01FF
+   --  Phase_Correct_PWM_10Bit    : constant PWM_Type; --  top = 03FF
+   --  Phase_Correct_PWM_ICR      : constant PWM_Type; --  top = MCU.ICR1
+   --  Phase_Correct_PWM_OCR      : constant PWM_Type; --  top = MCU.OCR1A
+   --  Phase_Freq_Correct_PWM_ICR : constant PWM_Type; --  top = MCU.ICR1
+   --  Phase_Freq_Correct_PWM_OCR : constant PWM_Type; --  top = MCU.OCR1A
 
 
    --  normal mode
@@ -61,6 +61,15 @@ package AVR.Timer1 is
                        PWM_Resolution : PWM_Type;
                        Inverted       : Boolean := False);
 
+   procedure Set_Output_Compare_Mode_Normal;
+   procedure Set_Output_Compare_Mode_Toggle;
+   procedure Set_Output_Compare_Mode_Clear;
+   procedure Set_Output_Compare_Mode_Set;
+   procedure Set_Output_Compare_Mode_B_Normal;
+   procedure Set_Output_Compare_Mode_B_Toggle;
+   procedure Set_Output_Compare_Mode_B_Clear;
+   procedure Set_Output_Compare_Mode_B_Set;
+
    --  stop the timer,
    --  set prescaler to No_Clock_Source, disable timer interrupts
    procedure Stop;
@@ -68,36 +77,22 @@ package AVR.Timer1 is
    procedure Enable_Interrupt_Compare;
    procedure Enable_Interrupt_Overflow;
 
-   --  #if MCU = "atmega168" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" then
+
    Signal_Compare  : constant String := MCU.Sig_Timer1_CompA_String;
    Signal_Overflow : constant String := MCU.Sig_Timer1_OVF_String;
-   --  #end if;
+
 
 private
-
-   --  type PWM_Type is new Unsigned_8 range 1 .. 15;
-   --  Fast_PWM_8bit              : constant PWM_Type :=  5; --  TOP = 00FF
-   --  Fast_PWM_9bit              : constant PWM_Type :=  6; --  TOP = 01FF
-   --  Fast_PWM_10bit             : constant PWM_Type :=  7; --  TOP = 03FF
-   --  Fast_PWM_ICR               : constant PWM_Type := 14; --  TOP = MCU.ICR1
-   --  Fast_PWM_OCR               : constant PWM_Type := 15; --  TOP = MCU.OCR1A
-   --  Phase_Correct_PWM_8Bit     : constant PWM_Type :=  1; --  TOP = 00FF
-   --  Phase_Correct_PWM_9Bit     : constant PWM_Type :=  2; --  TOP = 01FF
-   --  Phase_Correct_PWM_10Bit    : constant PWM_Type :=  3; --  TOP = 03FF
-   --  Phase_Correct_PWM_ICR      : constant PWM_Type := 10; --  TOP = MCU.ICR1
-   --  Phase_Correct_PWM_OCR      : constant PWM_Type := 11; --  TOP = MCU.OCR1A
-   --  Phase_Freq_Correct_PWM_ICR : constant PWM_Type :=  8; --  TOP = MCU.ICR1
-   --  Phase_Freq_Correct_PWM_OCR : constant PWM_Type :=  9; --  TOP = MCU.OCR1A
 
    type PWM_Type is array (0..3) of Boolean;
    -- pragma Pack (PWM_Type);
    -- for PWM_Type'Size use 8;
-   Fast_PWM_8bit              : constant PWM_Type := (0 => True,  1 => False, 2 => True,  3 => False); --  TOP = 00FF
-   Fast_PWM_9bit              : constant PWM_Type := (0 => False, 1 => True,  2 => True,  3 => False); --  TOP = 01FF
-   Fast_PWM_10bit             : constant PWM_Type := (0 => True,  1 => True,  2 => True,  3 => False); --  TOP = 03FF
+   Fast_PWM_8bit              : constant PWM_Type := (0 => True,  1 => False, 2 => True,  3 => False); --  top = 00FF
+   Fast_PWM_9bit              : constant PWM_Type := (0 => False, 1 => True,  2 => True,  3 => False); --  top = 01FF
+   Fast_PWM_10bit             : constant PWM_Type := (0 => True,  1 => True,  2 => True,  3 => False); --  top = 03FF
    --  Fast_PWM_ICR               : constant PWM_Type := 14; --  TOP = MCU.ICR1
    --  Fast_PWM_OCR               : constant PWM_Type := 15; --  TOP = MCU.OCR1A
-   --  Phase_Correct_PWM_8Bit     : constant PWM_Type :=  1; --  TOP = 00FF
+   Phase_Correct_PWM_8Bit     : constant PWM_Type := (0 => True,  1 => False, 2 => False, 3 => False); --  top = 00FF
    --  Phase_Correct_PWM_9Bit     : constant PWM_Type :=  2; --  TOP = 01FF
    --  Phase_Correct_PWM_10Bit    : constant PWM_Type :=  3; --  TOP = 03FF
    --  Phase_Correct_PWM_ICR      : constant PWM_Type := 10; --  TOP = MCU.ICR1

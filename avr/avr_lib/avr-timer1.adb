@@ -15,6 +15,14 @@
 -- executable file might be covered by the GNU Public License.           --
 ---------------------------------------------------------------------------
 
+--
+--  supported MCUs:
+--
+--  ATTINY:
+--
+--  ATMEGA:
+--  atmega168   atmega169   atmega2560  atmega32    atmega328p  atmega644
+--  atmega644p  _atmega8_(partly)
 
 with Interfaces;                   use Interfaces;
 with AVR;                          use AVR;
@@ -25,39 +33,29 @@ package body AVR.Timer1 is
 
    Output_Compare_Reg : Unsigned_16 renames MCU.OCR1A;
 
--- #if MCU = "atmega32" or else MCU = "atmega168" or else MCU = "atmega169" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" then
-   Ctrl_Reg       : Bits_In_Byte renames MCU.TCCR1A_Bits;
--- #end if;
+   Ctrl_Reg           : Bits_In_Byte renames MCU.TCCR1A_Bits;
+
+   Prescale_Reg       : Unsigned_8 renames MCU.TCCR1B;
 
 
--- #if MCU = "atmega32" or else MCU = "atmega328p" or else MCU = "atmega168" or else MCU = "atmega644p" then
-   Prescale_Reg   : Unsigned_8 renames MCU.TCCR1B;
--- #end if;
-
-
-#if MCU = "atmega168" or else MCU = "atmega169" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" or else MCU = "atmega2560" then
+#if MCU = "atmega168" or else MCU = "atmega169" or else MCU = "atmega2560" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" then
    Interrupt_Mask : Bits_In_Byte renames MCU.TIMSK1_Bits;
-#elsif MCU = "atmega32" then
+#elsif MCU = "atmega8" or else MCU = "atmega32" then
    Interrupt_Mask : Bits_In_Byte renames MCU.TIMSK_Bits;
 #end if;
    Output_Compare_Interrupt_Enable : Boolean renames Interrupt_Mask (MCU.OCIE1A_Bit);
    Overflow_Interrupt_Enable       : Boolean renames Interrupt_Mask (MCU.TOIE1_Bit);
 
-#if MCU = "atmega32" or else MCU = "atmega168" or else MCU = "atmega168a" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" or else MCU = "atmega2560" then
+
    WGM0 : Boolean renames MCU.TCCR1A_Bits (MCU.WGM10_Bit);
    WGM1 : Boolean renames MCU.TCCR1A_Bits (MCU.WGM11_Bit);
    WGM2 : Boolean renames MCU.TCCR1B_Bits (MCU.WGM12_Bit);
    WGM3 : Boolean renames MCU.TCCR1B_Bits (MCU.WGM13_Bit);
-#end if;
 
-#if MCU = "attiny13" or else MCU = "atmega32" or else MCU = "atmega168" or else MCU = "atmega169" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" or else MCU = "atmega2560" then
-   Com0 : Boolean renames Ctrl_Reg (MCU.COM1A0_Bit);
-   Com1 : Boolean renames Ctrl_Reg (MCU.COM1A1_Bit);
---  #elsif MCU = "atmega32" then
---     Com0 : Boolean renames Ctrl_Reg (MCU.COM10_Bit);
---     Com1 : Boolean renames Ctrl_Reg (MCU.COM11_Bit);
-#end if;
-
+   Com0  : Boolean renames Ctrl_Reg (MCU.COM1A0_Bit);
+   Com1  : Boolean renames Ctrl_Reg (MCU.COM1A1_Bit);
+   ComB0 : Boolean renames Ctrl_Reg (MCU.COM1B0_Bit);
+   ComB1 : Boolean renames Ctrl_Reg (MCU.COM1B1_Bit);
 
 
    function No_Clock_Source return Scale_Type is
@@ -111,7 +109,6 @@ package body AVR.Timer1 is
    procedure Init_Normal (Prescaler : Scale_Type)
    is
    begin
--- #if MCU = "attiny13" or else MCU = "atmega32" or else MCU = "atmega168" or else MCU = "atmega169" or else MCU = "atmega328p" or else MCU = "atmega644p" then
       Ctrl_Reg := (MCU.COM1A0_Bit => False, --  \  normal operation,
                    MCU.COM1A1_Bit => False, --  /  OC0 disconnected
 
@@ -119,7 +116,6 @@ package body AVR.Timer1 is
                    MCU.WGM11_Bit => False,  --  /
 
                    others    => False);
--- #end if;
 
       Init_Common (Prescaler);
 
@@ -133,7 +129,6 @@ package body AVR.Timer1 is
    begin
       --  set the control register with the prescaler and mode flags to
       --  timer output compare mode and clear timer on compare match
-#if MCU = "attiny13" or else MCU = "atmega32" or else MCU = "atmega168" or else MCU = "atmega169" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" or else MCU = "atmega2560" then
       Ctrl_Reg := (MCU.COM1A0_Bit => False, --  \  normal operation,
                    MCU.COM1A1_Bit => False, --  /  OC0 disconnected
 
@@ -141,15 +136,6 @@ package body AVR.Timer1 is
                    MCU.WGM11_Bit => True,   --  /  Match (CTC)
 
                    others    => False);
---  #elsif MCU = then
---        Ctrl_Reg := (MCU.COM10_Bit => False, --  \  normal operation,
---                     MCU.COM11_Bit => False, --  /  OC0 disconnected
-
---                     MCU.WGM10_Bit => False,  --  \  Clear Timer on Compare
---                     MCU.WGM11_Bit => True,   --  /  Match (CTC)
-
---                     others    => False);
-#end if;
 
       Init_Common (Prescaler);
 
@@ -165,7 +151,6 @@ package body AVR.Timer1 is
                        Inverted       : Boolean := False)
    is
    begin
-
       Init_Common (Prescaler);
 
       WGM0 := PWM_Resolution(0);
@@ -175,7 +160,6 @@ package body AVR.Timer1 is
 
       Com0 := Inverted;
       Com1 := High;
-
    end Init_PWM;
 
 
@@ -203,6 +187,30 @@ package body AVR.Timer1 is
       Com1 := True;
    end Set_Output_Compare_Mode_Clear;
 
+   procedure Set_Output_Compare_Mode_B_Normal is
+   begin
+      ComB0 := False;
+      ComB1 := False;
+   end Set_Output_Compare_Mode_B_Normal;
+
+   procedure Set_Output_Compare_Mode_B_Toggle is
+   begin
+      ComB0 := True;
+      ComB1 := False;
+   end Set_Output_Compare_Mode_B_Toggle;
+
+   procedure Set_Output_Compare_Mode_B_Clear is
+   begin
+      ComB0 := False;
+      ComB1 := True;
+   end Set_Output_Compare_Mode_B_Clear;
+
+   procedure Set_Output_Compare_Mode_B_Set is
+   begin
+      ComB0 := True;
+      ComB1 := True;
+   end Set_Output_Compare_Mode_B_Set;
+
 
    procedure Stop is
    begin
@@ -217,18 +225,15 @@ package body AVR.Timer1 is
       Output_Compare_Interrupt_Enable := True;
    end Enable_Interrupt_Compare;
 
-
    procedure Enable_Interrupt_Overflow is
    begin
       Overflow_Interrupt_Enable := True;
    end Enable_Interrupt_Overflow;
 
-
    procedure Set_Overflow_At (Overflow : Unsigned_16) is
    begin
       Output_Compare_Reg := Overflow;
    end Set_Overflow_At;
-
 
 end AVR.Timer1;
 
