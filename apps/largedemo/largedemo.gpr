@@ -8,7 +8,8 @@
 -- PURPOSE. See the GNU General Public License for more details.         --
 ---------------------------------------------------------------------------
 
-with "avr.gpr";
+with "avr_tools.gpr";
+with "avr_lib.gpr";
 
 project Largedemo is
 
@@ -18,10 +19,10 @@ project Largedemo is
    for Object_Dir use "obj";
    for Exec_Dir use ".";
 
-   package Builder  renames AVR.Builder;
-   package Compiler renames AVR.Compiler;
-   package Binder   renames AVR.Binder;
-   package Linker   renames AVR.Linker;
+   package Builder  renames AVR_Tools.Builder;
+   package Compiler renames AVR_Tools.Compiler;
+   package Binder   renames AVR_Tools.Binder;
+   package Linker   renames AVR_Tools.Linker;
 
    for Source_Dirs use (".");
 

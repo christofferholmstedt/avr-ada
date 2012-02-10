@@ -10,12 +10,11 @@
 ---------------------------------------------------------------------------
 
 
-with "avr.gpr";
 with "mcu.gpr";
 
 project OneWire extends "onewire_lib" is
 
-   for Library_Dir  use "owlib";
+   for Library_Dir use "owlib";
    for Object_Dir use "owobj";
 
    case MCU.MCU is

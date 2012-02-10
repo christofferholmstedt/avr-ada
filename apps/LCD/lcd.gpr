@@ -9,8 +9,6 @@
 ---------------------------------------------------------------------------
 
 
-with "avr.gpr";
-
 library project LCD extends "lcd_lib" is
 
    for Library_Dir use "lcdlib";

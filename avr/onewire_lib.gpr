@@ -10,11 +10,12 @@
 ---------------------------------------------------------------------------
 
 
-with "avr.gpr";
-with "crc.gpr";
+with "avr_tools.gpr";
+with "avr_lib.gpr";
+with "crc_lib.gpr";
 with "debug_lib.gpr";
 
-project OneWire_Lib is
+library project OneWire_Lib is
 
    for Library_Name use "onewire";
    for Library_Dir  use "onewire/lib";
@@ -25,10 +26,10 @@ project OneWire_Lib is
    for Object_Dir use "onewire/obj";
 
 
-   package Builder renames AVR.Builder;
-   package Compiler renames AVR.Compiler;
-   package Binder renames AVR.Binder;
-   package Linker renames AVR.Linker;
+   package Builder renames AVR_Tools.Builder;
+   package Compiler renames AVR_Tools.Compiler;
+   package Binder renames AVR_Tools.Binder;
+   package Linker renames AVR_Tools.Linker;
 
    for Source_Dirs use ("onewire");
    for Source_Files use ("one_wire.ads",           "one_wire.adb",

@@ -8,7 +8,7 @@
 -- PURPOSE. See the GNU General Public License for more details.         --
 ---------------------------------------------------------------------------
 
-project MCU is
+abstract project MCU is
 
    type MCU_Type is
      ("None",

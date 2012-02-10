@@ -10,11 +10,11 @@
 ---------------------------------------------------------------------------
 
 
-with "avr.gpr";
+with "avr_tools.gpr";
+with "avr_lib.gpr";
 with "mcu.gpr";
 
--- library
-project Debug_Lib is
+library project Debug_Lib is
 
    for Library_Name use "debug";
    for Library_Dir  use "debug/lib";
@@ -23,10 +23,9 @@ project Debug_Lib is
    for Languages use ("Ada");
    for Object_Dir use "debug/obj";
 
-   package Builder renames AVR.Builder;
-   package Compiler renames AVR.Compiler;
-   package Binder renames AVR.Binder;
-   -- package Linker renames AVR.Linker;
+   package Builder renames AVR_Tools.Builder;
+   package Compiler renames AVR_Tools.Compiler;
+   package Binder renames AVR_Tools.Binder;
 
    type Internal_Clock_Prescaler is
       ("Has_Prescaler",

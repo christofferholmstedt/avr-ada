@@ -8,11 +8,12 @@
 -- PURPOSE. See the GNU General Public License for more details.         --
 ---------------------------------------------------------------------------
 
---  generic application project.  You have to extend this project file
+--  Generic application project.  You have to extend this project file
 --  in your own application
 
-with "avr.gpr";
 with "mcu.gpr";
+with "avr_tools.gpr";
+with "avr_lib.gpr";
 
 project AVR_App is
 
@@ -21,9 +22,9 @@ project AVR_App is
 
    for Languages use ("Ada");
 
-   package Builder renames AVR.Builder;
-   package Compiler renames AVR.Compiler;
-   package Binder renames AVR.Binder;
+   package Builder renames AVR_Tools.Builder;
+   package Compiler renames AVR_Tools.Compiler;
+   package Binder renames AVR_Tools.Binder;
    package Linker is
       --  create map file and add cross references.  Put the map file
       --  in the parent directory of the build directory which happens
@@ -41,7 +42,7 @@ project AVR_App is
          "-Wl,--relax",          -- linker relaxation
          "--GCC=avr-gcc -Os -mmcu=" & MCU.MCU
           & " --RTS=rts/" & MCU.Arch
-          & " -fdata-sections -ffunction-sections",
+          & " -gnatp -fdata-sections -ffunction-sections",
          Mapfile_Opt);
    end Linker;
 

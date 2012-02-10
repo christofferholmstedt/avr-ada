@@ -11,7 +11,7 @@
 #
 # list of primary devices
 #
-PRIM_MCU_LIST := at90s2313 at90s8515 atmega8 atmega162 atmega168 atmega169 \
+PRIM_MCU_LIST := atmega8 atmega168 atmega169 \
    atmega32 atmega328p atmega644 atmega644p
 
 #
@@ -44,8 +44,8 @@ at%/lib/libavrada.a : MCU = $(patsubst %/lib/libavrada.a,%, $@)
 at%/avr-mcu.ads     : MCU = $(patsubst %/avr-mcu.ads,%, $@)
 
 # then provide the rules for building
-at%/lib/libavrada.a: stamp-links at%/obj at%/lib ../avr.gpr ../mcu.gpr at%/avr-mcu.ads
-	avr-gnatmake -P../avr -XMCU=$(MCU)
+at%/lib/libavrada.a: stamp-links at%/obj at%/lib ../avr_lib.gpr ../avr_tools.gpr ../mcu.gpr at%/avr-mcu.ads
+	avr-gnatmake -P../avr_lib.gpr -XMCU=$(MCU)
 
 avr-real_time.ads: avr-real_time.ads.gp
 	$(GNATPREP) -b -DTICK=tick_1ms $< $@
@@ -75,10 +75,10 @@ stamp-libs: $(libs)
 
 # Compile: create assembler files from Ada source files.
 %.s : %.adb
-	avr-gnatmake -f -u -P../avr -XMCU=$(MCU) $< -cargs -S
+	avr-gnatmake -f -u -P../avr_lib -XMCU=$(MCU) $< -cargs -S
 
 %.s : %.ads
-	avr-gnatmake -f -u -P../avr -XMCU=$(MCU) $< -cargs -S
+	avr-gnatmake -f -u -P../avr_lib -XMCU=$(MCU) $< -cargs -S
 
 clean:
 	$(RM) stamp-*

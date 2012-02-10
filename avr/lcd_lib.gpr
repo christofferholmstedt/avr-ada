@@ -17,7 +17,8 @@
 ---------------------------------------------------------------------------
 
 
-with "avr.gpr";
+with "avr_tools.gpr";
+with "avr_lib.gpr";
 
 library project LCD_Lib is
 
@@ -28,9 +29,9 @@ library project LCD_Lib is
    for Languages use ("Ada");
    for Object_Dir use "lcd/obj";
 
-   package Builder renames AVR.Builder;
-   package Compiler renames AVR.Compiler;
-   package Binder renames AVR.Binder;
+   package Builder renames AVR_Tools.Builder;
+   package Compiler renames AVR_Tools.Compiler;
+   package Binder renames AVR_Tools.Binder;
 
    for Source_Dirs use ("lcd");
    for Source_Files use ("lcd.ads", "lcd.adb",

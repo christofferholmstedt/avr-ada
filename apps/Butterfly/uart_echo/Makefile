@@ -10,9 +10,6 @@
 
 MCU := atmega8
 
-AVR_ADA := /k/Data/Development/AVR-Ada/avr
-#/mingw/avr/avr/ada
-
 #put the name of the target files here (without extension)
 TRGS	  := main
 
@@ -38,7 +35,7 @@ GNATMAKE  := avr-gnatmake
 
 ###### output format can be srec, ihex (avrobj is always created) #######
 FORMAT = ihex
-# ------------------------------------------	
+# ------------------------------------------
 
 # other intersting file formats
 TRGS_ELF  := $(addsuffix .elf, $(TRGS))
@@ -47,7 +44,7 @@ TRGS_EEP  := $(addsuffix .eep, $(TRGS))
 TRGS_LSS  := $(addsuffix .lss, $(TRGS))
 
 # --- this defines the targets of the make process ---
-all:	$(TRGS_ELF) $(TRGS_ROM) $(TRGS_EEP) $(TRGS_LSS) size ok 
+all:	$(TRGS_ELF) $(TRGS_ROM) $(TRGS_EEP) $(TRGS_LSS) size ok
 
 
 # prog:
@@ -57,10 +54,9 @@ all:	$(TRGS_ELF) $(TRGS_ROM) $(TRGS_EEP) $(TRGS_LSS) size ok
 
 .PHONY: main.elf
 
-
 # --- build and link using gnatmake ---
 $(TRGS_ELF): $(SRCS) $(PRJ) obj
-	export ADA_PROJECT_PATH=$(AVR_ADA); $(GNATMAKE) $(MFLAGS) -P$(PRJ) --RTS=rts/$(MCU)
+	$(GNATMAKE) $(MFLAGS) -P$(PRJ)
 
 # --- create bin (.hex and .eep) files from elf output file ---
 %.hex: %.elf
@@ -82,15 +78,9 @@ $(TRGS_ELF): $(SRCS) $(PRJ) obj
 size:  $(TRGS_ELF)
 	$(SIZE) -x -C --mcu=$(MCU) $^
 
-
 obj:
 	$(RM) obj
 	mkdir obj
-
-# --- If all other steps compile ok then echo "Errors: none" ---
-# --- Necessary for AVR Studio to understand that everything went ok ---
-ok:
-	@echo "Errors: none" 
 
 # --- make instruction to delete created files ---
 clean:

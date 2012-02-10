@@ -31,7 +31,7 @@
 #
 #             Documentation
 #
-# install_doc : copy the documentation to $(PREFIX)/doc/AVR-Ada/web and the 
+# install_doc : copy the documentation to $(PREFIX)/doc/AVR-Ada/web and the
 #               examples to $(PREFIX)/doc/AVR-Ada/examples.
 #
 ###############################################################
@@ -44,7 +44,7 @@ include excldevs.mk
 
 MCU_LIST := $(filter-out $(excluded_parts), $(shell (cd avr/avr_lib; ls -d at*)))
 # MCU_LIST := atmega169
-ARCH_LIST := avr2 avr25 avr3 avr35 avr4 avr5 avr6
+ARCH_LIST := avr2 avr25 avr3 avr31 avr35 avr4 avr5 avr51 avr6
 
 DOC_DIR := $(PREFIX)/share/doc/avr-ada
 DOC_DIR_APPS := $(DOC_DIR)/apps
