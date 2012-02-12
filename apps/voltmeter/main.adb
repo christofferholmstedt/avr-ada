@@ -14,41 +14,32 @@
 -- exception does  not  however  invalidate  any  other reasons why  the --
 -- executable file might be covered by the GNU Public License.           --
 ---------------------------------------------------------------------------
-
---
---  use standard Ada relative delays for blinking.
---
---  depending on the configuration settings in the AVR support library
---  that either uses AVR.Real_Time or busy waits from AVR.Wait;
+with Interfaces;                   use Interfaces;
+with AVR;                          use AVR;
+with AVR.UART;
+with AVR.ADC;
 with AVR.Real_Time.Clock;
---  we have to explicitely import this function as it gets called via
---  the delay statement. The avr-gnatbind does not yet know that the
---  Ada.Calendar.Delay-routines call Clock and that it must be
---  included in the elaboration code. All of the timer and clock
---  infrastructure gets initialized by elaborating the body of
---  AVR.Real_Time.Clock_Impl.
---
---  AVR.Real_Time.Clock uses AVR.Config (for the quartz frequency) and
---  AVR.Timer0 to generate interrupts at 1000Hz, ie. every 1ms.  The
---  delay routine continuously compares the current time with the end
---  of the delay time for returning. To save power the mcu is put into
---  sleep mode after every tick.
+with AVR.MCU;
 
-with LED;
-
-procedure Blink_Rel is
-
-   Off_Cycle : constant := 1.0;
-   On_Cycle  : constant := 1.0;
-
+procedure Main is
+   Raw : ADC.Conversion_10bit;
+   Result : Unsigned_16;
 begin
-   LED.Init;
+
+   UART.Init(UART.Baud_19200_16MHz);
+
+   MCU.DDRC_Bits(0) := DD_Input;
+   MCU.PortC_Bits(0) := Low;
+
+   ADC.Init (ADC.Scale_By_128, ADC.Int_Ref);
 
    loop
-      LED.Off_1;
-      delay Off_Cycle;
-      LED.On_1;
-      delay On_Cycle;
+      Raw := ADC.Convert_10bit (Ch => 0);
+      Result := Raw + Raw / 16;
+      UART.Put (Result);
+      UART.New_Line;
+
+      delay 0.2;
    end loop;
 
-end Blink_Rel;
+end Main;

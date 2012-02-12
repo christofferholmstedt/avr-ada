@@ -20,13 +20,82 @@ with AVR.MCU;
 
 package body LED is
 
+   --  Compile boolean constants serve as kind of conditional
+   --  compiling.  All these routines are typically inlined and
+   --  generate just a single assembler instruction.
+
+   Has_LED1 : constant Boolean := True;
+   Has_LED2 : constant Boolean := False;
+
+
+   --  check your actual wiring. The STK500 connects the LEDs between
+   --  the port pin and +5V. You switch them on by setting the pin to
+   --  Low (stk500 --> set LEDx_On_Is_High to False).  The Arduino has
+   --  a LED between B5 and ground.  You have to set the pin high to
+   --  switch on.
+   LED1_On_Is_High : constant Boolean := True;
+   LED2_On_Is_High : constant Boolean := True;
+
+
    --  there is a LED on the Arduino platform at Port B, pin 5 (digital pin 13)
    LED1    : Boolean renames AVR.MCU.PORTB_Bits (5);
    LED1_DD : Boolean renames AVR.MCU.DDRB_Bits (5);
 
-   LED2    : Boolean renames AVR.MCU.PORTB_Bits (2);
-   LED2_DD : Boolean renames AVR.MCU.DDRB_Bits (2);
+   LED2    : Boolean renames AVR.MCU.PORTB_Bits (6);
+   LED2_DD : Boolean renames AVR.MCU.DDRB_Bits (6);
 
+
+   procedure Off_1 is
+   begin
+      if Has_LED1 then
+         if LED1_On_Is_High then
+            LED1 := Low;  --  Arduino
+         else
+            LED1 := High; --  stk500
+         end if;
+      else
+         null;
+      end if;
+   end Off_1;
+
+   procedure Off_2 is
+   begin
+      if Has_LED2 then
+         if LED1_On_Is_High then
+            LED2 := Low;  --  Arduino
+         else
+            LED2 := High; --  stk500
+         end if;
+      else
+         null;
+      end if;
+   end Off_2;
+
+   procedure On_1 is
+   begin
+      if Has_LED1 then
+         if LED1_On_Is_High then
+            LED1 := High;  -- Arduino
+         else
+            LED1 := Low;  -- stk500
+         end if;
+      else
+         null;
+      end if;
+   end On_1;
+
+   procedure On_2 is
+   begin
+      if Has_LED2 then
+         if LED2_On_Is_High then
+            LED2 := High;  -- Arduino
+         else
+            LED2 := Low;  -- stk500
+         end if;
+      else
+         null;
+      end if;
+   end On_2;
 
    procedure Init is
       --  JTD : Boolean renames MCU.MCUCR_Bits (MCU.JTD_Bit);
@@ -35,32 +104,8 @@ package body LED is
       -- JTD := True;
       -- MCU.MCUCR := MCU.JTD_Mask;
 
-      LED1_DD := DD_Output;
-      LED2_DD := DD_Output;
+      if Has_LED1 then LED1_DD := DD_Output; Off_1; end if;
+      if Has_LED2 then LED2_DD := DD_Output; Off_2; end if;
    end Init;
-
-   --  check your actual wiring. The STK500 connects the LEDs between
-   --  the port pin and +5V. You switch them on by setting the pin to
-   --  Low.  The Arduino 2009 has a LED between B5 and ground.  You
-   --  have to set the pin high to switch on.
-   procedure Off_1 is
-   begin
-      LED1 := Low;
-   end Off_1;
-
-   procedure Off_2 is
-   begin
-      LED2 := Low;
-   end Off_2;
-
-   procedure On_1 is
-   begin
-      LED1 := High;
-   end On_1;
-
-   procedure On_2 is
-   begin
-      LED2 := High;
-   end On_2;
 
 end LED;

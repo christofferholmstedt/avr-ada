@@ -24,7 +24,7 @@ with LED;
 procedure Blink_Clock is
 
    Next_Off : Time := Clock + 0.5;
-   Next_On  : Time := Next_Off + 1.0;
+   Next_On  : Time := Next_Off + 0.5;
 
 begin
 
