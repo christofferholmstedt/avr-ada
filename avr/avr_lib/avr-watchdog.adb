@@ -19,7 +19,6 @@
 --  Subprograms to access the on-chip watchdog timer.
 --  Tested with ATmega8 only
 
-with System.Machine_Code;          use System.Machine_Code;
 with Ada.Unchecked_Conversion;
 
 with AVR;                          use AVR;
@@ -32,8 +31,7 @@ package body AVR.Watchdog is
       new Ada.Unchecked_Conversion (WDT_Oscillator_Cycles, Unsigned_8);
 
 
-   procedure Enable (Wdt : WDT_Oscillator_Cycles)
-   is
+   procedure Enable (Wdt : WDT_Oscillator_Cycles) is
    begin
       Interrupts.Save_Disable;
       WDTCR_Bits := (WDCE_Bit => True,
@@ -44,8 +42,7 @@ package body AVR.Watchdog is
    end Enable;
 
 
-   procedure Disable
-   is
+   procedure Disable is
    begin
       Interrupts.Save_Disable;
       WDTCR_Bits := (WDCE_Bit => True,
@@ -55,11 +52,5 @@ package body AVR.Watchdog is
       Interrupts.Restore;
    end Disable;
 
-
-   procedure Wdr
-   is
-   begin
-      Asm ("wdr", Volatile => True);
-   end Wdr;
 
 end AVR.Watchdog;

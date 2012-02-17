@@ -16,20 +16,7 @@
 ---------------------------------------------------------------------------
 
 
-with System.Machine_Code;  use System.Machine_Code;
-
 package body AVR.Interrupts is
-
-   procedure Sei is
-   begin
-      Asm ("sei", Volatile => True);
-   end Sei;
-
-
-   procedure Cli is
-   begin
-      Asm ("cli", Volatile => True);
-   end Cli;
 
 
    SREG : Unsigned_8;

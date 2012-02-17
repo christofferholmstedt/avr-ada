@@ -49,4 +49,5 @@ private
    pragma Inline_Always (Reset);
    pragma Inline_Always (Enable);
    pragma Inline_Always (Disable);
+   pragma Import (Intrinsic, Wdr, "__builtin_avr_wdr");
 end AVR.Watchdog;

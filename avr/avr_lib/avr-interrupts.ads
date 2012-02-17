@@ -54,8 +54,10 @@ package AVR.Interrupts is
 
 private
 
-   pragma Inline (Sei);
-   pragma Inline (Cli);
+   pragma Inline_Always (sei);
+   pragma Inline_Always (cli);
+   pragma Import (Intrinsic, sei, "__builtin_avr_sei");
+   pragma Import (Intrinsic, cli, "__builtin_avr_cli");
 
    pragma Inline_Always (Save_And_Disable);
    pragma Inline (Restore);
