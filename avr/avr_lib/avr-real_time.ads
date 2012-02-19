@@ -72,7 +72,7 @@ package AVR.Real_Time is
                      Friday, Saturday, Sunday);
    for Day_Name'Size use 8;
 
-   function Day_of_Week (Date : Time) return Day_Name;
+   function Day_Of_Week (Date : Time) return Day_Name;
 
 
    --  Declarations representing limits of allowed local time values.

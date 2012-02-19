@@ -78,8 +78,8 @@ package AVR.Timer1 is
    procedure Enable_Interrupt_Overflow;
 
 
-   Signal_Compare  : constant String := MCU.Sig_Timer1_CompA_String;
-   Signal_Overflow : constant String := MCU.Sig_Timer1_OVF_String;
+   Signal_Compare  : constant String := MCU.Sig_TIMER1_COMPA_String;
+   Signal_Overflow : constant String := MCU.Sig_TIMER1_OVF_String;
 
 
 private

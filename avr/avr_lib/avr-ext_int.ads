@@ -40,8 +40,8 @@ package AVR.Ext_Int is
    procedure Disable_External_Interrupt_0;
    procedure Disable_External_Interrupt_1;
 
-   Signal_Ext_Int0 : constant String := MCU.Sig_Int0_String;
-   Signal_Ext_Int1 : constant String := MCU.Sig_Int1_String;
+   Signal_Ext_Int0 : constant String := MCU.Sig_INT0_String;
+   Signal_Ext_Int1 : constant String := MCU.Sig_INT1_String;
 
    --
    -- pin change interrupts (PCI)

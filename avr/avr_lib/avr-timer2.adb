@@ -193,7 +193,9 @@ package body AVR.Timer2 is
 
       MCU.TCCR2A_Bits(MCU.WGM20_Bit) := PWM_Resolution(WGM0);
       MCU.TCCR2A_Bits(MCU.WGM21_Bit) := PWM_Resolution(WGM1);
+#if not MCU = "atmega169" then
       MCU.TCCR2B_Bits(MCU.WGM22_Bit) := PWM_Resolution(WGM2);
+#end if;
    end Init_PWM;
 
 

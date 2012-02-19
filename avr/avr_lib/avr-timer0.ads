@@ -55,17 +55,17 @@ package AVR.Timer0 is
    procedure Enable_Interrupt_Overflow;
 
 #if MCU = "attiny13" or else MCU = "attiny13a" then
-   Signal_Compare  : constant String := MCU.Sig_Tim0_CompA_String;
-   Signal_Overflow : constant String := MCU.Sig_Tim0_OVF_String;
+   Signal_Compare  : constant String := MCU.Sig_TIM0_COMPA_String;
+   Signal_Overflow : constant String := MCU.Sig_TIM0_OVF_String;
 #elsif MCU = "attiny2313" or else MCU = "atmega168" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" or else MCU = "atmega2560" then
-   Signal_Compare  : constant String := MCU.Sig_Timer0_CompA_String;
-   Signal_Overflow : constant String := MCU.Sig_Timer0_OVF_String;
+   Signal_Compare  : constant String := MCU.Sig_TIMER0_COMPA_String;
+   Signal_Overflow : constant String := MCU.Sig_TIMER0_OVF_String;
 #elsif MCU = "atmega169" or else MCU = "atmega32" then
-   Signal_Compare  : constant String := MCU.Sig_Timer0_Comp_String;
-   Signal_Overflow : constant String := MCU.Sig_Timer0_OVF_String;
+   Signal_Compare  : constant String := MCU.Sig_TIMER0_COMP_String;
+   Signal_Overflow : constant String := MCU.Sig_TIMER0_OVF_String;
 #elsif MCU = "atmega8" then
    Signal_Compare  : constant String := "not available";
-   Signal_Overflow : constant String := MCU.Sig_Timer0_OVF_String;
+   Signal_Overflow : constant String := MCU.Sig_TIMER0_OVF_String;
 #end if;
 
 private

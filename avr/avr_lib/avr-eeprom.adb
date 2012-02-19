@@ -23,7 +23,7 @@
 
 with System;                       use System;
 with Ada.Unchecked_Conversion;
-With AVR.Interrupts;
+with AVR.Interrupts;
 with AVR.MCU;
 
 use AVR;

@@ -53,7 +53,7 @@ package AVR.ADC is
 
    procedure Start_Conversion (Ch : ADC_Channel_T);
    function Conversion_Is_Active return Boolean;
-   function Last_Result return Conversion_10Bit;
+   function Last_Result return Conversion_10bit;
 --   function Last_Result return Conversion_8Bit;
 
    function Convert_10bit (Ch : ADC_Channel_T) return Conversion_10bit;

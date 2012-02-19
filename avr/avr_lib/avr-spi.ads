@@ -57,13 +57,13 @@ package AVR.SPI is
    ------------------------------------------------------------------
    type Clock_Mode_Type is
      (
-      Sample_Rising_Setup_Falling,    -- CPOL=0, CPHA=0 (Mode 0)  __^--|__^--|____
-                                      -- MOSI/MISO                X***XXX***XXXXXX
-      Sample_Falling_Setup_Rising,    -- CPOL=1, CPHA=0 (Mode 2)  --v__|--v__|----
-      Setup_Rising_Sample_Falling,    -- CPOL=0, CPHA=1 (Mode 1)  __|--v__|--v____
-                                      -- MOSI/MISO                XXXX***XXX***XXX
-      Setup_Falling_Sample_Rising     -- CPOL=1, CPHA=1 (Mode 3)  --|__^--|__^----
-                                      -- Chip Select              -|___________|--
+      Sample_Rising_Setup_Falling,  -- CPOL=0, CPHA=0 (Mode 0)  __^--|__^--|____
+                                    -- MOSI/MISO                X***XXX***XXXXXX
+      Sample_Falling_Setup_Rising,  -- CPOL=1, CPHA=0 (Mode 2)  --v__|--v__|----
+      Setup_Rising_Sample_Falling,  -- CPOL=0, CPHA=1 (Mode 1)  __|--v__|--v____
+                                    -- MOSI/MISO                XXXX***XXX***XXX
+      Setup_Falling_Sample_Rising   -- CPOL=1, CPHA=1 (Mode 3)  --|__^--|__^----
+                                    -- Chip Select              -|___________|--
      );
 
    ------------------------------------------------------------------

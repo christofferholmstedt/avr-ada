@@ -71,22 +71,22 @@ package body AVR.Ext_Int is
 
    procedure Enable_External_Interrupt_0 is
    begin
-      MCU.EIMSK_Bits (MCU.Int0_Bit) := True;
+      MCU.EIMSK_Bits (MCU.INT0_Bit) := True;
    end Enable_External_Interrupt_0;
 
    procedure Enable_External_Interrupt_1 is
    begin
-      MCU.EIMSK_Bits (MCU.Int1_Bit) := True;
+      MCU.EIMSK_Bits (MCU.INT1_Bit) := True;
    end Enable_External_Interrupt_1;
 
    procedure Disable_External_Interrupt_0 is
    begin
-      MCU.EIMSK_Bits (MCU.Int0_Bit) := False;
+      MCU.EIMSK_Bits (MCU.INT0_Bit) := False;
    end Disable_External_Interrupt_0;
 
    procedure Disable_External_Interrupt_1 is
    begin
-      MCU.EIMSK_Bits (MCU.Int1_Bit) := False;
+      MCU.EIMSK_Bits (MCU.INT1_Bit) := False;
    end Disable_External_Interrupt_1;
 
 

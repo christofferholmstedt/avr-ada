@@ -110,11 +110,11 @@ package body One_Wire.Temperature_Sensors is
             Crc : Unsigned_8;
             T   : Unsigned_8;
          begin
-            Crc := Crc8 (LSB, 0);
-            Crc := Crc8 (MSB, Crc);
+            Crc := CRC8 (LSB, 0);
+            Crc := CRC8 (MSB, Crc);
             for I in Unsigned_8 range 2 .. 8 loop
                T := Get;
-               Crc := Crc8 (T, Crc);
+               Crc := CRC8 (T, Crc);
                if Debug_Read then
                   Put (" I:");   Put (I);
                   Put (" R:");   Put (T, 16);
@@ -122,7 +122,7 @@ package body One_Wire.Temperature_Sensors is
                end if;
             end loop;
             if Debug_Read then New_Line; end if;
-            -- if Crc /= 0 then goto Start; end if; 
+            -- if Crc /= 0 then goto Start; end if;
             if Crc /= 0 then return 16#063E#; end if; -- = 99.9, 12bit
          end;
       end if;

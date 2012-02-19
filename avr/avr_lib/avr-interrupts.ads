@@ -20,19 +20,19 @@ package AVR.Interrupts is
    pragma Preelaborate (AVR.Interrupts);
 
    -- Enable interrupts
-   procedure Sei;
+   procedure sei;
    procedure Enable
-     renames Sei;
+     renames sei;
    procedure Enable_Interrupts
-     renames Sei;
+     renames sei;
 
 
    -- disable interrupts
-   procedure Cli;
+   procedure cli;
    procedure Disable
-     renames Cli;
+     renames cli;
    procedure Disable_Interrupts
-     renames Cli;
+     renames cli;
 
    --  save the status register and and disable interrupts
    function Save_And_Disable return Nat8;

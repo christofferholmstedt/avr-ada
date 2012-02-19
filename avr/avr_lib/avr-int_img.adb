@@ -133,7 +133,7 @@ package body AVR.Int_Img is
 
    --  put text representation of decimal number Data into Target
    --  string beginning at the left most character.
-   procedure U16_Img_orig (Data : Unsigned_16;
+   procedure U16_Img_Orig (Data : Unsigned_16;
                            Target : out AStr5; Last : out Unsigned_8) is
       Val     : Unsigned_16 := Data;
       D       : Unsigned_8;
@@ -153,7 +153,7 @@ package body AVR.Int_Img is
          end if;
       end loop;
       Target (Last) := Character'Val (48 + Val);
-   end U16_Img_orig;
+   end U16_Img_Orig;
    pragma Unreferenced (U16_Img_Orig);
 
    procedure U16_Img (Data : Unsigned_16;

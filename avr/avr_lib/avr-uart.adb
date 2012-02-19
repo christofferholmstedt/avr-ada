@@ -18,7 +18,7 @@
 with Ada.Unchecked_Conversion;
 with System;                            use type System.Address;
 with AVR.Int_Img;
-with Avr.Interrupts;
+with AVR.Interrupts;
 with AVR.MCU;                           use AVR.MCU;
 
 package body AVR.UART is
@@ -483,7 +483,7 @@ package body AVR.UART is
    function Have_Input return Boolean is
    begin
       return Rx_Outx /= Rx_Inx;
-   end;
+   end Have_Input;
 
 
    procedure Get_Line (S    : out AVR_String;

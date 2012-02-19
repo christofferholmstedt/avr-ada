@@ -91,7 +91,7 @@ package body AVR.ADC is
    end Conversion_Is_Active;
 
 
-   function Last_Result return Conversion_10Bit
+   function Last_Result return Conversion_10bit
    is
    begin
       return MCU.ADC;

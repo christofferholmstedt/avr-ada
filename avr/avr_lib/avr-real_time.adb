@@ -100,10 +100,10 @@ package body AVR.Real_Time is
    is
       J, D, M, Y : Integer_32;
    begin
-      j := JD - 1_721_119;
+      J := JD - 1_721_119;
       Y := (4 * J - 1) / 146_097;  J := 4 * J - 1 - 146_097 * Y;  D := J / 4;
       J := (4 * D + 3) / 1_461;  D := 4 * D + 3 - 1_461 * J;  D := (D + 4) / 4 ;
-      M := (5 * d - 3) / 153;  D := 5 * D - 3 - 153 * M;  D := (D + 5) / 5 ;
+      M := (5 * D - 3) / 153;  D := 5 * D - 3 - 153 * M;  D := (D + 5) / 5 ;
       Y := 100 * Y + J;
       if M < 10 then
          Month := Month_Number (M + 3);
@@ -216,12 +216,12 @@ package body AVR.Real_Time is
       SS : Day_Duration := 0.0;
       H : constant Integer_32 := Integer_32(Hour);
       M : constant Integer_32 := Integer_32(Minute);
-      S : constant Integer_32 := Integer_32(Minute);
+      S : constant Integer_32 := Integer_32(Second);
       T : Integer_32;
-   Begin
+   begin
       T := H * 60 + M;
       T := T * 60 + S;
-      -- Ss := Day_Duration (T); <<-- generate compiler error
+      Ss := Day_Duration (T); <<-- generate compiler error
 
       --  SS := Day_Duration ((((Integer_32(Hour) * 60) + Integer_32(Minute)) * 60)
       --  + Integer_32(Second))
@@ -491,7 +491,7 @@ package body AVR.Real_Time is
 
 
    function Date_Image_Short (D : Time) return AStr6 is
-      Img_L : constant Astr10 := Date_Image (D);
+      Img_L : constant AStr10 := Date_Image (D);
       Img : AStr6;
    begin
       Img (1) := Img_L (3);
