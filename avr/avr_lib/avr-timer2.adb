@@ -248,7 +248,7 @@ package body AVR.Timer2 is
 
    procedure Enable_Interrupt_Overflow is
    begin
-      Output_Compare_Interrupt_Enable := True;
+      Overflow_Interrupt_Enable := True;
    end Enable_Interrupt_Overflow;
 
 
