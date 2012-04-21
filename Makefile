@@ -17,7 +17,7 @@
 #
 # build_rts   : rebuild the standard Ada runtime system for all supported
 #               AVR parts
-# rtsclean    : remove a potentially existing runtime installation in the
+# clean_rts   : remove a potentially existing runtime installation in the
 #               compiler's default adainclude and adalib directories.
 # install_rts : copy the just built Ada runtime system into the
 #               compiler's default adainclude and adalib directories.
@@ -51,7 +51,6 @@ DOC_DIR_APPS := $(DOC_DIR)/apps
 DOC_DIR_DOCS := $(DOC_DIR)/.
 DOC_DIRS := $(DOC_DIR) $(DOC_DIR_APPS) $(DOC_DIR_DOCS)
 
-
 RTS_SOURCE   := gcc-$(major).$(minor)-rts
 
 # default rule: build rts and avrlib;
@@ -62,9 +61,8 @@ all: build_rts build_libs
 #
 #  build and install the run time system (RTS)
 #
-build_rts install_rts rtsclean:
+build_rts install_rts clean_rts:
 	$(MAKE) -C $(RTS_SOURCE) $@
-
 
 
 ###############################################################
@@ -82,11 +80,13 @@ build_libs: build_rts
 install_libs:
 	$(MAKE) -C avr install
 
+
 ###############################################################
 #
 #  install RTS and avrlib in the final gcc tree
 #
 install: install_rts install_libs install_doc
+
 
 ###############################################################
 #
@@ -94,7 +94,6 @@ install: install_rts install_libs install_doc
 #
 install_doc: $(DOC_DIRS)
 	cp -a apps $(DOC_DIR)
-
 
 $(DOC_DIRS):
 	mkdir -p $@
@@ -104,7 +103,6 @@ $(DOC_DIRS):
 #
 #  make the sample projects
 #
-
 samples:
 	$(MAKE) -C apps all
 
@@ -113,7 +111,6 @@ samples:
 #
 #  prepare building the installer program
 #
-
 DIST_PREP_DIR := /c/temp/avr-ada-dist
 dist_prep:
 	mkdir -p $(DIST_PREP_DIR)
@@ -131,7 +128,6 @@ unix_eol:
 #
 #  clean machinery
 #
-
 config:
 	./configure
 
@@ -152,21 +148,18 @@ distclean:  clean
 #
 #  remove RTS and avrlib from the gcc tree
 #
-
 avrlibclean:
 	-chmod -R a+w $(PREFIX)/avr/ada
 	-rm -rf $(PREFIX)/avr/ada
 
-
-maintclean: rtsclean avrlibclean distclean
+maintclean: clean_rts avrlibclean distclean
 
 
 ###############################################################
 #
 #  Makefile stuff
 #
-
-.PHONY: clean distclean rtsclean maintclean samples install_rts
+.PHONY: clean distclean clean_rts maintclean samples install_rts
 
 print-%:
 	@echo $* = $($*)

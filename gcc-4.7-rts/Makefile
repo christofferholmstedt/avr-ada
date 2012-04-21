@@ -27,8 +27,11 @@ ADASRC = ada.ads interfac.ads system.ads unchconv.ads a-unccon.ads \
    a-calend.ads a-caldel.ads \
    i-c.ads \
    a-except.ads a-except.adb \
-   s-secsta.ads s-secsta.adb
-#  a-tags.ads a-tags.adb s-htable.ads s-htable.adb
+   s-secsta.ads s-secsta.adb \
+   s-memory.ads s-memory.adb \
+   a-tags.ads a-tags.adb
+
+#   s-htable.ads s-htable.adb
 #   a-stream.ads
 #   s-finroo.ads s-finroo.adb a-finali.ads a-finali.adb
 #   a-reatim.adb a-reatim.ads
@@ -39,8 +42,14 @@ OBJ = $(ADASRC:.ads=.o)
 
 NOT_NEEDED_OBJS = ada.o interfac.o system.o s-maccod.o
 
-LIBGNAT_OBJS = s-bitops.o a-except.o
-LIBGNAT_ALIS = $(ADASRC:.ads=.ali)
+LIBGNAT_OBJS = s-bitops.o a-except.o s-memory.o a-tags.o s-secsta.o
+LIBGNAT_ALIS = $(filter %.ali,$(ADASRC:.ads=.ali)) # filter out the .adb from ADASRC
+
+ARCH_LIST := avr25 avr3 avr31 avr35 avr4 avr5 avr51 avr6
+
+RTS_LIB_LIST := $(patsubst %, rts/%/adalib/libgnat.a, $(ARCH_LIST))
+RTS_INC_LIST := $(patsubst %, rts/%/adainclude, $(ARCH_LIST))
+RTS_SOURCE   := .
 
 vpath %.ads adainclude
 vpath %.adb adainclude
@@ -55,19 +64,14 @@ ADAFLAGS = -g -Os -gnatn -gnatpg -mmcu=$(MCU)
 ###### define some variables based on the AVR base path in $(AVR) #######
 CC	= avr-gcc
 RM	= rm -f
-COPY	= cp
+COPY	= cp -p
+MOVE    = mv
 AR	= avr-ar
 RANLIB  = avr-ranlib
 
 
 # ------------------------------------------
 -include ../config
-
-ARCH_LIST := avr25 avr3 avr31 avr35 avr4 avr5 avr51 avr6
-
-RTS_LIB_LIST := $(patsubst %, rts/%/adalib/libgnat.a, $(ARCH_LIST))
-RTS_INC_LIST := $(patsubst %, rts/%/adainclude, $(ARCH_LIST))
-RTS_SOURCE   := .
 
 
 ###############################################################
@@ -78,71 +82,62 @@ all build_rts: ${RTS_LIB_LIST}
 
 rts/%/adalib/libgnat.a : MCU = $(patsubst rts/%/adalib/libgnat.a,%, $@)
 
-rts/%/adalib/libgnat.a:
+rts/%/adalib/libgnat.a: rts/%/adalib rts/%/adainclude
 	$(MAKE) clean
-	$(MAKE) MCU=$(MCU) adalib/libgnat.a
-
-	mkdir -p rts/$(MCU)/adainclude
-	mkdir -p rts/$(MCU)/adalib
-
-	cp -p $(RTS_SOURCE)/adainclude/*.ad? rts/$(MCU)/adainclude
-	cp -p $(RTS_SOURCE)/adalib/*.ali     rts/$(MCU)/adalib
-	cp -p $(RTS_SOURCE)/adalib/libgnat.a rts/$(MCU)/adalib
+	$(MAKE) libgnat.a MCU=$(MCU)
+	$(MOVE) libgnat.a $@
+	$(MAKE) $(LIBGNAT_ALIS) MCU=$(MCU)
+	$(COPY) $(LIBGNAT_ALIS) rts/$(MCU)/adalib
+	$(COPY) $(patsubst %,adainclude/%,$(ADASRC)) rts/$(MCU)/adainclude
 	$(MAKE) clean
 
+rts/%/adalib:
+	mkdir -p $@
+
+rts/%/adainclude:
+	mkdir -p $@
+
+libgnat.a: $(LIBGNAT_OBJS)
+	$(AR) cr $@ $^
+	$(RANLIB) $@
+
+.PRECIOUS: rts/%/adalib rts/%/adainclude
 
 ###############################################################
 #
 #  install the RTS
 #
 install_rts: build_rts rtsclean
-	cp -rp rts $(RTS_BASE)
+	$(COPY) -r rts $(RTS_BASE)
 	chmod a-w -R $(RTS_BASE)/rts
 	-mkdir $(RTS_BASE)/adainclude
-	cp -p $(RTS_SOURCE)/adainclude/system.ads $(RTS_BASE)/adainclude
-	cp -p $(RTS_SOURCE)/README.gnatlink_inst  $(RTS_BASE)/adainclude
+	$(COPY) $(RTS_SOURCE)/adainclude/system.ads $(RTS_BASE)/adainclude
+	$(COPY) $(RTS_SOURCE)/README.gnatlink_inst  $(RTS_BASE)/adainclude
 
 
 ###############################################################
 #
 #  remove RTS from the gcc tree
 #
-rtsclean:
+clean_rts:
 	-chmod a+w -R $(RTS_BASE)/rts
 	-rm -rf $(RTS_BASE)/rts
 
-###############################################################
-#
-adalib/libgnat.a: $(LIBGNAT_OBJS) $(LIBGNAT_ALIS)
-	$(AR) cr $@ $(LIBGNAT_OBJS)
-	$(RANLIB) $@
-
-empty.o: empty.c
-	$(CC) -c $^ -o $@
-
-empty.c:
-	echo > $@
 
 # keep the order of the following two implicit rules.  This way it
 # tries to build a .ali first from .adb if available.  Only if there
 # is no .adb, it tries to build from .ads.
 %.ali %.o : %.adb
 	$(CC) -c $(ADAFLAGS) $(INC) $<
-	$(COPY) $@ adalib
 
 %.ali %.o : %.ads
 	$(CC) -c $(ADAFLAGS) $(INC) $<
-	$(COPY) $@ adalib
 
 # --- make instruction to delete created files ---
 clean:
 	$(RM) *.o
 	$(RM) *.ali
-	$(RM) empty.c
-	$(RM) adalib/*.o
-	$(RM) adalib/*.ali
-	$(RM) adalib/libgnat.a
-
+	$(RM) libgnat.a
 
 
 ###############################################################
