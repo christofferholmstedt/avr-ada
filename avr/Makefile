@@ -13,14 +13,15 @@
 include ../excldevs.mk
 MCU_LIST := $(filter-out $(excluded_parts), $(shell (cd avr_lib; ls -d at*)))
 
-LOCAL_RTS_BASE := $(AVR_ADA_HOME)/build
-INSTALL_BASE := $(RTS_BASE)/../../../..
-PREFIX = $(INSTALL_BASE)
-
 #
-# Installation diretory
+# Installation directory
 #
-INSTALL_DIR = $(INSTALL_BASE)/lib/gnat
+# default search directories for gpr-files of gnatmake and gprbuild
+# 1: <prefix>/<target>/lib/gnat (gprbuild requires --target)
+# 2: <prefix>/share/gpr/
+# 3: <prefix>/lib/gnat
+PREFIX = $(RTS_BASE)/../../../..
+INSTALL_DIR = $(PREFIX)/avr/lib/gnat
 
 libraries := debug lcd sensirion onewire slip threads
 library_objs := $(patsubst %,%/obj, $(libraries))
@@ -62,7 +63,7 @@ copy_libs:
            --exclude "*~" \
            --exclude "*.o" \
            --exclude */*~ \
-           avr_lib avr.gpr mcu.gpr gnat.adc avr_app.gpr \
+           avr_lib avr_tools.gpr avr_lib.gpr avr_threads.gpr mcu.gpr gnat.adc avr_app.gpr \
            $(libraries) \
            $(library_gprs) \
            | (cd $(INSTALL_DIR); tar xpvf -)

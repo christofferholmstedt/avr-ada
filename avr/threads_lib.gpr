@@ -14,16 +14,16 @@
 
 with "mcu.gpr";
 
-library project AVR_Threads is
+library project Threads_Lib is
 
    MCU : MCU.MCU_Type := MCU.MCU;
 
-   for Library_Name use "avr-threads";
-   for Library_Dir  use "avr_lib/" & MCU & "/lib";
+   for Library_Name use "avr-thread";
+   for Library_Dir  use "avr_lib/" & MCU & "/thread-lib";
    for Library_Kind use "static";
 
    for Languages use ("C", "Asm_Cpp");
-   for Object_Dir use "avr_lib/" & MCU & "/obj";
+   for Object_Dir use "avr_lib/" & MCU & "/thread-obj";
 
    for Source_Dirs use ("threads-1.3/src");
 
@@ -41,4 +41,4 @@ library project AVR_Threads is
       for Switches ("Asm_Cpp") use Flags;
    end Compiler;
 
-end AVR_Threads;
+end Threads_Lib;
