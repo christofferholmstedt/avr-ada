@@ -27,7 +27,7 @@ package body Blink_Threads_Pkg is
       Ticks : constant Threads.Ticks_T := Ticks_T'Max (Ticks_T(MS)/2, 1);
    begin
       Threads.Sleep (Ticks);
-   end;
+   end Delay_MS;
 
 
    procedure Blinky_1 is
@@ -39,18 +39,18 @@ package body Blink_Threads_Pkg is
          LED.Off_1;
          Delay_MS (200);
       end loop;
-    end Blinky_1;
+   end Blinky_1;
 
 
-    procedure Blinky_2 is
-    begin
-       loop
-          LED.On_2;
-          Delay_MS (800);
+   procedure Blinky_2 is
+   begin
+      loop
+         LED.On_2;
+         Delay_MS (800);
 
-          LED.Off_2;
-          Delay_MS (400);
-       end loop;
-    end Blinky_2;
+         LED.Off_2;
+         Delay_MS (400);
+      end loop;
+   end Blinky_2;
 
 end Blink_Threads_Pkg;

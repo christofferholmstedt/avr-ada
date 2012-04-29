@@ -21,6 +21,7 @@
 --  depending on the configuration settings in the AVR support library
 --  that either uses AVR.Real_Time or busy waits from AVR.Wait;
 with AVR.Real_Time.Clock;
+pragma Unreferenced (AVR.Real_Time.Clock);
 --  we have to explicitely import this function as it gets called via
 --  the delay statement. The avr-gnatbind does not yet know that the
 --  Ada.Calendar.Delay-routines call Clock and that it must be

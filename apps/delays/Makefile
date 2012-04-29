@@ -61,7 +61,7 @@ AVRDUDE_PROGRAMMER = stk500v2
 
 # com1 = serial port.
 # programmer connected to serial device, add -b 57600 for Arduinos
-AVRDUDE_PORT = com5 -b 57600 -v -v
+AVRDUDE_PORT = com5
 
 AVRDUDE_WRITE_FLASH = -U flash:w:
 AVRDUDE_WRITE_EEPROM = -U eeprom:w:

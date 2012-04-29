@@ -21,10 +21,10 @@ with AVR.Threads;
 
 package Blink_Threads_Pkg is
 
-    Context_1 : Threads.Context (100);
-    Context_2 : Threads.Context (100);
+   Context_1 : Threads.Context (100);
+   Context_2 : Threads.Context (100);
 
-    procedure Blinky_1;
-    procedure Blinky_2;
+   procedure Blinky_1;
+   procedure Blinky_2;
 
 end Blink_Threads_Pkg;
