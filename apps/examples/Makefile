@@ -39,7 +39,7 @@ GPR := examples.gpr
 
 # put the names of the target files here (without extension)
 ADA_TARGETS := pwm_demo flash_led hello_led test_eeprom walking_led_main \
-   test_starterkit_main extern_int_main test_progmem
+   test_starterkit_main extern_int_main test_progmem test_local_exception test_tags
 
 
 #---------------- GNATMAKE Options ----------------
@@ -60,7 +60,7 @@ FORMAT = ihex
 #
 AVRDUDE_PROGRAMMER = stk500v2
 
-# com1 = serial port. 
+# com1 = serial port.
 # programmer connected to serial device, add -b 57600 for Arduinos
 AVRDUDE_PORT = com5 -b 57600
 
