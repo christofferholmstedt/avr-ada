@@ -8,7 +8,7 @@
 --                              (AVR Version)                               --
 --                                                                          --
 --          Copyright (C) 1992-2007 Free Software Foundation, Inc.          --
---                  Copyright (C) 2004, 2010 Rolf Ebert                     --
+--                  Copyright (C) 2004, 2010, 2012 Rolf Ebert               --
 --                                                                          --
 -- This specification is derived from the Ada Reference Manual for use with --
 -- GNAT. The copyright notice above, and the license provisions that follow --
@@ -36,6 +36,13 @@
 -- Extensive contributions were provided by Ada Core Technologies Inc.      --
 --                                                                          --
 ------------------------------------------------------------------------------
+
+pragma Restrictions (No_Exception_Propagation);
+pragma Restrictions (No_Exception_Registration);
+pragma Restrictions (No_Finalization);
+pragma Restrictions (No_Implicit_Dynamic_Code);
+--  Pointers to nested subprograms are not allowed, in order
+--  to prevent the compiler from building "trampolines".
 
 package System is
    pragma Pure;
@@ -142,7 +149,7 @@ private
 
    Denorm                    : constant Boolean := True;
 
-   Duration_32_Bits          : constant Boolean := False;
+   Duration_32_Bits          : constant Boolean := True;
    Duration_Delta_Microseconds : constant       := 1000;
    --  If True, then Duration is represented in 32 bits and the delta
    --  and small values are set to Duration_Delta_Microseconds*(10**(-6))
@@ -161,7 +168,7 @@ private
    Machine_Overflows         : constant Boolean := False;
    Machine_Rounds            : constant Boolean := True;
    Preallocated_Stacks       : constant Boolean := False;
-   Signed_Zeros              : constant Boolean := False;
+   Signed_Zeros              : constant Boolean := True;
    Stack_Check_Default       : constant Boolean := False;
    Stack_Check_Probes        : constant Boolean := False;
    Stack_Check_Limits        : constant Boolean := False;

@@ -33,13 +33,6 @@
 
 --  This implementation assumes that the underlying malloc/free/realloc
 --  implementation is thread safe, and thus, no additional lock is required.
---  Note that we still need to defer abort because on most systems, an
---  asynchronous signal (as used for implementing asynchronous abort of
---  task) cannot safely be handled while malloc is executing.
-
---  If you are not using Ada constructs containing the "abort" keyword, then
---  you can remove the calls to Abort_Defer.all and Abort_Undefer.all from
---  this unit.
 
 with Ada.Exceptions;               use Ada.Exceptions;
 
@@ -53,9 +46,6 @@ package body System.Memory is
 
    procedure c_free (Ptr : System.Address);
    pragma Import (Intrinsic, c_free, "__builtin_free");
-
-   --  function c_realloc
-   --  (Ptr : System.Address; Size : System.CRTL.size_t) return System.Address;
 
    -----------
    -- Alloc --
@@ -92,37 +82,5 @@ package body System.Memory is
    begin
       c_free (Ptr);
    end Free;
-
-   -------------
-   -- Realloc --
-   -------------
-
-   --  function Realloc
-   --    (Ptr  : System.Address;
-   --     Size : size_t)
-   --     return System.Address
-   --  is
-   --     Result      : System.Address;
-   --     Actual_Size : constant size_t := Size;
-
-   --  begin
-   --     if Size = size_t'Last then
-   --        Raise_Exception (Storage_Error'Identity, "object too large");
-   --     end if;
-
-   --     if Parameters.No_Abort then
-   --        Result := c_realloc (Ptr, System.CRTL.size_t (Actual_Size));
-   --     else
-   --        Abort_Defer.all;
-   --        Result := c_realloc (Ptr, System.CRTL.size_t (Actual_Size));
-   --        Abort_Undefer.all;
-   --     end if;
-
-   --     if Result = System.Null_Address then
-   --        Raise_Exception (Storage_Error'Identity, "heap exhausted");
-   --     end if;
-
-   --     return Result;
-   --  end Realloc;
 
 end System.Memory;

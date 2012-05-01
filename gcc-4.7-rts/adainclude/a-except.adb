@@ -32,6 +32,23 @@
 
 package body Ada.Exceptions is
 
+   procedure Reset;
+   pragma Import (Ada, Reset);
+   for Reset'Address use 0;
+   pragma No_Return (Reset);
+
+   procedure Default_Handler (Msg : System.Address; Line : Integer);
+   pragma Export (C, Default_Handler, "__gnat_last_chance_handler");
+   pragma Weak_External (Default_Handler);
+   pragma No_Return (Default_Handler);
+
+   procedure Default_Handler (Msg : System.Address; Line : Integer) is
+      pragma Unreferenced (Msg);
+      pragma Unreferenced (Line);
+   begin
+      Reset;
+   end Default_Handler;
+
    procedure Last_Chance_Handler (Msg : System.Address; Line : Integer);
    pragma Import (C, Last_Chance_Handler, "__gnat_last_chance_handler");
    pragma No_Return (Last_Chance_Handler);

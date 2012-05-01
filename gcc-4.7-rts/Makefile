@@ -18,18 +18,24 @@
 # This makefile compiles the AVR Ada run time system (RTS)
 
 # Ada source files
-ADASRC = ada.ads interfac.ads system.ads unchconv.ads a-unccon.ads \
-   s-maccod.ads s-stoele.adb s-stoele.ads s-unstyp.ads \
-   a-charac.ads a-chlat1.ads a-chlat9.ads \
+ADASRC = system.ads \
+   s-maccod.ads \
+   s-stoele.ads s-stoele.adb \
+   s-unstyp.ads \
    s-bitops.ads s-bitops.adb \
-   gnat.ads g-souinf.ads \
-   s-stalib.ads s-parame.ads \
-   a-calend.ads a-caldel.ads \
-   i-c.ads \
-   a-except.ads a-except.adb \
+   s-stalib.ads \
+   s-parame.ads \
    s-secsta.ads s-secsta.adb \
    s-memory.ads s-memory.adb \
-   a-tags.ads a-tags.adb
+   s-gccbui.ads \
+   interfac.ads i-c.ads \
+   ada.ads \
+   unchconv.ads a-unccon.ads \
+   a-charac.ads a-chlat1.ads a-chlat9.ads \
+   a-calend.ads a-caldel.ads \
+   a-except.ads a-except.adb \
+   a-tags.ads a-tags.adb \
+   gnat.ads g-souinf.ads
 
 #   s-htable.ads s-htable.adb
 #   a-stream.ads
@@ -39,8 +45,6 @@ ADASRC = ada.ads interfac.ads system.ads unchconv.ads a-unccon.ads \
 #
 
 OBJ = $(ADASRC:.ads=.o)
-
-NOT_NEEDED_OBJS = ada.o interfac.o system.o s-maccod.o
 
 LIBGNAT_OBJS = s-bitops.o a-except.o s-memory.o a-tags.o s-secsta.o
 LIBGNAT_ALIS = $(filter %.ali,$(ADASRC:.ads=.ali)) # filter out the .adb from ADASRC
@@ -107,7 +111,7 @@ libgnat.a: $(LIBGNAT_OBJS)
 #
 #  install the RTS
 #
-install_rts: build_rts rtsclean
+install_rts: build_rts clean_rts
 	$(COPY) -r rts $(RTS_BASE)
 	chmod a-w -R $(RTS_BASE)/rts
 	-mkdir $(RTS_BASE)/adainclude
@@ -144,7 +148,7 @@ clean:
 #
 #  Makefile stuff
 #
-.PHONY: clean rtsclean install_rts
+.PHONY: clean clean_rts install_rts
 
 print-%:
 	@echo $* = $($*)

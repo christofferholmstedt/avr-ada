@@ -39,16 +39,14 @@
 --  exception propagation, i.e. restriction No_Exception_Propagation
 --  is set.
 --
---  You also have to define __gnat_last_chance_handler somewher in
+--  You also have to define __gnat_last_chance_handler somewhere in
 --  your code as the typical binder generated last-chance-handler is
 --  stripped in AVR-Ada.
 
 with System;
-with System.Parameters;
-with System.Standard_Library;
 
 package Ada.Exceptions is
-   pragma Preelaborate_05;
+   pragma Preelaborate;
 
    type Exception_Id is private;
    pragma Preelaborable_Initialization (Exception_Id);
