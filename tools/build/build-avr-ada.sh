@@ -111,7 +111,7 @@ AVRADA_BIN_DIR="$AVRADA_DIR/binutils/$VER_BINUTILS"
 # Download necessary tarbals and patches using wget and cvs
 download_files="no"
 delete_obj_dirs="yes"
-delete_build_dir="yes"
+delete_build_dir="no"
 delete_install_dir="no"
 build_binutils="no"
 build_gcc="yes"
@@ -470,10 +470,6 @@ if test "$build_gcc" = "yes" ; then
     make &> $AVR_BUILD/step05_gcc_gcc_obj.log
     # error in gcc-4.7.0 multilib support for Ada
     cp gcc/s-avr-mlib gcc/ada/tools/
-    # for some unknown reason it does not pick the right value for
-    # AVR, set it explicitely
-    export TOOLS_TARGET_PAIRS="mlib-tgt-specific.adb<mlib-tgt-specific-xi.adb \
-      indepsw.adb<indepsw-gnu.adb"
     make &> $AVR_BUILD/step05.1_gcc_gcc_obj.log
     check_return_code
 
