@@ -13,13 +13,12 @@ with "avr_tools.gpr";
 
 library project AVR_Lib is
 
-   MCU  := MCU.MCU;
-   Arch := MCU.Arch;
+   MCU   : MCU.MCU_Type   := MCU.MCU;
+   Board : MCU.Board_Type := MCU.BOARD;
 
    for Library_Name use "avrada";
    for Library_Dir  use "avr_lib/" & MCU & "/lib";
    for Library_Kind use "static";
-   --  for Externally_Built use "true";
 
    for Languages use ("Ada");
    for Object_Dir use "avr_lib/" & MCU & "/obj";
@@ -34,9 +33,16 @@ library project AVR_Lib is
          "-gnateDEeprom_We=" & MCU.Eeprom_WE);
    end Compiler;
 
+   case Board is
+   when "none" => for Source_Dirs use
+      ("avr_lib/" & MCU,          --  first look in the MCU specific dir
+       "avr_lib");                --  then look in the default dir
 
-   for Source_Dirs use ("avr_lib/" & MCU,  --  first look in the MCU specific dir
-                        "avr_lib");        --  then look in the default dir
+   when others => for Source_Dirs use
+      ("avr_lib/board-" & Board,  --  first look in the board specific dir
+       "avr_lib/" & MCU,          --  then look in the MCU specific dir
+       "avr_lib");                --  then look in the default dir
+   end case;
 
 
    Std_Sources :=
@@ -68,6 +74,7 @@ library project AVR_Lib is
        --
 --       "avr-generic_text_io.ads",      "avr-generic_text_io.adb",
 --       "avr-shared_text_io.ads",       "avr-shared_text_io.adb",
+       "avr-gcc_builtins.ads",
 
        --
        --  µC description and its general name AVR.MCU.
@@ -190,7 +197,7 @@ library project AVR_Lib is
       when "atmega8" | "atmega162" =>
          for Source_Files use
            Std_Sources & UART_Sources & EEPROM_Sources & Sleep_Sources
-           & WDT_Sources & Time_Sources;
+           & WDT_Sources & Time_No_Clock_Sources;
 
       when "atmega169" =>
          for Source_Files use

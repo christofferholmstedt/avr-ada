@@ -46,7 +46,7 @@ package body AVR.Timer0 is
 #end if;
 
    Prescale_Reg   : Unsigned_8 renames
-#if MCU = "attiny13" or else MCU = "attiny13a" or else MCU = "attiny2313" or else MCU = "atmega328p" or else MCU = "atmega168" or else MCU = "atmega2560" then
+#if MCU = "attiny13" or else MCU = "attiny13a" or else MCU = "attiny2313" or else MCU = "atmega168" or else MCU = "atmega328p" or else MCU = "atmega2560" then
     MCU.TCCR0B;
 #elsif MCU = "atmega169" or else MCU = "atmega644" or else MCU = "atmega644p" then
     MCU.TCCR0A;
@@ -73,6 +73,15 @@ package body AVR.Timer0 is
 #end if;
 
 
+   --  the setting of the CSx bits had been verified for the following MCUs:
+   --  atmega168
+   --  atmega328p
+
+   --  If you use a different MCU please compare the settings here
+   --  with the corresponding data sheet.  And please report your
+   --  finding (errors or successful verification) to
+   --  avr-devel@lists.sourceforge.net.
+
    function No_Clock_Source return Scale_Type is
    begin
       return 0;
@@ -90,12 +99,15 @@ package body AVR.Timer0 is
 
    function Scale_By_32     return Scale_Type is
    begin
+#if MCU = "atmega168" or else MCU = "atmega328p" then
+      raise Program_Error with "1/32 not available for this MCU";
+#end if;
       return MCU.CS01_Mask or MCU.CS00_Mask;
    end Scale_By_32;
 
    function Scale_By_64     return Scale_Type is
    begin
-#if MCU = "atmega32" then
+#if MCU = "atmega32" or else MCU = "atmega168" or else MCU = "atmega328p" then
       return MCU.CS01_Mask or MCU.CS00_Mask;
 #else
       return MCU.CS02_Mask;
@@ -104,12 +116,15 @@ package body AVR.Timer0 is
 
    function Scale_By_128    return Scale_Type is
    begin
+#if MCU = "atmega168" or else MCU = "atmega328p" then
+      raise Program_Error with "1/128 not available for this MCU";
+#end if;
       return MCU.CS02_Mask or MCU.CS00_Mask;
    end Scale_By_128;
 
    function Scale_By_256    return Scale_Type is
    begin
-#if MCU = "atmega32" or else MCU = "atmega8" then
+#if MCU = "atmega8" or else MCU = "atmega32" or else MCU = "atmega168" or else MCU = "atmega328p" then
       return MCU.CS02_Mask;
 #else
       return MCU.CS02_Mask or MCU.CS01_Mask;
@@ -118,7 +133,7 @@ package body AVR.Timer0 is
 
    function Scale_By_1024   return Scale_Type is
    begin
-#if MCU = "atmega32" then
+#if MCU = "atmega32" or else MCU = "atmega168" or else MCU = "atmega328p" then
       return MCU.CS02_Mask or MCU.CS00_Mask;
 #else
       return MCU.CS02_Mask or MCU.CS01_Mask or MCU.CS00_Mask;
@@ -147,7 +162,7 @@ package body AVR.Timer0 is
 
                    others    => False);
 
-#elsif MCU = "atmega32" then
+#elsif MCU = "atemga8" or else MCU = "atmega32" then
       Ctrl_Reg := (MCU.COM00_Bit => False,  --  \  normal operation,
                    MCU.COM01_Bit => False,  --  /  OC0 disconnected
 
@@ -193,7 +208,7 @@ package body AVR.Timer0 is
 
                    others    => False);
 
-#elsif MCU = "atmega32" then
+#elsif MCU = "atmega8" or else MCU = "atmega32" then
       Ctrl_Reg := (MCU.COM00_Bit => False,  --  \  normal operation,
                    MCU.COM01_Bit => False,  --  /  OC0 disconnected
 
@@ -206,16 +221,14 @@ package body AVR.Timer0 is
       --  select the clock
       Prescale_Reg := Prescale_Reg or Prescaler;
 
+#if not MCU = "atmega8" then
       --  enable Timer0 output compare interrupt
       Output_Compare_Interrupt_Enable := True;
 
       Output_Compare_Reg := Overflow;
-
-      --  clear interrupt-flags of timer/counter0
-      -- MCU.TIFR0 := 16#FF#;
+#end if;
 
       --  reset all counters
-      -- Clear_Overflow_Count;
       MCU.TCNT0 := 0;
 
    end Init_CTC;
@@ -224,7 +237,7 @@ package body AVR.Timer0 is
 #if MCU = "attiny13" or else MCU = "attiny13a" or else MCU = "attiny2313" or else MCU = "atmega168" or else MCU = "atmega169" or else MCU = "atmega2560" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" then
    Com0 : Boolean renames Ctrl_Reg (MCU.COM0A0_Bit);
    Com1 : Boolean renames Ctrl_Reg (MCU.COM0A1_Bit);
-#elsif MCU = "atmega32" then
+#elsif MCU = "atmega8" or else MCU = "atmega32" then
    Com0 : Boolean renames Ctrl_Reg (MCU.COM00_Bit);
    Com1 : Boolean renames Ctrl_Reg (MCU.COM01_Bit);
 #end if;

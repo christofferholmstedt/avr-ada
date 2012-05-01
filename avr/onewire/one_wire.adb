@@ -75,8 +75,10 @@ package body One_Wire is
    pragma Inline_Always (Wait_4us);
 
 
+   Standard_Prescaler : Unsigned_8; -- possibly save the current value
+   --  of the clock prescaler in ordre to set it back after
+   --  communication in Exit_Comm.
    procedure Init_Comm is separate;
-
 
    procedure Exit_Comm is
    begin

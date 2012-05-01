@@ -5,15 +5,15 @@ with AVR.Real_Time.Clock;
 package body AVR.Real_Time.Delays is
 
 
-   Max_Sensible_Delay : constant Duration := 24.0 * 60.0 * 60.0;
+   --  Max_Sensible_Delay : constant Duration := 24.0 * 60.0 * 60.0;
 
    --  Values for Mode call below. Note that the compiler (exp_ch9.adb)
    --  relies on these values. So any change here must be reflected in
    --  corresponding changes in the compiler.
-   Relative          : constant := 0;
-   Absolute_Calendar : constant := 1;
-   Absolute_RT       : constant := 2;
-   AVR_RT            : constant := 3;
+   --  Relative          : constant := 0;
+   --  Absolute_Calendar : constant := 1;
+   --  Absolute_RT       : constant := 2;
+   --  AVR_RT            : constant := 3;
 
 
    procedure Delay_For (D : Duration) is

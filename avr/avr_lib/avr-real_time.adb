@@ -214,18 +214,19 @@ package body AVR.Real_Time is
      return Day_Duration
    is
       SS : Day_Duration := 0.0;
-      H : constant Integer_32 := Integer_32(Hour);
-      M : constant Integer_32 := Integer_32(Minute);
+      H : constant Integer_16 := Integer_16(Hour);
+      M : constant Integer_16 := Integer_16(Minute);
       S : constant Integer_32 := Integer_32(Second);
+      T16 : Integer_16;
       T : Integer_32;
    begin
-      T := H * 60 + M;
-      T := T * 60 + S;
-      Ss := Day_Duration (T); <<-- generate compiler error
+      T16 := H * 60 + M;
+      T := Integer_32(T16) * 60 + S;
+      -- SS := Day_Duration (T); -- <<-- generate compiler error
 
       --  SS := Day_Duration ((((Integer_32(Hour) * 60) + Integer_32(Minute)) * 60)
       --  + Integer_32(Second))
-      --  + Sub_Second;
+      SS := SS + Sub_Second;
       return SS;
    end Seconds_Of;
 

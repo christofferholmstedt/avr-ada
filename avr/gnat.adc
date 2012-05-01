@@ -60,9 +60,11 @@ pragma Restrictions (No_Entry_Calls_In_Elaboration_Code);
 --  use of this restriction, the compiler can assume that no code past
 --  an accept statement in a task can be executed at elaboration time.
 
-pragma Restrictions (No_Exception_Handlers);
+--  pragma Restrictions (No_Exception_Handlers);
 --  This restriction ensures at compile time that there are no
 --  explicit exception handlers.
+
+pragma Restrictions (No_Exception_Propagation);
 
 --  pragma Restrictions(No_Implicit_Conditionals);
 --  This restriction ensures that the generated code does not contain
@@ -177,12 +179,16 @@ pragma Restrictions(Static_Storage_Size);
 --  pragma Restrictions (No_Allocators);
 --  There are no occurrences of an allocator.
 
-pragma Restrictions (No_Local_Allocators);
+--  pragma Restrictions (No_Local_Allocators);
 --  Allocators are prohibited in subprograms, generic subprograms,
 --  tasks, and entry bodies; instantiations of generic packages are
 --  also prohibited in these contexts.
 
-pragma Restrictions (No_Unchecked_Deallocation);
+pragma Restrictions (No_Implicit_Heap_Allocations);
+--  This prohibits implicit allocations (for example an array with
+--  non-static subscript bounds declared at library level).
+
+--  pragma Restrictions (No_Unchecked_Deallocation);
 --  Semantic dependence on Unchecked_Deallocation is not allowed.
 
 pragma Restrictions (Immediate_Reclamation);
@@ -197,7 +203,7 @@ pragma Restrictions (No_Finalization);
 --  Exception-related restriction:
 --  ==============================
 
-pragma Restrictions (No_Exceptions);
+--  pragma Restrictions (No_Exceptions);
 --  Raise_statements and exception_handlers are not allowed.  No
 --  language-defined run-time checks are generated; however, a
 --  run-time check performed automatically by the hardware is

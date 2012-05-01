@@ -213,6 +213,6 @@ private
    pragma Inline (Wait);
    pragma Inline (Wait_And_Clear);
 
-   pragma Linker_Options ("-lavr-thread");
+--   pragma Linker_Options ("-lavr-threads");
 
 end AVR.Threads;

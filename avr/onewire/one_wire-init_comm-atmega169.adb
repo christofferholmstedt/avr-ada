@@ -1,3 +1,5 @@
+with AVR.MCU;
+
 separate (One_Wire)
 procedure Init_Comm is
 begin
@@ -18,4 +20,3 @@ begin
    MCU.CLKPR := 16#00#;
 
 end Init_Comm;
-

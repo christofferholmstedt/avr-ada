@@ -12,11 +12,11 @@ with "mcu.gpr";
 
 abstract project AVR_Tools is
 
-   MCU  := MCU.MCU;
-   Arch := MCU.Arch;
+   MCU  : MCU.MCU_Type     := MCU.MCU;
+   Arch : MCU.Architecture := MCU.Arch;
 
 
-   for Languages use ("Ada");
+   for Languages use ("Ada", "C");
 
 
    package Builder is
@@ -29,7 +29,7 @@ abstract project AVR_Tools is
    package Compiler is
       System_Case_Style_Checks := "n";
       Space_Style_Checks       := "t";
-      Base_Style_Checks        := "-gnaty3abefhiklM120pr";
+      Base_Style_Checks        := "-gnaty3abefhiklM130pr";
       Style_Checks             := Base_Style_Checks &
                                   System_Case_Style_Checks &
                                   Space_Style_Checks;
@@ -66,6 +66,7 @@ abstract project AVR_Tools is
          --  A unit compiled with `-fstack-usage' will generate an
          --  extra file that specifies the maximum amount of stack
          --  used, on a per-function basis.
+         "-gnatdY",
 
          "-fdata-sections",     --  create separate data sections
          "-ffunction-sections", --  create separate function sections
@@ -73,8 +74,8 @@ abstract project AVR_Tools is
          "-mmcu=" & MCU,        --  name of the micro controler
          "-gnateDMCU=" & MCU,    --  name of the micro controler for preprocessor
          "-gnateDUART=" & MCU.UART
-        );
-      -- & Non_Spacing_Style_Checks;
+        )
+      & Non_Spacing_Style_Checks;
    end Compiler;
 
 

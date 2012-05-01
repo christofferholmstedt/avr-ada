@@ -15,8 +15,6 @@
 -- executable file might be covered by the GNU Public License.           --
 ---------------------------------------------------------------------------
 
-with System;
-with System.Machine_Code;
 with AVR.MCU;
 with AVR.Interrupts;
 
@@ -25,7 +23,7 @@ package body AVR.Sleep is
 
    --  Define internal sleep types for the various devices.  Also define
    --  some internal masks for use in Set_Mode.
-#if MCU = "atmega32" or else MCU = "attiny2313" then
+#if MCU = "atmega8" or else MCU = "atmega32" or else MCU = "attiny2313" then
    Sleep_Ctrl_Bits : AVR.Bits_In_Byte renames AVR.MCU.MCUCR_Bits;
 #else
    Sleep_Ctrl_Bits : AVR.Bits_In_Byte renames AVR.MCU.SMCR_Bits;
@@ -143,9 +141,9 @@ package body AVR.Sleep is
 --  #endif
 
 
-
    procedure Sleep_Instr;
    pragma Inline_Always (Sleep_Instr);
+   pragma Import (Intrinsic, Sleep_Instr, "__builtin_avr_sleep");
 
 
    procedure Set_Mode (Mode : Sleep_Mode_T)
@@ -212,8 +210,8 @@ package body AVR.Sleep is
 
 --  #define set_sleep_mode(mode) \
 --  do { \
---      MCUCR = ((MCUCR & ~_BV(SM1)) | ((mode) == SLEEP_MODE_PWR_DOWN || (mode) == SLEEP_MODE_PWR_SAVE ? _BV(SM1) : 0)); \
---      EMCUCR = ((EMCUCR & ~_BV(SM0)) | ((mode) == SLEEP_MODE_PWR_SAVE ? _BV(SM0) : 0)); \
+--      MCUCR = ((MCUCR & ~_BV(SM1)) | ((mode) == SLEEP_MODE_PWR_DOWN || (mode) == SLEEP_MODE_PWR_SAVE ? _BV(SM1) : 0));
+--      EMCUCR = ((EMCUCR & ~_BV(SM0)) | ((mode) == SLEEP_MODE_PWR_SAVE ? _BV(SM0) : 0));
 --  } while(0)
 
 --  #elif _SLEEP_TYPE == 4
@@ -234,53 +232,40 @@ package body AVR.Sleep is
 
 --  #endif
 
-    --  Put the device in sleep mode. How the device is brought out of
-    --  sleep mode depends on the specific mode selected with the
-    --  set_mode function.  See the data sheet for your device for
-    --  more details.
+   --  Put the device in sleep mode. How the device is brought out of
+   --  sleep mode depends on the specific mode selected with the
+   --  set_mode function.  See the data sheet for your device for
+   --  more details.
 
 
-    --  Manipulates the SE (sleep enable) bit.
-    procedure Enable
-    is
-    begin
-       Sleep_Ctrl_Bits (AVR.MCU.SE_Bit) := True;
-    end Enable;
+   --  Manipulates the SE (sleep enable) bit.
+   procedure Enable is
+   begin
+      Sleep_Ctrl_Bits (AVR.MCU.SE_Bit) := True;
+   end Enable;
+
+   procedure Disable is
+   begin
+      Sleep_Ctrl_Bits (AVR.MCU.SE_Bit) := False;
+   end Disable;
 
 
-    procedure Disable
-    is
-    begin
-       Sleep_Ctrl_Bits (AVR.MCU.SE_Bit) := False;
-    end Disable;
+   --  Put the device in sleep mode. SE-bit must be set beforehand.
+   procedure Go_Sleeping is
+   begin
+      Enable;
+      Sleep_Instr;
+      Disable;
+   end Go_Sleeping;
 
 
-    procedure Sleep_Instr
-    is
-       use System.Machine_Code;
-    begin
-       Asm ("sleep", Volatile => True);
-    end Sleep_Instr;
-
-
-    --  Put the device in sleep mode. SE-bit must be set beforehand.
-    procedure Go_Sleeping
-    is
-    begin
-       Enable;
-       Sleep_Instr;
-       Disable;
-    end Go_Sleeping;
-
-
-    --  Put the device in sleep mode if Condition is true.  Condition
-    --  is checked and sleep mode entered as one indivisible action.
-    procedure Go_Sleeping_If (Condition : Boolean)
-    is
-    begin
-       AVR.Interrupts.Save_Disable;
-       if Condition then Go_Sleeping; end if;
-       AVR.Interrupts.Restore;
-    end Go_Sleeping_If;
+   --  Put the device in sleep mode if Condition is true.  Condition
+   --  is checked and sleep mode entered as one indivisible action.
+   procedure Go_Sleeping_If (Condition : Boolean) is
+   begin
+      AVR.Interrupts.Save_Disable;
+      if Condition then Go_Sleeping; end if;
+      AVR.Interrupts.Restore;
+   end Go_Sleeping_If;
 
 end AVR.Sleep;

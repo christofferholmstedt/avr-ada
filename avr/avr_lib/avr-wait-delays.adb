@@ -5,7 +5,7 @@ with Interfaces;                   use Interfaces;
 package body AVR.Wait.Delays is
 
 
-   procedure Wait_1ms is new Generic_Wait_USecs (Crystal_Hertz => 8_000_000,
+   procedure Wait_1ms is new Generic_Wait_USecs (Crystal_Hertz => 16_000_000,
                                                  Micro_Seconds => 1_000);
 
    function To_Milliseconds is new Ada.Unchecked_Conversion (Source => Duration,

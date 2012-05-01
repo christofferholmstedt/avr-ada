@@ -34,6 +34,8 @@ package AVR.Wait is
    procedure Wait_4_Cycles (Count : Unsigned_16);
    -- can wait up to 2**16 x 4 cycles
 
+   procedure Wait_Cycles (Count : Unsigned_32);
+
 
    generic
       Crystal_Hertz : Long_Long_Integer;
@@ -64,5 +66,6 @@ private
    pragma Inline_Always (Wait_3_Cycles);
    pragma Inline_Always (Wait_4_Cycles);
    pragma Inline_Always (Generic_Wait_USecs);
+   pragma Import (Intrinsic, Wait_Cycles, "__builtin_avr_delay_cycles");
 
 end AVR.Wait;

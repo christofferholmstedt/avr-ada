@@ -27,7 +27,7 @@ MCU_LIST = $(PRIMARY_MCU_LIST)
 
 # we build separate libraries for each supported device
 libs := $(patsubst %, %/lib/libavrada.a, $(MCU_LIST))
-thread_libs := $(patsubst %, %/thread-lib/libavr-threads.a, $(MCU_LIST))
+thread_libs := $(patsubst %, %/thread-lib/libavr-thread.a, $(MCU_LIST))
 
 # all part specific registers and definitions are made available
 mcu_specs := $(patsubst %, %/avr-mcu.ads, $(MCU_LIST))
@@ -39,14 +39,14 @@ all:	stamp-links stamp-libs
 # first set the variable MCU
 at%/lib/libavrada.a : MCU = $(patsubst %/lib/libavrada.a,%, $@)
 at%/avr-mcu.ads     : MCU = $(patsubst %/avr-mcu.ads,%, $@)
-at%/thread-lib/libavr-threads.a : MCU = $(patsubst %/thread-lib/libavr-threads.a,%, $@)
+at%/thread-lib/libavr-thread.a : MCU = $(patsubst %/thread-lib/libavr-thread.a,%, $@)
 
 # then provide the rules for building
 at%/lib/libavrada.a: stamp-links at%/obj at%/lib ../avr_lib.gpr ../avr_tools.gpr ../mcu.gpr at%/avr-mcu.ads
 	avr-gnatmake -p -P../avr_lib.gpr -XMCU=$(MCU)
 
 # rule for building the thread library
-at%/thread-lib/libavr-threads.a: at%/thread-obj at%/thread-lib ../avr_threads.gpr ../mcu.gpr
+at%/thread-lib/libavr-thread.a: at%/thread-obj at%/thread-lib ../threads_lib.gpr ../mcu.gpr
 	gprbuild -p --config=../avr.cgpr -P../threads_lib.gpr -XMCU=$(MCU)
 
 at%/avr-mcu.ads:
@@ -78,6 +78,7 @@ clean:
 	$(RM) b~*.*
 	$(RM) -rf obj lib
 	$(RM) -rf at*/obj at*/lib
+	$(RM) -rf at*/thread-obj at*/thread-lib
 	$(RM) avr-mcu.ads at*/avr-mcu.ads
 
 

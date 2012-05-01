@@ -63,7 +63,7 @@ copy_libs:
            --exclude "*~" \
            --exclude "*.o" \
            --exclude */*~ \
-           avr_lib avr_tools.gpr avr_lib.gpr avr_threads.gpr mcu.gpr gnat.adc avr_app.gpr \
+           avr_lib avr.cgpr avr_tools.gpr avr_lib.gpr threads_lib.gpr mcu.gpr gnat.adc avr_app.gpr \
            $(libraries) \
            $(library_gprs) \
            | (cd $(INSTALL_DIR); tar xpvf -)

@@ -26,4 +26,3 @@ procedure AVR.Real_Time.Timing_Events.Process is
 begin
    AVR.Real_Time.Timing_Events.Event_Queue.Process_Events;
 end AVR.Real_Time.Timing_Events.Process;
-   

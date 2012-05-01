@@ -55,13 +55,13 @@ package body AVR.Wait is
 
    procedure Generic_Wait_USecs is
       -- time for four cycles measured in nano seconds
-      Four_Cycles_Length : constant Long_Long_Integer :=
-        4_000_000_000 / Crystal_Hertz;
+      Cycle_Length : constant Long_Long_Integer :=
+        1_000_000_000 / Crystal_Hertz;
 
-      Four_Cycles_Waits : constant Unsigned_16
-        := Unsigned_16 ((Micro_Seconds * 1_000) / Four_Cycles_Length);
+      Cycles_To_Wait : constant Unsigned_32
+        := Unsigned_32 ((Micro_Seconds * 1_000) / Cycle_Length);
    begin
-      Wait_4_Cycles (Four_Cycles_Waits);
+      Wait_Cycles (Cycles_To_Wait);
    end Generic_Wait_USecs;
 
 
