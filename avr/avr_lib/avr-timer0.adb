@@ -208,7 +208,7 @@ package body AVR.Timer0 is
 
                    others    => False);
 
-#elsif MCU = "atmega8" or else MCU = "atmega32" then
+#elsif MCU = "atmega32" then
       Ctrl_Reg := (MCU.COM00_Bit => False,  --  \  normal operation,
                    MCU.COM01_Bit => False,  --  /  OC0 disconnected
 
@@ -237,33 +237,49 @@ package body AVR.Timer0 is
 #if MCU = "attiny13" or else MCU = "attiny13a" or else MCU = "attiny2313" or else MCU = "atmega168" or else MCU = "atmega169" or else MCU = "atmega2560" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" then
    Com0 : Boolean renames Ctrl_Reg (MCU.COM0A0_Bit);
    Com1 : Boolean renames Ctrl_Reg (MCU.COM0A1_Bit);
-#elsif MCU = "atmega8" or else MCU = "atmega32" then
+#elsif MCU = "atmega32" then
    Com0 : Boolean renames Ctrl_Reg (MCU.COM00_Bit);
    Com1 : Boolean renames Ctrl_Reg (MCU.COM01_Bit);
 #end if;
 
    procedure Set_Output_Compare_Mode_Normal is
    begin
+#if not MCU = "atmega8" then
       Com0 := False;
       Com1 := False;
+#else
+      pragma Not_Implemented; null;
+#end if;
    end Set_Output_Compare_Mode_Normal;
 
    procedure Set_Output_Compare_Mode_Toggle is
    begin
+#if not MCU = "atmega8" then
       Com0 := True;
       Com1 := False;
+#else
+      pragma Not_Implemented; null;
+#end if;
    end Set_Output_Compare_Mode_Toggle;
 
    procedure Set_Output_Compare_Mode_Set is
    begin
+#if not MCU = "atmega8" then
       Com0 := True;
       Com1 := True;
+#else
+      pragma Not_Implemented; null;
+#end if;
    end Set_Output_Compare_Mode_Set;
 
    procedure Set_Output_Compare_Mode_Clear is
    begin
+#if not MCU = "atmega8" then
       Com0 := False;
       Com1 := True;
+#else
+      pragma Not_Implemented; null;
+#end if;
    end Set_Output_Compare_Mode_Clear;
 
 
@@ -277,7 +293,11 @@ package body AVR.Timer0 is
 
    procedure Enable_Interrupt_Compare is
    begin
+#if not MCU = "atmega8" then
       Output_Compare_Interrupt_Enable := True;
+#else
+      pragma Not_Implemented; null;
+#end if;
    end Enable_Interrupt_Compare;
 
 
@@ -289,9 +309,11 @@ package body AVR.Timer0 is
 
    procedure Set_Overflow_At (Overflow : Unsigned_8) is
    begin
+#if not MCU = "atmega8" then
       Output_Compare_Reg := Overflow;
+#else
+      pragma Not_Implemented; null;
+#end if;
    end Set_Overflow_At;
 
-
 end AVR.Timer0;
-

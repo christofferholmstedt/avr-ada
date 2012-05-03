@@ -52,7 +52,7 @@ restrict_permissions:
 	chmod -R a-w $(INSTALL_DIR)
 	-chown -R root $(INSTALL_DIR)  &>/dev/null
 
-$(library_objs) $(library_libs) $(OBJ_DIRS) ${INSTALL_DIR}:
+$(library_objs) $(library_libs) $(OBJ_DIRS) $(INSTALL_DIR):
 	mkdir -p $@
 
 copy_libs:

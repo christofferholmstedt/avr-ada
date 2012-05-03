@@ -115,8 +115,8 @@ install_rts: build_rts clean_rts
 	$(COPY) -r rts $(RTS_BASE)
 	chmod a-w -R $(RTS_BASE)/rts
 	-mkdir $(RTS_BASE)/adainclude
-	$(COPY) $(RTS_SOURCE)/adainclude/system.ads $(RTS_BASE)/adainclude
-	$(COPY) $(RTS_SOURCE)/README.gnatlink_inst  $(RTS_BASE)/adainclude
+	-$(COPY) $(RTS_SOURCE)/adainclude/system.ads $(RTS_BASE)/adainclude
+	-$(COPY) $(RTS_SOURCE)/README.gnatlink_inst  $(RTS_BASE)/adainclude
 
 
 ###############################################################

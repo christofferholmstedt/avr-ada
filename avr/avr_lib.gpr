@@ -74,7 +74,6 @@ library project AVR_Lib is
        --
 --       "avr-generic_text_io.ads",      "avr-generic_text_io.adb",
 --       "avr-shared_text_io.ads",       "avr-shared_text_io.adb",
-       "avr-gcc_builtins.ads",
 
        --
        --  µC description and its general name AVR.MCU.
@@ -197,7 +196,7 @@ library project AVR_Lib is
       when "atmega8" | "atmega162" =>
          for Source_Files use
            Std_Sources & UART_Sources & EEPROM_Sources & Sleep_Sources
-           & WDT_Sources & Time_No_Clock_Sources;
+           & WDT_Sources & Time_No_Clock_Sources & Timer0_Sources;
 
       when "atmega169" =>
          for Source_Files use
