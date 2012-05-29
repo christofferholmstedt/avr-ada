@@ -53,7 +53,7 @@ at%/lib/libavrada.a: stamp-links at%/obj at%/lib ../avr_lib.gpr ../avr_tools.gpr
 
 # rule for building the thread library
 at%/thread-lib/libavr-thread.a: at%/thread-obj at%/thread-lib ../threads_lib.gpr ../mcu.gpr
-	gprbuild -p -P../threads_lib.gpr -XMCU=$(MCU)
+	gprbuild -p --config=../avr.cgpr -P../threads_lib.gpr -XMCU=$(MCU)
 
 # custom boards
 include boards.mk
