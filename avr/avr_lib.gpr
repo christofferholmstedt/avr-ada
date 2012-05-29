@@ -21,7 +21,6 @@ library project AVR_Lib is
    for Library_Kind use "static";
 
    for Languages use ("Ada");
-   for Object_Dir use "avr_lib/" & MCU & "/obj";
 
    package Builder renames AVR_Tools.Builder;
    package Binder  renames AVR_Tools.Binder;
@@ -34,11 +33,17 @@ library project AVR_Lib is
    end Compiler;
 
    case Board is
-   when "none" => for Source_Dirs use
+   when "none" =>
+      for Object_Dir use "avr_lib/" & MCU & "/obj";
+	  
+      for Source_Dirs use
       ("avr_lib/" & MCU,          --  first look in the MCU specific dir
        "avr_lib");                --  then look in the default dir
 
-   when others => for Source_Dirs use
+   when others =>
+      for Object_Dir use "avr_lib/board-" & BOARD & "/obj";
+
+      for Source_Dirs use
       ("avr_lib/board-" & Board,  --  first look in the board specific dir
        "avr_lib/" & MCU,          --  then look in the MCU specific dir
        "avr_lib");                --  then look in the default dir

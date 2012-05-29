@@ -14,6 +14,7 @@
 PRIMARY_MCU_LIST := attiny2313 atmega8 atmega168 atmega169 \
    atmega32 atmega328p atmega644p atmega2560
 
+BOARD_LIST := arduino_uno xbeeimu
 #
 # list of not yet supported devices
 # excluded_parts should be in sync with AVR-Ada/Makefile:excluded_parts
@@ -32,6 +33,11 @@ thread_libs := $(patsubst %, %/thread-lib/libavr-thread.a, $(MCU_LIST))
 # all part specific registers and definitions are made available
 mcu_specs := $(patsubst %, %/avr-mcu.ads, $(MCU_LIST))
 
+
+board_libs := $(patsubst %, board-%/lib/libavrada.a, $(BOARD_LIST))
+board_mcu_specs := $(patsubst %, board-%/avr-mcu.ads, $(BOARD_LIST))
+
+
 #
 # default target, build all libraries
 all:	stamp-links stamp-libs
@@ -49,6 +55,13 @@ at%/lib/libavrada.a: stamp-links at%/obj at%/lib ../avr_lib.gpr ../avr_tools.gpr
 at%/thread-lib/libavr-thread.a: at%/thread-obj at%/thread-lib ../threads_lib.gpr ../mcu.gpr
 	gprbuild -p -P../threads_lib.gpr -XMCU=$(MCU)
 
+# custom boards
+include boards.mk
+
+board-%/lib/libavrada.a: stamp-links board-%/obj board-%/lib ../avr_lib.gpr ../mcu.gpr board-%/avr-mcu.ads
+	avr-gnatmake -P../avr_lib.gpr -XBOARD=$(BOARD) -XMCU=$(MCU)
+
+
 at%/avr-mcu.ads:
 	echo "pragma Style_Checks (Off);"  > $@
 	echo "with AVR.${MCU};"                    >> $@
@@ -57,10 +70,23 @@ at%/avr-mcu.ads:
 at%/lib at%/obj at%/thread-lib at%/thread-obj:
 	mkdir -p $@
 
-stamp-links: $(mcu_specs)
+board-%/avr-mcu.ads:
+	echo "pragma Style_Checks (Off);"  > $@
+	echo "with AVR.${MCU};"                    >> $@
+	echo "package AVR.MCU renames AVR.${MCU};" >> $@
+
+board-%/obj :
+	mkdir -p $@
+
+board-%/lib :
+	mkdir -p $@
+
+
+
+stamp-links: $(mcu_specs) $(board_mcu_specs)
 	touch $@
 
-stamp-libs: $(thread_libs) $(libs)
+stamp-libs: $(thread_libs) $(libs) $(board_libs)
 	touch $@
 
 # Compile: create assembler files from Ada source files.
@@ -79,11 +105,12 @@ clean:
 	$(RM) -rf obj lib
 	$(RM) -rf at*/obj at*/lib
 	$(RM) -rf at*/thread-obj at*/thread-lib
+	$(RM) -rf board-*/obj board-*/lib
 	$(RM) avr-mcu.ads at*/avr-mcu.ads
 
 
 # don't delete these intermediate files
-.PRECIOUS: at%/avr-mcu.ads at%/lib at%/obj
+.PRECIOUS: at%/avr-mcu.ads at%/lib at%/obj board-%/lib board-%/obj board-%/avr-mcu.ads
 
 # always run these commands
 .PHONY: clean
