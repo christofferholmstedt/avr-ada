@@ -12,7 +12,7 @@
 # list of primary devices
 #
 PRIMARY_MCU_LIST := attiny2313 atmega8 atmega168 atmega169 \
-   atmega32 atmega328p atmega644p
+   atmega32 atmega328p atmega644p atmega2560
 
 #
 # list of not yet supported devices
@@ -47,7 +47,7 @@ at%/lib/libavrada.a: stamp-links at%/obj at%/lib ../avr_lib.gpr ../avr_tools.gpr
 
 # rule for building the thread library
 at%/thread-lib/libavr-thread.a: at%/thread-obj at%/thread-lib ../threads_lib.gpr ../mcu.gpr
-	gprbuild -p --config=../avr.cgpr -P../threads_lib.gpr -XMCU=$(MCU)
+	gprbuild -p -P../threads_lib.gpr -XMCU=$(MCU)
 
 at%/avr-mcu.ads:
 	echo "pragma Style_Checks (Off);"  > $@
