@@ -52,7 +52,7 @@ package AVR.UART is
    Baud_57600_12MHz  : constant Serial_Speed := 12;
 
    -- 14.7456MHz crystal gives 0.0% error rate for 115200bps
-   Baud_115200_147MHz : constant Serial_Speed := 7;  -- error = 0.0%
+   Baud_115200_14_7MHz : constant Serial_Speed := 7;  -- error = 0.0%
 
    Baud_9600_16MHz   : constant Serial_Speed := 103;
    Baud_19200_16MHz  : constant Serial_Speed := 51;
