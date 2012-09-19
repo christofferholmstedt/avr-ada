@@ -95,7 +95,7 @@ package body AVR.Timer1 is
       --  reset power reduction for Timer1
 #if MCU = "atmega328p" then
       MCU.PRR_Bits (MCU.PRTIM1_Bit) := Low;
-#elsif MCU = "atmega644p" then
+#elsif MCU = "atmega644p" or else MCU = "atmega2560" then
       MCU.PRR0_Bits (MCU.PRTIM1_Bit) := Low;
 #end if;
 
