@@ -245,7 +245,7 @@ abstract project MCU is
    case MCU is
    when "at90s2313"  | "at90s2323"  | "at90s2343"  | "at90s4414"  | "at90s4433"
       | "at90s4434"  | "atmega48"   | "attiny13"   | "attiny13a"  | "attiny22"
-      | "attiny2313" | "attiny26"
+      | "attiny2313" | "attiny26"   | "attiny4313"
      => Eeprom_Width := "eeprom_8bit";
    when others
      => Eeprom_Width := "eeprom_16bit";
@@ -261,7 +261,7 @@ abstract project MCU is
 
    case MCU is
    when "atmega168"  | "atmega328p" | "atmega644"  | "atmega644p"
-      | "atmega2560" | "attiny2313"
+      | "atmega2560" | "attiny2313" | "attiny4313"
      => Eeprom_WE := "eeprom_pe";
    when others
      => Eeprom_WE := "eeprom_we";
@@ -277,7 +277,7 @@ abstract project MCU is
    case MCU is
    when "at90s2313"  | "at90s8515"
      => UART := "uart";
-   when "atmega8"    | "atmega32" | "attiny2313"
+   when "atmega8"    | "atmega32" | "attiny2313" | "attiny4313"
      => UART := "usart";
    when others
      => UART := "usart0";

@@ -19,7 +19,7 @@
 --  supported MCUs:
 --
 --  ATTINY
---  attiny13    attiny13a   attiny2313
+--  attiny13    attiny13a   attiny2313  attiny4313
 --
 --  ATMEGA
 --  atmega168   atmega169   atmega2560  atmega32    atmega328p  atmega644
@@ -32,21 +32,21 @@ with AVR.MCU;
 package body AVR.Timer0 is
 
 
-#if MCU = "attiny13" or else MCU = "attiny13a" or else MCU = "attiny2313" or else MCU = "atmega168" or else MCU = "atmega169" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" or else MCU = "atmega2560" then
+#if MCU = "attiny13" or else MCU = "attiny13a" or else MCU = "attiny2313" or else MCU = "attiny4313" or else MCU = "atmega168" or else MCU = "atmega169" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" or else MCU = "atmega2560" then
    Output_Compare_Reg : Unsigned_8 renames MCU.OCR0A;
 #elsif mcu = "atmega32" then
    Output_Compare_Reg : Unsigned_8 renames MCU.OCR0;
 #end if;
 
 
-#if MCU = "attiny13" or else MCU = "attiny13a" or else MCU = "attiny2313" or else MCU = "atmega168" or else MCU = "atmega169" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" or else MCU = "atmega2560" then
+#if MCU = "attiny13" or else MCU = "attiny13a" or else MCU = "attiny2313" or else MCU = "attiny4313" or else MCU = "atmega168" or else MCU = "atmega169" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" or else MCU = "atmega2560" then
    Ctrl_Reg       : Bits_In_Byte renames MCU.TCCR0A_Bits;
 #elsif MCU = "atmega8" or else MCU = "atmega32" then
    Ctrl_Reg       : Bits_In_Byte renames MCU.TCCR0_Bits;
 #end if;
 
    Prescale_Reg   : Unsigned_8 renames
-#if MCU = "attiny13" or else MCU = "attiny13a" or else MCU = "attiny2313" or else MCU = "atmega168" or else MCU = "atmega328p" or else MCU = "atmega2560" then
+#if MCU = "attiny13" or else MCU = "attiny13a" or else MCU = "attiny2313" or else MCU = "attiny4313" or else MCU = "atmega168" or else MCU = "atmega328p" or else MCU = "atmega2560" then
     MCU.TCCR0B;
 #elsif MCU = "atmega169" or else MCU = "atmega644" or else MCU = "atmega644p" then
     MCU.TCCR0A;
@@ -62,7 +62,7 @@ package body AVR.Timer0 is
    Interrupt_Mask : Bits_In_Byte renames MCU.TIMSK_Bits;
    Output_Compare_Interrupt_Enable : Boolean renames MCU.TIMSK_Bits (MCU.OCIE0_Bit);
    Overflow_Interrupt_Enable       : Boolean renames MCU.TIMSK_Bits (MCU.TOIE0_Bit);
-#elsif  MCU = "attiny2313" then
+#elsif  MCU = "attiny2313" or else MCU = "attiny4313" then
    Interrupt_Mask : Bits_In_Byte renames MCU.TIMSK_Bits;
    Output_Compare_Interrupt_Enable : Boolean renames MCU.TIMSK_Bits (MCU.OCIE0A_Bit);
    Overflow_Interrupt_Enable       : Boolean renames MCU.TIMSK_Bits (MCU.TOIE0_Bit);
@@ -144,7 +144,7 @@ package body AVR.Timer0 is
    procedure Init_Normal (Prescaler : Scale_Type)
    is
    begin
-#if MCU = "attiny13" or else MCU = "attiny13a" or else MCU = "attiny2313" or else MCU = "atmega168" or else MCU = "atmega169" or else MCU = "atmega328p" or else MCU = "atmega644p" then
+#if MCU = "attiny13" or else MCU = "attiny13a" or else MCU = "attiny2313" or else MCU = "attiny4313" or else MCU = "atmega168" or else MCU = "atmega169" or else MCU = "atmega328p" or else MCU = "atmega644p" then
       Ctrl_Reg := (MCU.COM0A0_Bit => False, --  \  normal operation,
                    MCU.COM0A1_Bit => False, --  /  OC0 disconnected
 
@@ -234,7 +234,7 @@ package body AVR.Timer0 is
    end Init_CTC;
 
 
-#if MCU = "attiny13" or else MCU = "attiny13a" or else MCU = "attiny2313" or else MCU = "atmega168" or else MCU = "atmega169" or else MCU = "atmega2560" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" then
+#if MCU = "attiny13" or else MCU = "attiny13a" or else MCU = "attiny2313" or else MCU = "attiny4313" or else MCU = "atmega168" or else MCU = "atmega169" or else MCU = "atmega2560" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" then
    Com0 : Boolean renames Ctrl_Reg (MCU.COM0A0_Bit);
    Com1 : Boolean renames Ctrl_Reg (MCU.COM0A1_Bit);
 #elsif MCU = "atmega32" then
