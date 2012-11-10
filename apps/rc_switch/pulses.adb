@@ -2,6 +2,7 @@ with Interfaces;                   use Interfaces;
 with AVR;                          use AVR;
 with AVR.MCU;
 with AVR.Timer0;
+with AVR.Ext_Int;
 with AVR.EEPROM;
 
 with Modes;
@@ -49,9 +50,12 @@ package body Pulses is
 
 
    procedure Init is
-      use Timer0;
+      use AVR.Ext_Int;
    begin
-      Timer0.Init_Normal (Scale_By_64);
+      Timer0.Init_Normal (Timer0.Scale_By_64);
+      -- enable interrupts, configure pin change interrupt
+      Enable_External_Interrupt_0;
+      Set_Int0_Sense_Control (Toggle);
    end Init;
 
 
