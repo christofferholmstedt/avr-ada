@@ -1,0 +1,10 @@
+--- gnattools/Makefile.in~	2011-10-13 00:41:57 +0200
++++ gnattools/Makefile.in	2012-11-16 20:50:48 +0100
+@@ -111,6 +111,7 @@
+ 	"GNATMAKE=gnatmake" \
+ 	"GNATLINK=gnatlink" \
+ 	"GNATBIND=gnatbind" \
++	"STAMP=echo timestamp >" \
+ 	"TOOLSCASE=cross" \
+ 	"LIBGNAT="
+ 
