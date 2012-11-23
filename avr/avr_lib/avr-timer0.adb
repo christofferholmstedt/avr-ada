@@ -99,7 +99,7 @@ package body AVR.Timer0 is
 
    function Scale_By_32     return Scale_Type is
    begin
-#if MCU = "atmega168" or else MCU = "atmega328p" then
+#if MCU = "atmega168" or else MCU = "atmega328p" or else MCU = "atmega2560" then
       raise Program_Error with "1/32 not available for this MCU";
 #end if;
       return MCU.CS01_Mask or MCU.CS00_Mask;
@@ -107,7 +107,7 @@ package body AVR.Timer0 is
 
    function Scale_By_64     return Scale_Type is
    begin
-#if MCU = "atmega32" or else MCU = "atmega168" or else MCU = "atmega328p" then
+#if MCU = "atmega32" or else MCU = "atmega168" or else MCU = "atmega328p" or else MCU = "atmega2560" then
       return MCU.CS01_Mask or MCU.CS00_Mask;
 #else
       return MCU.CS02_Mask;
@@ -116,7 +116,7 @@ package body AVR.Timer0 is
 
    function Scale_By_128    return Scale_Type is
    begin
-#if MCU = "atmega168" or else MCU = "atmega328p" then
+#if MCU = "atmega168" or else MCU = "atmega328p" or else MCU = "atmega2560" then
       raise Program_Error with "1/128 not available for this MCU";
 #end if;
       return MCU.CS02_Mask or MCU.CS00_Mask;
@@ -124,7 +124,7 @@ package body AVR.Timer0 is
 
    function Scale_By_256    return Scale_Type is
    begin
-#if MCU = "atmega8" or else MCU = "atmega32" or else MCU = "atmega168" or else MCU = "atmega328p" then
+#if MCU = "atmega8" or else MCU = "atmega32" or else MCU = "atmega168" or else MCU = "atmega328p" or else MCU = "atmega2560" then
       return MCU.CS02_Mask;
 #else
       return MCU.CS02_Mask or MCU.CS01_Mask;
@@ -133,7 +133,7 @@ package body AVR.Timer0 is
 
    function Scale_By_1024   return Scale_Type is
    begin
-#if MCU = "atmega32" or else MCU = "atmega168" or else MCU = "atmega328p" then
+#if MCU = "atmega32" or else MCU = "atmega168" or else MCU = "atmega328p" or else MCU = "atmega2560" then
       return MCU.CS02_Mask or MCU.CS00_Mask;
 #else
       return MCU.CS02_Mask or MCU.CS01_Mask or MCU.CS00_Mask;
