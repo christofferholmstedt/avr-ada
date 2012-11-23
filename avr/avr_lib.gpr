@@ -222,10 +222,10 @@ library project AVR_Lib is
          for Source_Files use
            Std_Sources & EEPROM_Sources & WDT_Sources & Time_Sources;
 
-      when "attiny2313" =>
+      when "attiny2313" | "attiny4313" =>
          for Source_Files use
            Std_Sources & UART_Sources & EEPROM_Sources & WDT_Sources
-           & Timer0_Sources & Time_Sources & Sleep_Sources;
+           & Timer0_Sources & Timer1_Sources & Time_Sources & Sleep_Sources;
 
       when "attiny25" | "attiny45" | "attiny85" =>
          for Source_Files use

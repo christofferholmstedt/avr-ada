@@ -23,7 +23,7 @@ package body AVR.Sleep is
 
    --  Define internal sleep types for the various devices.  Also define
    --  some internal masks for use in Set_Mode.
-#if MCU = "atmega8" or else MCU = "atmega32" or else MCU = "attiny2313" then
+#if MCU = "atmega8" or else MCU = "atmega32" or else MCU = "attiny2313" or else MCU = "attiny4313" then
    Sleep_Ctrl_Bits : AVR.Bits_In_Byte renames AVR.MCU.MCUCR_Bits;
 #else
    Sleep_Ctrl_Bits : AVR.Bits_In_Byte renames AVR.MCU.SMCR_Bits;
@@ -163,42 +163,42 @@ package body AVR.Sleep is
       when Idle =>
          Sleep_Ctrl_Bits (SM0_Bit) := False;
          Sleep_Ctrl_Bits (SM1_Bit) := False;
-#if not MCU = "attiny2313" then
+#if (not MCU = "attiny2313") and (not MCU = "attiny4313") then
          Sleep_Ctrl_Bits (SM2_Bit) := False;
 #end if;
 
       when ADC_Noise_Reduction =>
          Sleep_Ctrl_Bits (SM0_Bit) := True;
          Sleep_Ctrl_Bits (SM1_Bit) := False;
-#if not MCU = "attiny2313" then
+#if ( not MCU = "attiny2313" ) and ( not MCU = "attiny4313" ) then
          Sleep_Ctrl_Bits (SM2_Bit) := False;
 #end if;
 
       when Power_Down =>
          Sleep_Ctrl_Bits (SM0_Bit) := False;
          Sleep_Ctrl_Bits (SM1_Bit) := True;
-#if not MCU = "attiny2313" then
+#if (not MCU = "attiny2313") and (not MCU = "attiny4313") then
          Sleep_Ctrl_Bits (SM2_Bit) := False;
 #end if;
 
       when Power_Save =>
          Sleep_Ctrl_Bits (SM0_Bit) := True;
          Sleep_Ctrl_Bits (SM1_Bit) := True;
-#if not MCU = "attiny2313" then
+#if (not MCU = "attiny2313" ) and (not MCU = "attiny4313" ) then
          Sleep_Ctrl_Bits (SM2_Bit) := False;
 #end if;
 
       when Standby =>
          Sleep_Ctrl_Bits (SM0_Bit) := False;
          Sleep_Ctrl_Bits (SM1_Bit) := True;
-#if not MCU = "attiny2313" then
+#if ( not MCU = "attiny2313" ) and ( not MCU = "attiny4313" ) then
          Sleep_Ctrl_Bits (SM2_Bit) := True;
 #end if;
 
       when Extended_Standby =>
          Sleep_Ctrl_Bits (SM0_Bit) := True;
          Sleep_Ctrl_Bits (SM1_Bit) := True;
-#if not MCU = "attiny2313" then
+#if ( not MCU = "attiny2313" ) and ( not MCU = "attiny4313" ) then
          Sleep_Ctrl_Bits (SM2_Bit) := True;
 #end if;
       end case;
