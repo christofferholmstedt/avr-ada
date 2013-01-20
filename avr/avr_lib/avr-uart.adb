@@ -33,7 +33,7 @@ package body AVR.UART is
    --  Buffer_Size : constant := 8;
 
    type Receive_Mode_T is (Polled, Interrupt);
-   Receive_Mode : Receive_Mode_T;
+   Receive_Mode : constant Receive_Mode_T := Polled;
 
 
 
@@ -163,7 +163,7 @@ package body AVR.UART is
       UCSRB := +(RXEN_Bit => True,
                  TXEN_Bit => True,
                  others => False);
-      Receive_Mode := Polled;
+      -- Receive_Mode := Polled;
    end Init;
 
 
@@ -195,7 +195,7 @@ package body AVR.UART is
 
       Interrupts.Enable_Interrupts;
 
-      Receive_Mode := Interrupt;
+      -- Receive_Mode := Interrupt;
    end Init_Interrupt_Read;
 
 

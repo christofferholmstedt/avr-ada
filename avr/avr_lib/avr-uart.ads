@@ -83,6 +83,7 @@ package AVR.UART is
 
    --  Output routines
    procedure Put (Ch : Character);
+   procedure Put_Char (Ch : Character) renames Put;
    procedure Put_Raw (Data : Unsigned_8);
 
    procedure Put (S : AVR_String);
@@ -124,11 +125,9 @@ private
    pragma Inline (Put_Raw);
    pragma Inline (Have_Input);
 
-   procedure Put_Char (Ch : Character) renames Put;
    pragma Inline (Put_Char);
 
    pragma Inline (New_Line);
    pragma Inline (CRLF);
 
 end AVR.UART;
-
