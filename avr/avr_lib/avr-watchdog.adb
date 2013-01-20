@@ -31,13 +31,23 @@ package body AVR.Watchdog is
       new Ada.Unchecked_Conversion (WDT_Oscillator_Cycles, Unsigned_8);
 
 
+#if MCU = "atmega8" then
+   Watchdog_Control_R : Unsigned_8 renames WDTCR;
+   Watchdog_Control_B : Bits_In_Byte renames WDTCR_Bits;
+#elsif MCU = "atmega328p" then
+   Watchdog_Control_R : Unsigned_8 renames WDTCSR;
+   Watchdog_Control_B : Bits_In_Byte renames WDTCSR_Bits;
+#end if;
+
+
    procedure Enable (Wdt : WDT_Oscillator_Cycles) is
    begin
       Interrupts.Save_Disable;
-      WDTCR_Bits := (WDCE_Bit => True,
-                     WDE_Bit  => True,
-                     others   => False);
-      WDTCR := (WDT_To_Byte (Wdt) or WDE_Mask);
+      Wdr;
+      Watchdog_Control_B := (WDCE_Bit => True,
+                             WDE_Bit  => True,
+                             others   => False);
+      Watchdog_Control_R := (WDT_To_Byte (Wdt) or WDE_Mask);
       Interrupts.Restore;
    end Enable;
 
@@ -45,10 +55,10 @@ package body AVR.Watchdog is
    procedure Disable is
    begin
       Interrupts.Save_Disable;
-      WDTCR_Bits := (WDCE_Bit => True,
-                     WDE_Bit  => True,
-                     others   => False);
-      WDTCR := 0;
+      Watchdog_Control_B := (WDCE_Bit => True,
+                             WDE_Bit  => True,
+                             others   => False);
+      Watchdog_Control_R := 0;
       Interrupts.Restore;
    end Disable;
 
