@@ -16,33 +16,17 @@
 ---------------------------------------------------------------------------
 
 with AVR;                          use AVR;
-with AVR.UART;
-
+with AVR.Serial;                   use AVR.Serial;
 
 procedure Main is
    C : Character;
 begin
-
-   --  51 -->  1200Bd @  1MHz
-   --  12 -->  4800Bd @  1MHz
-
-   --  51 -->  4800Bd @  4MHz
-   --  12 --> 19200Bd @  4MHz
-
-   --  51 -->  9600Bd @  8MHz
-   --  25 --> 19200Bd @  8MHz
-   --  15 --> 31250Bd @  8MHz
-
-   -- 103 -->  9600Bd @ 16MHz
-   --  51 --> 19200Bd @ 16MHz
-   --  25 --> 38400Bd @ 16MHz
-
-   AVR.UART.Init(51);
+   Init(Baud_19200_16MHz);
 
    loop
-      C := AVR.UART.Get;
-      AVR.UART.Put (C);
+      C := Get;
+      Put (C);
+      New_Line;
    end loop;
 
 end Main;
-

@@ -38,7 +38,7 @@ MCU := atmega328p
 GPR := build.gpr
 
 # put the names of the target files here (without extension)
-ADA_TARGETS := main table
+ADA_TARGETS := main
 
 
 #---------------- GNATMAKE Options ----------------
@@ -162,8 +162,6 @@ build: $(ADA_TARGETS_ELF) $(ADA_TARGETS_HEX) $(ADA_TARGETS_EEP) \
 
 # Assemble: create object files from assembler source files.
 %.o : %.S
-	@echo
-	@echo $(MSG_ASSEMBLING) $<
 	$(CC) -c $(ALL_ASFLAGS) $< -o $@
 
 # create the subdirectories
