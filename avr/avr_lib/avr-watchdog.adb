@@ -43,7 +43,6 @@ package body AVR.Watchdog is
    procedure Enable (Wdt : WDT_Oscillator_Cycles) is
    begin
       Interrupts.Save_Disable;
-      Wdr;
       Watchdog_Control_B := (WDCE_Bit => True,
                              WDE_Bit  => True,
                              others   => False);

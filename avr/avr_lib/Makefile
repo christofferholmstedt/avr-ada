@@ -37,6 +37,9 @@ mcu_specs := $(patsubst %, %/avr-mcu.ads, $(MCU_LIST))
 board_libs := $(patsubst %, board-%/lib/libavrada.a, $(BOARD_LIST))
 board_mcu_specs := $(patsubst %, board-%/avr-mcu.ads, $(BOARD_LIST))
 
+#
+#
+ALL_ASFLAGS = -mmcu=$(MCU) -I. -x assembler-with-cpp $(ASFLAGS)
 
 #
 # default target, build all libraries
@@ -45,10 +48,11 @@ all:	stamp-links stamp-libs
 # first set the variable MCU
 at%/lib/libavrada.a : MCU = $(patsubst %/lib/libavrada.a,%, $@)
 at%/avr-mcu.ads     : MCU = $(patsubst %/avr-mcu.ads,%, $@)
+at%/obj/ada_u32_img.o : MCU = $(patsubst %/obj/ada_u32_img.o,%, $@)
 at%/thread-lib/libavr-thread.a : MCU = $(patsubst %/thread-lib/libavr-thread.a,%, $@)
 
 # then provide the rules for building
-at%/lib/libavrada.a: stamp-links at%/obj at%/lib ../avr_lib.gpr ../avr_tools.gpr ../mcu.gpr at%/avr-mcu.ads
+at%/lib/libavrada.a: stamp-links at%/obj at%/lib ../avr_lib.gpr ../avr_tools.gpr ../mcu.gpr at%/avr-mcu.ads at%/obj/ada_u32_img.o
 	avr-gnatmake -p -P../avr_lib.gpr -XMCU=$(MCU)
 
 # rule for building the thread library
@@ -95,6 +99,10 @@ stamp-libs: $(thread_libs) $(libs) $(board_libs)
 
 %.s : %.ads
 	avr-gnatmake -f -u -P../avr_lib -XMCU=$(MCU) $< -cargs -S
+
+# Assemble: create object files from assembler source files.
+at%/obj/ada_u32_img.o : asm/ada_32_img.S
+	avr-gcc -c $(ALL_ASFLAGS) $< -o $@
 
 clean:
 	$(RM) stamp-*

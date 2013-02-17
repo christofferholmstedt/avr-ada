@@ -30,7 +30,7 @@ package AVR.Strings is
    Space      : constant Character      := ' ';
 
    --  AVR_String is not part of the ARM.
-   type AVR_String is array (Unsigned_8 range <>) of Character;
+   type AVR_String is array (Unsigned_8 range <>) of aliased Character;
    --  The equivalent to Standard.String except that it is indexed not
    --  by Positive (2 bytes) but by Unsigned_8 (1 byte).
 
@@ -57,6 +57,10 @@ package AVR.Strings is
    subtype AStr19 is AVR_String (1 .. 19);
    subtype AStr20 is AVR_String (1 .. 20);
    subtype AStr100 is AVR_String (1 .. 100);
+
+   --  subtype AStr_Too_Long is AVR_String (Unsigned_8);
+   --  type AStr_Ref is access all AStr_Too_Long;
+   --  a general reference to a constrained AVR_String
 
    --  Progmem_String and PStr are not part of the ARM.
    type Progmem_String is new AVR_String;

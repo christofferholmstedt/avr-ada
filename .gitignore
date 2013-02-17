@@ -7,8 +7,17 @@ build
 *.hex
 *.map
 *.eep
+*.ali
+*.o
+*.exe
 obj
+lib
+owobj
+owlib
+thread-obj
+thread-lib
 rts
 set_devel_env.sh
 Makefile.devel.pre
 Makefile.devel.post
+material

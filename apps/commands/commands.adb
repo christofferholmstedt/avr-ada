@@ -3,9 +3,9 @@ with Interfaces;                   use Interfaces;
 with Ada.Unchecked_Conversion;
 with Interfaces;                   use Interfaces;
 with AVR;                          use AVR;
-with AVR.UART;
 with AVR.Watchdog;
 with AVR.Strings.Edit;             use AVR.Strings.Edit;
+with AVR.UART_Base_Polled;
 with AVR.Programspace;             use AVR.Programspace;
 
 with PM_Str;
@@ -15,7 +15,11 @@ with OW;
 package body Commands is
 
 
-   function Is_Equal (Left : PM_String; Right : Input_String) return Boolean
+   procedure Flush is new AVR.Strings.Edit.Flush_Output
+     (Put_Raw => AVR.UART_Base_Polled.Put_Raw);
+
+
+   function Is_Equal (Left : PM_String; Right : Edit_String) return Boolean
    is
       use System;
       Ch : Character;
@@ -24,10 +28,6 @@ package body Commands is
       function "+" is new Ada.Unchecked_Conversion (Source => Unsigned_8,
                                                     Target => Character);
    begin
-      --  UART.Put ("'");
-      --  UART.Put(Input_Line(First(Right) .. Last(Right)));
-      --  UART.Put ("' =? '");
-
       if Left_Len /= Unsigned_8(Length(Right)) then return False; end if;
 
       PM_Ptr := Programspace.Program_Address(Left);
@@ -45,14 +45,10 @@ package body Commands is
                                              Default_Action : Cmd_Action)
    is
       use AVR.Strings.Edit;
-      Cmd : Input_String;
+      Cmd : Edit_String;
    begin
       Skip;
       Cmd := Get_Str;
-
-      --  UART.Put ("found id '");
-      --  UART.Put(Input_Line(First(Cmd) .. Last(Cmd)));
-      --  UART.Put_Line ("'");
 
       for I in Cmd_List'Range loop
          if Is_Equal (Cmd_List(I).Id, Cmd) then
@@ -60,32 +56,40 @@ package body Commands is
             return;
          end if;
       end loop;
-      -- UART.Put_Line("no command found, trigger default action");
-      -- Default_Action.all;
    end Parse_Input_And_Trigger_Action;
 
 
    procedure Show_Commands is
-      procedure Put is new PM_Str.Generic_Put (UART.Put_Char);
+      procedure Put_Char (C : Character) is
+      begin
+         AVR.Strings.Edit.Put (C);
+      end Put_Char;
+      procedure Put is new PM_Str.Generic_Put (Put_Char);
    begin
       for I in Cmd_List'Range loop
          Put (Cmd_List(I).Id);
-         UART.New_Line;
+         Edit.New_Line; Flush;
       end loop;
    end Show_Commands;
 
+
    procedure Reset is
+      procedure Jump_To_Zero;
+      pragma Import (Ada, Jump_To_Zero);
+      for Jump_To_Zero'Address use 0;
    begin
-      UART.Put_Line ("reset");
+      Edit.Put_Line ("reset"); Flush;
+      Jump_To_Zero;
    end Reset;
+
 
    procedure Wd_Reset is
    begin
-      UART.Put_Line ("going to reset via watchdog");
+      Edit.Put_Line ("going to reset via watchdog"); Flush;
       Watchdog.Enable(Watchdog.WDT_16K);
-      Watchdog.Wdr;
       loop null; end loop;
    end Wd_Reset;
+
 
    procedure OW_Parse renames OW.Parse;
    procedure IO_Parse renames IO.Parse;

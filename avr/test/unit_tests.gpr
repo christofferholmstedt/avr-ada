@@ -1,4 +1,4 @@
-with "..\..\..\Ada\aunit-1.03\aunit.gpr";
+with "c:\Devel\Ada\aunit-1.05\aunit.gpr";
 
 project Unit_Tests is
 
