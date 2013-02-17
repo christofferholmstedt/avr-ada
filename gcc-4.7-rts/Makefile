@@ -29,6 +29,8 @@ ADASRC = system.ads \
    s-memory.ads s-memory.adb \
    s-gccbui.ads \
    interfac.ads i-c.ads \
+   i-cstrin.ads i-cstrin.adb \
+   s-intimg.ads \
    ada.ads \
    unchconv.ads a-unccon.ads \
    a-charac.ads a-chlat1.ads a-chlat9.ads \
@@ -46,7 +48,7 @@ ADASRC = system.ads \
 
 OBJ = $(ADASRC:.ads=.o)
 
-LIBGNAT_OBJS = s-bitops.o a-except.o s-memory.o a-tags.o s-secsta.o
+LIBGNAT_OBJS = s-bitops.o a-except.o s-memory.o a-tags.o s-secsta.o ada_u32_img.o
 LIBGNAT_ALIS = $(filter %.ali,$(ADASRC:.ads=.ali)) # filter out the .adb from ADASRC
 
 ARCH_LIST := avr25 avr3 avr31 avr35 avr4 avr5 avr51 avr6
@@ -57,12 +59,14 @@ RTS_SOURCE   := .
 
 vpath %.ads adainclude
 vpath %.adb adainclude
+vpath %.S   asm
 
 # includes to compile
 INC	= -I- -Iadainclude
 
 #compiler flags
-ADAFLAGS = -g -Os -gnatn -gnatpg -mmcu=$(MCU)
+ADAFLAGS = -g -Os -gnatn -gnatpg -mmcu=$(MCU) -fdata-sections -ffunction-sections
+ASMFLAGS = -c -I. -x assembler-with-cpp -mmcu=$(MCU)
 
 
 ###### define some variables based on the AVR base path in $(AVR) #######
@@ -136,6 +140,9 @@ clean_rts:
 
 %.ali %.o : %.ads
 	$(CC) -c $(ADAFLAGS) $(INC) $<
+
+%.o : %.S
+	$(CC) -c $(ASMFLAGS) $<
 
 # --- make instruction to delete created files ---
 clean:

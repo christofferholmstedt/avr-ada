@@ -99,7 +99,7 @@ package System.Bit_Ops is
 
 private
    pragma Inline (Bit_And);
-   --  pragma Inline (Bit_Eq);
+   pragma Inline (Bit_Eq);
    pragma Inline (Bit_Not);
    pragma Inline (Bit_Or);
    pragma Inline (Bit_Xor);
