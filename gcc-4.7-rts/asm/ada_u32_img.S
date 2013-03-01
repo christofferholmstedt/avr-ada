@@ -32,6 +32,22 @@ _U(ada_u32_img):
         /* X = (r26:27)
            Y = (r28:29)
            Z = (r30:31)
+
+        Call-Used Registers
+
+        The call-used or call-clobbered general purpose registers
+	(GPRs) are registers that might be destroyed (clobbered) by a
+	function call.
+
+        R18-R27, R30, R31
+        These GPRs are call clobbered. An ordinary function may use
+	them without restoring the contents. Interrupt service
+	routines (ISRs) must save and restore each register they use.
+
+        R0, T-Flag
+        The temporary register and the T-flag in SREG are also
+	call-clobbered, but this knowledge is not exposed explicitly
+	to the compiler (R0 is a fixed register).
         */
 
         ;; push    r28
@@ -86,7 +102,7 @@ _U(ada_u32_img):
         ;; return the length of the string
 	mov     r24, strlen
 
-ENTRY   __ada_strrev
+;ENTRY   __ada_strrev
     ; Reverse the string and return the length.
     ; Assumes Z pointing to the cell right after the last character in
     ; the string.

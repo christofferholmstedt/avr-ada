@@ -21,11 +21,11 @@ package AVR.Strings.Edit.Integers is
    -- process starts at Input_Line (Input_Ptr). The parameter Base
    -- indicates the base of the expected number.
    --
-   procedure Get is new Generic_Integers.Get_I (Integer_64);
+   --  procedure Get is new Generic_Integers.Get_I (Integer_64);
    procedure Get is new Generic_Integers.Get_I (Integer_32);
    procedure Get is new Generic_Integers.Get_I (Integer_16);
    procedure Get is new Generic_Integers.Get_I (Integer_8);
-   procedure Get is new Generic_Integers.Get_U (Unsigned_64);
+   --  procedure Get is new Generic_Integers.Get_U (Unsigned_64);
    procedure Get is new Generic_Integers.Get_U (Unsigned_32);
    procedure Get is new Generic_Integers.Get_U (Unsigned_16);
    procedure Get is new Generic_Integers.Get_U (Unsigned_8);

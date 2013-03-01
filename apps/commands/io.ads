@@ -30,10 +30,10 @@ private
    pragma Linker_Section (Help_PM, ".progmem");
 
    IO_Cmds : constant Cmd_List_T :=
-     ((PM_String(Get_PM'Address), IO_Get'Access),
-      (PM_String(Set_PM'Address), IO_Set'Access),
-      (PM_String(Dump_PM'Address), Dump'Access),
-      (PM_String(Help_PM'Address), Show_IO_Commands'Access));
+     ((PM_String(Get_PM'Address), 0, IO_Get'Access),
+      (PM_String(Set_PM'Address), 0, IO_Set'Access),
+      (PM_String(Dump_PM'Address), 0, Dump'Access),
+      (PM_String(Help_PM'Address), 0, Show_IO_Commands'Access));
 
    IO_Default : constant Cmd_Action := Show_IO_Commands'Access;
 

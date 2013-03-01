@@ -43,14 +43,10 @@ package AVR.Interrupts is
 
    --  save the SREG register to a package local variable and disable
    --  interrupts
-   procedure Save_Disable;
+   procedure Save_And_Disable;
    --  restore the status register
    procedure Restore;
 
-
-   --  return from interrupt
-   --  (needed for the implementation of "naked" interrupts)
-   -- procedure Return_From_Interrupt;
 
 private
 
@@ -59,8 +55,8 @@ private
    pragma Import (Intrinsic, sei, "__builtin_avr_sei");
    pragma Import (Intrinsic, cli, "__builtin_avr_cli");
 
-   pragma Inline_Always (Save_And_Disable);
-   pragma Inline (Restore);
+   pragma Inline (Save_And_Disable);
+   pragma Inline_Always (Restore);
 
    -- pragma Inline_Always (Return_From_Interrupt);
    --  pragma No_Return (Return_From_Interrupt);

@@ -24,6 +24,7 @@ with Ada.Unchecked_Conversion;
 with AVR;                          use AVR;
 with AVR.MCU;                      use AVR.MCU;
 with AVR.Interrupts;
+--  with AVR.Watchdog.Disable_At_Startup;
 
 package body AVR.Watchdog is
 
@@ -41,25 +42,29 @@ package body AVR.Watchdog is
 
 
    procedure Enable (Wdt : WDT_Oscillator_Cycles) is
+      Tmp_SREG : Unsigned_8;
    begin
-      Interrupts.Save_Disable;
+      Tmp_SREG := Interrupts.Save_And_Disable;
+      Reset;
       Watchdog_Control_B := (WDCE_Bit => True,
                              WDE_Bit  => True,
                              others   => False);
       Watchdog_Control_R := (WDT_To_Byte (Wdt) or WDE_Mask);
-      Interrupts.Restore;
+      Interrupts.Restore (Tmp_SREG);
    end Enable;
 
 
    procedure Disable is
+      Tmp_SREG : Unsigned_8;
    begin
-      Interrupts.Save_Disable;
+      Tmp_SREG := Interrupts.Save_And_Disable;
       Watchdog_Control_B := (WDCE_Bit => True,
                              WDE_Bit  => True,
                              others   => False);
       Watchdog_Control_R := 0;
-      Interrupts.Restore;
+      Interrupts.Restore (Tmp_SREG);
    end Disable;
 
-
+--  begin
+--     Disable;
 end AVR.Watchdog;

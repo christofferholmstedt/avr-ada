@@ -3,14 +3,13 @@ with AVR;                          use AVR;
 with AVR.Strings;                  use AVR.Strings;
 with AVR.Strings.Edit;
 with AVR.Serial;
-with AVR.Watchdog;
 with Commands;                     use Commands;
 
 procedure Main is
    Prompt : constant AVR_String := "$> ";
+   pragma Linker_Options ("disable_watchdog.o");
 
 begin
-   Watchdog.Disable;
    Serial.Init (Serial.Baud_19200_16MHz);
    Serial.Put_Line ("starting chip inspection");
 
@@ -20,10 +19,7 @@ begin
       Strings.Edit.Input_Ptr := 1;
       Strings.Edit.Output_Last := 1;
 
-      Serial.Put ("found complete input """);
-      Serial.Put (Strings.Edit.Input_Line(1 .. Strings.Edit.Input_Last));
-      Serial.Put_Line ("""");
-
+      --  Serial.Put_Line (''' & Edit.Input_Line(1..Edit.Input_Last) & ''');
       Parse_Input_And_Trigger_Action (Commands.Cmd_List, Commands.Default);
    end loop Cmd_Loop;
 end Main;

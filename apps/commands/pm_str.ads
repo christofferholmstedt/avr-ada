@@ -13,7 +13,6 @@ package PM_Str is
    --  By limiting the length of PM_Strings to 255 bytes we can index
    --  them with unsigned 8-bit variables.  The first character alway
    --  has the index 1.
-
    type PM_Index is new Unsigned_8;
 
    --  a handle to the string in program memory (=flash)

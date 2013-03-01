@@ -10,6 +10,7 @@ package Commands is
 
    type Cmd_Info is record
       Id     : PM_String;
+      Doc    : PM_String;
       Action : Cmd_Action;
    end record;
 
@@ -17,6 +18,7 @@ package Commands is
 
    procedure Parse_Input_And_Trigger_Action (Cmd_List       : Cmd_List_T;
                                              Default_Action : Cmd_Action);
+
 
    type Text_In_Progmem (Len : Nat8) is record
       Text : AVR_String(1..Len);
@@ -54,12 +56,21 @@ private
    pragma Linker_Section (Ow_PM, ".progmem");
    pragma Linker_Section (IO_PM, ".progmem");
 
+   Reset_Doc       : constant AVR_String := "warm reset, restart from 0.";
+   Reset_Doc_PM    : constant Text_In_Progmem := (Reset_Doc'Length, Reset_Doc);
+   Wd_Reset_Doc    : constant AVR_String := "going to reset via watchdog.";
+   Wd_Reset_Doc_PM : constant Text_In_Progmem := (Wd_Reset_Doc'Length, Wd_Reset_Doc);
+   pragma Linker_Section (Reset_Doc_PM, ".progmem");
+   pragma Linker_Section (Wd_Reset_Doc_PM, ".progmem");
+
+   subtype P is PM_String;
+
    Cmd_List : constant Cmd_List_T :=
-     ((PM_String(Help_PM'Address),     Show_Commands'Access),
-      (PM_String(Reset_PM'Address),    Reset'Access),
-      (PM_String(Wd_Reset_PM'Address), Wd_Reset'Access),
-      (PM_String(OW_PM'Address),       OW_Parse'Access),
-      (PM_String(IO_PM'Address),       IO_Parse'Access));
+     ((P(Help_PM'Address),     0,                       Show_Commands'Access),
+      (P(Reset_PM'Address),    P(Reset_Doc_PM'Address),    Reset'Access),
+      (P(Wd_Reset_PM'Address), P(Wd_Reset_Doc_PM'Address), Wd_Reset'Access),
+      (P(OW_PM'Address),       0,                       OW_Parse'Access),
+      (P(IO_PM'Address),       0,                       IO_Parse'Access));
 
    Default : constant Cmd_Action := Show_Commands'Access;
 end Commands;

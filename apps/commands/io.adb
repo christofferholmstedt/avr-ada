@@ -6,6 +6,8 @@ with AVR.Strings.Edit;             use AVR.Strings.Edit;
 with AVR.Strings.Edit.Integers;
 with AVR.UART_Base_Polled;
 with Commands;                     use Commands;
+--  with AVR.Int_Img;
+--  with System.Int_Img;
 
 package body IO is
 
@@ -25,14 +27,28 @@ package body IO is
       Addr : Unsigned_16;
    begin
       Skip;
-      Integers.Get (Unsigned_16(Addr), 16);
+      Integers.Get (Addr, 16);
       Integers.Put (Addr, 16, Field => 4, Justify => Right, Fill => '0');
       Put(": ");
       declare
-         Cell : Unsigned_8;
-         for Cell'Address use System.Address(Addr);
+         Cell_Orig : Unsigned_8;
+         for Cell_Orig'Address use System.Address(Addr);
+         Cell : constant Unsigned_8 := Cell_Orig;
       begin
          Integers.Put (Cell, 16, Field => 2, Justify => Right, Fill => '0');
+         --  Put (' ');
+         --  Integers.Put (Cell, 2, Field => 8, Justify => Right, Fill => '0');
+         --  Put (' ');
+         --  Put ('<');
+         --  for I in reverse Bit_Number loop
+         --     Mask := Interfaces.Shift_Left (Unsigned_8'(1), Natural(I));
+         --     if (Cell and Mask) /= 0 then
+         --        Put('1');
+         --     else
+         --        Put('0');
+         --     end if;
+         --  end loop;
+         --  Put('>');
       end;
       New_Line; Flush;
    end IO_Get;
@@ -43,16 +59,31 @@ package body IO is
       Addr : Unsigned_16;
    begin
       Skip;
-      Integers.Get (Unsigned_16(Addr), 16);
+      Integers.Get (Addr, 16);
       Integers.Put (Addr, 16, Field => 4, Justify => Right, Fill => '0');
       Put (':');
       for I in 1 .. 16 loop
          declare
-            Cell : Unsigned_8;
-            for Cell'Address use System.Address(Addr);
+            Cell_Orig : Unsigned_8;
+            for Cell_Orig'Address use System.Address(Addr);
+            Cell : constant Unsigned_8 := Cell_Orig;
          begin
             Put(' ');
             Integers.Put(Cell, 16, Field => 2, Justify => Right, Fill => '0');
+            --  Put ('<'); U8_Hex_Img (Cell, Img); Put(Img); Put('>');
+            --  Put (' ');
+            --  Integers.Put (Cell, 2, Field => 8, Justify => Right, Fill => '0');
+            --  Put (' ');
+            --  Put ('<');
+            --  for I in reverse Bit_Number loop
+            --     Mask := Interfaces.Shift_Left (Unsigned_8'(1), Natural(I));
+            --     if (Cell and Mask) /= 0 then
+            --        Put('1');
+            --     else
+            --        Put('0');
+            --     end if;
+            --  end loop;
+            --  Put('>');
          end;
          Addr := Addr + 1;
       end loop;
@@ -66,14 +97,10 @@ package body IO is
       Val  : Unsigned_8;
    begin
       Skip;
-      Integers.Get (Unsigned_16(Addr), 16);
+      Integers.Get (Addr, 16);
       Skip;
       Integers.Get (Val, 16);
-      --  Put ("set register ");
-      --  Integers.Put (Addr, 16, Field => 4, Justify => Right, Fill => '0');
-      --  Put (" to value ");
-      --  Integers.Put (Val, 16, Field => 2, Justify => Right, Fill => '0');
-      --  Edit.New_Line; Flush;
+
       declare
          Cell : Unsigned_8;
          for Cell'Address use System.Address(Addr);

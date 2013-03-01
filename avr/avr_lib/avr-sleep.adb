@@ -262,10 +262,11 @@ package body AVR.Sleep is
    --  Put the device in sleep mode if Condition is true.  Condition
    --  is checked and sleep mode entered as one indivisible action.
    procedure Go_Sleeping_If (Condition : Boolean) is
+      S_Reg : Unsigned_8;
    begin
-      AVR.Interrupts.Save_Disable;
+      S_Reg := AVR.Interrupts.Save_And_Disable;
       if Condition then Go_Sleeping; end if;
-      AVR.Interrupts.Restore;
+      AVR.Interrupts.Restore (S_Reg);
    end Go_Sleeping_If;
 
 end AVR.Sleep;

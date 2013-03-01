@@ -24,10 +24,10 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Interfaces.C.Strings;
+with Interfaces;
 
 package System.Int_Img is
-   pragma Preelaborate;
+   pragma Pure;
    --  The function U32_Img converts an unsigned value into a text
    --  representation.
    --
@@ -39,9 +39,13 @@ package System.Int_Img is
    --  Radix is the number base in the range of 2 .. 36.
    --
    --  The return value is length+1 of the generated string
+   --  type chars_ptr is access all Character;
+   --  for chars_ptr'Size use System.Parameters.ptr_bits;
+   --  pragma Preelaborable_Initialization (chars_ptr);
+   --  pragma No_Strict_Aliasing (chars_ptr);
 
    function U32_Img (Value : Interfaces.Unsigned_32; --  value to be converted
-                     Buf   : Interfaces.C.Strings.chars_ptr; --  to buffer
+                     Buf   : not null access Character;   --  to buffer
                      Radix : Interfaces.Unsigned_8 := 10) --  range 2 .. 36
                     return Interfaces.Unsigned_8; --  length of the string
    pragma Import (C, U32_Img, "ada_u32_img");

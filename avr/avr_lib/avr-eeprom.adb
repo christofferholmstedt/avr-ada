@@ -64,6 +64,7 @@ package body AVR.EEprom is
 
    procedure Put (Address : EEprom_Address; Data : Unsigned_8) is
       use AVR.MCU;
+      S_Reg : Unsigned_8;
    begin
       while not Is_Ready loop null; end loop;
 
@@ -76,10 +77,10 @@ package body AVR.EEprom is
 
       EEDR := Data;
       -- no ints between setting EEMWE and EEWE
-      AVR.Interrupts.Save_Disable;
+      S_Reg := AVR.Interrupts.Save_And_Disable;
       EE_Master_Write_Enable := True;
       EE_Write_Enable := True;
-      AVR.Interrupts.Restore;
+      AVR.Interrupts.Restore (S_Reg);
    end Put;
 
 

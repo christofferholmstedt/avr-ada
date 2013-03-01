@@ -41,6 +41,22 @@ package body Commands is
    end Is_Equal;
 
 
+   procedure Put_Char (C : Character) is
+   begin
+      AVR.Strings.Edit.Put (C);
+   end Put_Char;
+   procedure Put is new PM_Str.Generic_Put (Put_Char);
+
+
+   procedure Show_Doc (Doc : PM_String)
+   is
+   begin
+      if Doc = 0 then return; end if;
+      Put (Doc);
+      Edit.New_Line; Flush;
+   end Show_Doc;
+
+
    procedure Parse_Input_And_Trigger_Action (Cmd_List       : Cmd_List_T;
                                              Default_Action : Cmd_Action)
    is
@@ -52,6 +68,7 @@ package body Commands is
 
       for I in Cmd_List'Range loop
          if Is_Equal (Cmd_List(I).Id, Cmd) then
+            Show_Doc (Cmd_List(I).Doc);
             Cmd_List(I).Action.all;
             return;
          end if;
@@ -60,11 +77,6 @@ package body Commands is
 
 
    procedure Show_Commands is
-      procedure Put_Char (C : Character) is
-      begin
-         AVR.Strings.Edit.Put (C);
-      end Put_Char;
-      procedure Put is new PM_Str.Generic_Put (Put_Char);
    begin
       for I in Cmd_List'Range loop
          Put (Cmd_List(I).Id);
@@ -78,15 +90,13 @@ package body Commands is
       pragma Import (Ada, Jump_To_Zero);
       for Jump_To_Zero'Address use 0;
    begin
-      Edit.Put_Line ("reset"); Flush;
       Jump_To_Zero;
    end Reset;
 
 
    procedure Wd_Reset is
    begin
-      Edit.Put_Line ("going to reset via watchdog"); Flush;
-      Watchdog.Enable(Watchdog.WDT_16K);
+      Watchdog.Enable(Watchdog.WDT_64K);
       loop null; end loop;
    end Wd_Reset;
 

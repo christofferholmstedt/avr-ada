@@ -1,3 +1,7 @@
+pragma Warnings (Off, "* is an internal GNAT unit");
+with System.Int_Img;
+pragma Warnings (On,  "* is an internal GNAT unit");
+
 with Interfaces;                   use Interfaces;
 
 package body AVR.Strings.Edit.Generic_Integers is
@@ -18,6 +22,26 @@ package body AVR.Strings.Edit.Generic_Integers is
    end Get_Digit;
 
 
+   procedure Get_U32 (Value : out Unsigned_32;
+                      Base  : in Number_Base := 10)
+   is
+      Radix : constant Unsigned_32 := Unsigned_32(Base);
+      Digit : Nat8;
+   begin
+      if Input_Line(Input_Ptr) = '+' then
+         Input_Ptr := Input_Ptr + 1;
+      end if;
+
+      Value := 0;
+      while Input_Ptr <= Input_Last loop
+         Digit := Get_Digit (Input_Line(Input_Ptr));
+         exit when Digit >= Nat8(Base);
+         Value := Value * Radix;
+         Value := Value + Unsigned_32(Digit);
+         Input_Ptr := Input_Ptr + 1;
+      end loop;
+   end Get_U32;
+
 
    -- Get -- Get an integer number from the Input_Line
    --
@@ -33,25 +57,27 @@ package body AVR.Strings.Edit.Generic_Integers is
    procedure Get_I (Value   : out Number_T;
                     Base    : in Number_Base := 10)
    is
-      Radix       : constant Number_T'Base := Number_T'Base(Base);
+      --  Radix       : constant Number_T'Base := Number_T'Base(Base);
       Is_Negative : Boolean := False;
-      Digit       : Nat8;
+      --  Digit       : Nat8;
    begin
-      if Input_Line(Input_Ptr) = '+' then
-         Input_Ptr := Input_Ptr + 1;
-      elsif Input_Line(Input_Ptr) = '-' then
+      --  if Input_Line(Input_Ptr) = '+' then
+      --     Input_Ptr := Input_Ptr + 1;
+      --  elsif Input_Line(Input_Ptr) = '-' then
+      if Input_Line(Input_Ptr) = '-' then
          Is_Negative := True;
          Input_Ptr := Input_Ptr + 1;
       end if;
 
-      Value := 0;
-      while Input_Ptr <= Input_Last loop
-         Digit := Get_Digit (Input_Line(Input_Ptr));
-         exit when Digit > Nat8(Base);
-         Value := Value * Radix;
-         Value := Value + Number_T'Base(Digit);
-         Input_Ptr := Input_Ptr + 1;
-      end loop;
+      Get_U32 (Unsigned_32(Value), Base);
+      --  Value := 0;
+      --  while Input_Ptr <= Input_Last loop
+      --     Digit := Get_Digit (Input_Line(Input_Ptr));
+      --     exit when Digit > Nat8(Base);
+      --     Value := Value * Radix;
+      --     Value := Value + Number_T'Base(Digit);
+      --     Input_Ptr := Input_Ptr + 1;
+      --  end loop;
       if Is_Negative then
          Value := - Value;
       end if;
@@ -61,76 +87,58 @@ package body AVR.Strings.Edit.Generic_Integers is
    procedure Get_U (Value   : out Number_T;
                     Base    : in Number_Base := 10)
    is
-      Radix : constant Number_T'Base := Number_T'Base(Base);
-      Digit : Nat8;
    begin
-      if Input_Line(Input_Ptr) = '+' then
-         Input_Ptr := Input_Ptr + 1;
-      end if;
-
-      Value := 0;
-      while Input_Ptr <= Input_Last loop
-         Digit := Get_Digit (Input_Line(Input_Ptr));
-         exit when Digit > Nat8(Base);
-         Value := Value * Radix;
-         Value := Value + Number_T'Base(Digit);
-         Input_Ptr := Input_Ptr + 1;
-      end loop;
+      Get_U32 (Unsigned_32(Value), Base);
    end Get_U;
 
 
-   --  # if MCU = "host" then
-   --     procedure Put_U32 (Value       : in Unsigned_32;
-   --                        Base        : in Number_Base := 10;
-   --                        Target      : in out AStr11;
-   --                        Last        : out Unsigned_8)
-   --     is
-   --        Temp : Unsigned_32 := Value;
-   --        Nibble : Unsigned_32;
-   --        Target_Str : String (1..11) := (others => '@');
-   --        L : Natural;
-   --     begin
-   --        for I in reverse Target_Str'Range loop
-   --           Nibble := Temp mod Unsigned_32(Base);
-   --           Temp := Temp / Unsigned_32(Base);
-   --           if Nibble > 9 then
-   --              Target_Str (I) := Character'Val (Character'Pos ('A') + Nibble - 10);
-   --           else
-   --              Target_Str (I) := Character'Val (Character'Pos ('0') + Nibble);
-   --           end if;
-   --        end loop;
+   --  procedure Get_U_Orig (Value   : out Number_T;
+   --                   Base    : in Number_Base := 10)
+   --  is
+   --     Radix : constant Number_T'Base := Number_T'Base(Base);
+   --     Digit : Nat8;
+   --  begin
+   --     if Input_Line(Input_Ptr) = '+' then
+   --        Input_Ptr := Input_Ptr + 1;
+   --     end if;
 
-   --        for I in Target_Str'Range loop
-   --           L := I;
-   --           exit when Target_Str(I) /= '0';
-   --        end loop;
+   --     Value := 0;
+   --     while Input_Ptr <= Input_Last loop
+   --        Digit := Get_Digit (Input_Line(Input_Ptr));
+   --        exit when Digit > Nat8(Base);
+   --        Value := Value * Radix;
+   --        Value := Value + Number_T'Base(Digit);
+   --        Input_Ptr := Input_Ptr + 1;
+   --     end loop;
+   --  end Get_U_Orig;
 
-   --        for I in L .. Target_Str'Last loop
-   --           Target(Unsigned_8(I-L)+2) := Target_Str(I);
-   --        end loop;
-   --        Last := Unsigned_8(Target_Str'Last-L+2);
-   --     end Put_U32;
-   --  #else
-   type Chars_Ptr is access all Character;
+   function C_ultoa (Value : Unsigned_32; Buffer : System.Address; Radix : Unsigned_8) return System.Address;
+   pragma Import (C, C_ultoa, "ultoa");
 
-   function U32_Img (Val : Unsigned_32;
-                     S   : Chars_Ptr;
-                     Radix : Number_Base)
-                    return All_Edit_Index_T;
-   pragma Import (C, U32_Img, "ada_u32_img");
-   --  pragma Linker_Options ("ada_u32_img.o");
+   function C_strlen (Start : System.Address) return Unsigned_8;
+   pragma Import (C, C_strlen, "strlen");
+
 
    procedure Put_U32 (Value   : in Unsigned_32;
                       Base    : in Number_Base := 10;
                       Target  : in out AStr11;
                       Last    : out Unsigned_8)
    is
+      use System.Int_Img;
       Len : All_Edit_Index_T;
    begin
-      Len := U32_Img (Value, Target(Target'First+1)'Unchecked_Access, Base);
+      Len := U32_Img (Value,
+                      Target(Target'First+1)'Unchecked_Access,
+                      Unsigned_8(Base));
       Last := Target'First + Len;
    end Put_U32;
-   -- #end if;
+
+   --     Start : constant System.Address := Target(Target'First+1)'Address;
+   --     Dummy : System.Address;
+   --  begin
+   --     Dummy := C_ultoa (Value, Start, Unsigned_8(Base));
+   --     Last := Target'First + C_strlen (Start);
+   --  end Put_U32;
 
 
    -- Put -- Put an integer into the Output_Line

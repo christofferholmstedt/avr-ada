@@ -40,10 +40,10 @@ package body AVR.Interrupts is
 
    Saved_SREG : Unsigned_8;
 
-   procedure Save_Disable is
+   procedure Save_And_Disable is
    begin
       Saved_SREG := Save_And_Disable;
-   end Save_Disable;
+   end Save_And_Disable;
 
 
    procedure Restore is
@@ -51,10 +51,5 @@ package body AVR.Interrupts is
       Restore (Saved_SREG);
    end Restore;
 
-
---     procedure Return_From_Interrupt is
---     begin
---        Asm ("reti");
---     end Return_From_Interrupt;
 
 end AVR.Interrupts;
