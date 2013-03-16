@@ -19,7 +19,8 @@ with Ada.Unchecked_Conversion;
 with System;                            use type System.Address;
 with AVR.Int_Img;
 with AVR.Interrupts;
-with AVR.MCU;                           use AVR.MCU;
+with AVR.MCU;                           use AVR;
+with AVR.UART_Config;                   use AVR.UART_Config;
 
 package body AVR.UART is
 
@@ -34,66 +35,6 @@ package body AVR.UART is
 
    type Receive_Mode_T is (Polled, Interrupt);
    Receive_Mode : constant Receive_Mode_T := Polled;
-
-
-
-#if UART = "usart0" then
-   UCSRA      : Nat8 renames MCU.UCSR0A;
-   UCSRA_Bits : Bits_In_Byte renames MCU.UCSR0A_Bits;
-   UCSRB      : Nat8 renames MCU.UCSR0B;
-   UCSRC      : Nat8 renames MCU.UCSR0C;
-
-   UBRR       : Nat16 renames MCU.UBRR0;
-
-   RXEN_Bit   : constant AVR.Bit_Number := RXEN0_Bit;
-   TXEN_Bit   : constant AVR.Bit_Number := TXEN0_Bit;
-   RXCIE_Bit  : constant AVR.Bit_Number := RXCIE0_Bit;
-   UCSZ0_Bit  : constant AVR.Bit_Number := UCSZ00_Bit;
-   UCSZ1_Bit  : constant AVR.Bit_Number := UCSZ01_Bit;
-   U2X_Mask   : constant                := U2X0_Mask;
-
-   UDRE_Bit   : constant AVR.Bit_Number := MCU.UDRE0_Bit;
-
-   UDR        : Nat8 renames MCU.UDR0;
-   RXC_Bit    : constant AVR.Bit_Number := MCU.RXC0_Bit;
-
-#if MCU = "atmega162" then
-   Rx_Name    : constant String := MCU.Sig_USART0_RXC_String;
-#elsif MCU = "atmega168" or else MCU = "atmega328p" then
-   Rx_Name    : constant String := MCU.Sig_USART_RX_String;
-#else
-   Rx_Name    : constant String := MCU.Sig_USART0_RX_String;
-#end if;
-
-#elsif UART = "usart" then
-
-   UCSZ0_Bit  : constant AVR.Bit_Number := MCU.UCSZ0_Bit;
-   UCSZ1_Bit  : constant AVR.Bit_Number := MCU.UCSZ1_Bit;
-
-   RXC_Bit    : constant AVR.Bit_Number := MCU.RXC_Bit;
-
-#if MCU = "atmega32" or MCU = "atmega8" then
-   Rx_Name    : constant String := MCU.Sig_USART_RXC_String;
-#else
-   Rx_Name    : constant String := MCU.Sig_USART_RX_String;
-#end if;
-
-
-#elsif UART = "uart" then
-   UCSRA_Bits : Bits_In_Byte renames MCU.USR_Bits;
-
-   UCSRB      : Unsigned_8 renames MCU.UCR;
-
-   UBRRL      : Unsigned_8 renames MCU.UBRR;
-   UBRR       : Unsigned_8 renames MCU.UBRR;
-
-   UDR        : Unsigned_8 renames MCU.UDR;
-
-   RXC_Bit    : constant AVR.Bit_Number := MCU.RXC_Bit;
-
-   Rx_Name    : constant String := MCU.Sig_UART_RX_String;
-
-#end if;
 
 
    --
@@ -136,7 +77,7 @@ package body AVR.UART is
       UCSRC := +(UCSZ0_Bit => True,
                  UCSZ1_Bit => True,
 #if MCU = "atmega8" or else MCU = "atmega32" then
-                 URSEL_Bit => True,
+                 MCU.URSEL_Bit => True,
 #end if;
                  others => False);
 

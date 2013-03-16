@@ -90,7 +90,8 @@ board-%/lib :
 stamp-links: $(mcu_specs) $(board_mcu_specs)
 	touch $@
 
-stamp-libs: $(thread_libs) $(libs) $(board_libs)
+# stamp-libs: $(thread_libs) $(libs) $(board_libs)
+stamp-libs: $(libs) $(board_libs)
 	touch $@
 
 # Compile: create assembler files from Ada source files.

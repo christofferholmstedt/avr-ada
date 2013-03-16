@@ -17,3 +17,11 @@ board-xbeeimu/lib/libavrada.a : BOARD = xbeeimu
 board-xbeeimu/avr-mcu.ads     : MCU = atmega328p
 board-xbeeimu/avr-mcu.ads     : BOARD = xbeeimu
 
+# ATmega8u2 breakout board, Sparkfun
+# http://www.sparkfun.com/products/10277
+# 
+# Has atmega8u2, runs at 16MHz
+board-sparkfun8u2/lib/libavrada.a : MCU = atmega8u2
+board-sparkfun8u2/lib/libavrada.a : BOARD = sparkfun8u2
+board-sparkfun8u2/avr-mcu.ads     : MCU = atmega8u2
+board-sparkfun8u2/avr-mcu.ads     : BOARD = sparkfun8u2

@@ -91,8 +91,10 @@ library project AVR_Lib is
       );
 
 
-   UART_Sources     := ("avr-uart.ads",         "avr-uart.adb");
+   UART_Sources     := ("avr-uart_config.ads",
+                        "avr-uart.ads",         "avr-uart.adb");
    Serial_Sources   := ("avr-uart_base_polled.ads", "avr-uart_base_polled.adb",
+                        "avr-uart_config.ads",
                         "avr-generic_text_io.ads",  "avr-generic_text_io.adb",
                         "avr-serial_polled.ads",
                         "avr-serial.ads");
@@ -244,7 +246,7 @@ library project AVR_Lib is
       when "atmega8u2" =>
          for Source_Files use
            Std_Sources & Timer0_Sources & Timer1_Sources & Time_Sources & 
-           Sleep_Sources;
+           Serial_Sources & Sleep_Sources & UART_Sources;
          
       when others =>
          for Source_Files use Std_Sources;

@@ -148,7 +148,8 @@ abstract project MCU is
       "arduino_uno",
       "net-io",         -- Pollin AVR Net-IO
       "butterfly",
-      "xbeeimu");
+      "xbeeimu",
+      "sparkfun8u2");
 
    Board : Board_Type := external ("BOARD", "none");
 
@@ -160,6 +161,7 @@ abstract project MCU is
       when "butterfly"        => MCU := "atmega169";
       when "net-io"           => MCU := "atmega644";
       when "xbeeimu"          => MCU := "atmega328p";
+      when "sparkfun8u2"      => MCU := "atmega8u2";
       when others =>
    end case;
 
@@ -271,7 +273,7 @@ abstract project MCU is
    --
    --  Serial Interface
    --
-   type UART_T is ("uart", "usart", "usart0");
+   type UART_T is ("uart", "usart", "usart0", "usart1");
    UART : UART_T := "usart0";
 
    case MCU is
@@ -279,6 +281,8 @@ abstract project MCU is
      => UART := "uart";
    when "atmega8"    | "atmega32" | "attiny2313" | "attiny4313"
      => UART := "usart";
+   when "atmega8u2"
+     => UART := "usart1";
    when others
      => UART := "usart0";
    end case;
