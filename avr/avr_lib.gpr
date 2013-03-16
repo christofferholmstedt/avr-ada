@@ -240,7 +240,12 @@ library project AVR_Lib is
       when "atmega16" | "atmega161" | "atmega163" =>
          for Source_Files use
            Std_Sources & EEPROM_Sources;
-
+         
+      when "atmega8u2" =>
+         for Source_Files use
+           Std_Sources & Timer0_Sources & Timer1_Sources & Time_Sources & 
+           Sleep_Sources;
+         
       when others =>
          for Source_Files use Std_Sources;
    end case;

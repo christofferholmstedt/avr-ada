@@ -11,7 +11,7 @@
 #
 # list of primary devices
 #
-PRIMARY_MCU_LIST := attiny2313 atmega8 atmega168 atmega169 \
+PRIMARY_MCU_LIST := attiny2313 atmega8 atmega8u2 atmega168 atmega169 \
    atmega32 atmega328p atmega644p atmega2560
 
 BOARD_LIST := arduino_uno xbeeimu
@@ -48,11 +48,11 @@ all:	stamp-links stamp-libs
 # first set the variable MCU
 at%/lib/libavrada.a : MCU = $(patsubst %/lib/libavrada.a,%, $@)
 at%/avr-mcu.ads     : MCU = $(patsubst %/avr-mcu.ads,%, $@)
-at%/obj/ada_u32_img.o : MCU = $(patsubst %/obj/ada_u32_img.o,%, $@)
+# at%/obj/ada_u32_img.o : MCU = $(patsubst %/obj/ada_u32_img.o,%, $@)
 at%/thread-lib/libavr-thread.a : MCU = $(patsubst %/thread-lib/libavr-thread.a,%, $@)
 
 # then provide the rules for building
-at%/lib/libavrada.a: stamp-links at%/obj at%/lib ../avr_lib.gpr ../avr_tools.gpr ../mcu.gpr at%/avr-mcu.ads at%/obj/ada_u32_img.o
+at%/lib/libavrada.a: stamp-links at%/obj at%/lib ../avr_lib.gpr ../avr_tools.gpr ../mcu.gpr at%/avr-mcu.ads
 	avr-gnatmake -p -P../avr_lib.gpr -XMCU=$(MCU)
 
 # rule for building the thread library
