@@ -182,17 +182,17 @@ package AVR.ATmega644P is
    for UBRR1H_Bits'Address use UBRR1H_Addr;
    pragma Volatile (UBRR1H_Bits);
    --  USART Baud Rate Register bit 8
-   UBRR8_Bit                : constant Bit_Number := 0;
-   UBRR8_Mask               : constant Unsigned_8 := 16#01#;
+   UBRR_8_Bit               : constant Bit_Number := 0;
+   UBRR_8_Mask              : constant Unsigned_8 := 16#01#;
    --  USART Baud Rate Register bit 9
-   UBRR9_Bit                : constant Bit_Number := 1;
-   UBRR9_Mask               : constant Unsigned_8 := 16#02#;
+   UBRR_9_Bit               : constant Bit_Number := 1;
+   UBRR_9_Mask              : constant Unsigned_8 := 16#02#;
    --  USART Baud Rate Register bit 10
-   UBRR10_Bit               : constant Bit_Number := 2;
-   UBRR10_Mask              : constant Unsigned_8 := 16#04#;
+   UBRR_10_Bit              : constant Bit_Number := 2;
+   UBRR_10_Mask             : constant Unsigned_8 := 16#04#;
    --  USART Baud Rate Register bit 11
-   UBRR11_Bit               : constant Bit_Number := 3;
-   UBRR11_Mask              : constant Unsigned_8 := 16#08#;
+   UBRR_11_Bit              : constant Bit_Number := 3;
+   UBRR_11_Mask             : constant Unsigned_8 := 16#08#;
 
    --  USART Baud Rate Register Low Byte
    UBRR1L_Addr              : constant Address    := 16#cc#;
@@ -206,29 +206,29 @@ package AVR.ATmega644P is
    for UBRR1L_Bits'Address use UBRR1L_Addr;
    pragma Volatile (UBRR1L_Bits);
    --  USART Baud Rate Register bit 0
-   UBRR0_Bit                : constant Bit_Number := 0;
-   UBRR0_Mask               : constant Unsigned_8 := 16#01#;
+   UBRR_0_Bit               : constant Bit_Number := 0;
+   UBRR_0_Mask              : constant Unsigned_8 := 16#01#;
    --  USART Baud Rate Register bit 1
---    UBRR1_Bit                : constant Bit_Number := 1;
---    UBRR1_Mask               : constant Unsigned_8 := 16#02#;
+   UBRR_1_Bit               : constant Bit_Number := 1;
+   UBRR_1_Mask              : constant Unsigned_8 := 16#02#;
    --  USART Baud Rate Register bit 2
-   UBRR2_Bit                : constant Bit_Number := 2;
-   UBRR2_Mask               : constant Unsigned_8 := 16#04#;
+   UBRR_2_Bit               : constant Bit_Number := 2;
+   UBRR_2_Mask              : constant Unsigned_8 := 16#04#;
    --  USART Baud Rate Register bit 3
-   UBRR3_Bit                : constant Bit_Number := 3;
-   UBRR3_Mask               : constant Unsigned_8 := 16#08#;
+   UBRR_3_Bit               : constant Bit_Number := 3;
+   UBRR_3_Mask              : constant Unsigned_8 := 16#08#;
    --  USART Baud Rate Register bit 4
-   UBRR4_Bit                : constant Bit_Number := 4;
-   UBRR4_Mask               : constant Unsigned_8 := 16#10#;
+   UBRR_4_Bit               : constant Bit_Number := 4;
+   UBRR_4_Mask              : constant Unsigned_8 := 16#10#;
    --  USART Baud Rate Register bit 5
-   UBRR5_Bit                : constant Bit_Number := 5;
-   UBRR5_Mask               : constant Unsigned_8 := 16#20#;
+   UBRR_5_Bit               : constant Bit_Number := 5;
+   UBRR_5_Mask              : constant Unsigned_8 := 16#20#;
    --  USART Baud Rate Register bit 6
-   UBRR6_Bit                : constant Bit_Number := 6;
-   UBRR6_Mask               : constant Unsigned_8 := 16#40#;
+   UBRR_6_Bit               : constant Bit_Number := 6;
+   UBRR_6_Mask              : constant Unsigned_8 := 16#40#;
    --  USART Baud Rate Register bit 7
-   UBRR7_Bit                : constant Bit_Number := 7;
-   UBRR7_Mask               : constant Unsigned_8 := 16#80#;
+   UBRR_7_Bit               : constant Bit_Number := 7;
+   UBRR_7_Mask              : constant Unsigned_8 := 16#80#;
 
    --  USART Control and Status Register C
    UCSR1C_Addr              : constant Address    := 16#ca#;
@@ -370,6 +370,18 @@ package AVR.ATmega644P is
    UBRR0H_Bits              : Bits_In_Byte;
    for UBRR0H_Bits'Address use UBRR0H_Addr;
    pragma Volatile (UBRR0H_Bits);
+   --  USART Baud Rate Register bit 8
+   UBRR8_Bit                : constant Bit_Number := 0;
+   UBRR8_Mask               : constant Unsigned_8 := 16#01#;
+   --  USART Baud Rate Register bit 9
+   UBRR9_Bit                : constant Bit_Number := 1;
+   UBRR9_Mask               : constant Unsigned_8 := 16#02#;
+   --  USART Baud Rate Register bit 10
+   UBRR10_Bit               : constant Bit_Number := 2;
+   UBRR10_Mask              : constant Unsigned_8 := 16#04#;
+   --  USART Baud Rate Register bit 11
+   UBRR11_Bit               : constant Bit_Number := 3;
+   UBRR11_Mask              : constant Unsigned_8 := 16#08#;
 
    --  USART Baud Rate Register Low Byte
    UBRR0L_Addr              : constant Address    := 16#c4#;
@@ -382,6 +394,30 @@ package AVR.ATmega644P is
    UBRR0L_Bits              : Bits_In_Byte;
    for UBRR0L_Bits'Address use UBRR0L_Addr;
    pragma Volatile (UBRR0L_Bits);
+   --  USART Baud Rate Register bit 0
+   UBRR0_Bit               : constant Bit_Number := 0;
+   UBRR0_Mask              : constant Unsigned_8 := 16#01#;
+   --  USART Baud Rate Register bit 1
+   UBRR1_Bit               : constant Bit_Number := 1;
+   UBRR1_Mask              : constant Unsigned_8 := 16#02#;
+   --  USART Baud Rate Register bit 2
+   UBRR2_Bit                : constant Bit_Number := 2;
+   UBRR2_Mask               : constant Unsigned_8 := 16#04#;
+   --  USART Baud Rate Register bit 3
+   UBRR3_Bit                : constant Bit_Number := 3;
+   UBRR3_Mask               : constant Unsigned_8 := 16#08#;
+   --  USART Baud Rate Register bit 4
+   UBRR4_Bit                : constant Bit_Number := 4;
+   UBRR4_Mask               : constant Unsigned_8 := 16#10#;
+   --  USART Baud Rate Register bit 5
+   UBRR5_Bit                : constant Bit_Number := 5;
+   UBRR5_Mask               : constant Unsigned_8 := 16#20#;
+   --  USART Baud Rate Register bit 6
+   UBRR6_Bit                : constant Bit_Number := 6;
+   UBRR6_Mask               : constant Unsigned_8 := 16#40#;
+   --  USART Baud Rate Register bit 7
+   UBRR7_Bit                : constant Bit_Number := 7;
+   UBRR7_Mask               : constant Unsigned_8 := 16#80#;
 
    --  USART Control and Status Register C
    UCSR0C_Addr              : constant Address    := 16#c2#;
@@ -695,29 +731,29 @@ package AVR.ATmega644P is
    for OCR2B_Bits'Address use OCR2B_Addr;
    pragma Volatile (OCR2B_Bits);
    --  Timer/Counter2 Output Compare Register Bit 0
-   OCR2_0_Bit               : constant Bit_Number := 0;
-   OCR2_0_Mask              : constant Unsigned_8 := 16#01#;
+   OCR2B_0_Bit              : constant Bit_Number := 0;
+   OCR2B_0_Mask             : constant Unsigned_8 := 16#01#;
    --  Timer/Counter2 Output Compare Register Bit 1
-   OCR2_1_Bit               : constant Bit_Number := 1;
-   OCR2_1_Mask              : constant Unsigned_8 := 16#02#;
+   OCR2B_1_Bit              : constant Bit_Number := 1;
+   OCR2B_1_Mask             : constant Unsigned_8 := 16#02#;
    --  Timer/Counter2 Output Compare Register Bit 2
-   OCR2_2_Bit               : constant Bit_Number := 2;
-   OCR2_2_Mask              : constant Unsigned_8 := 16#04#;
+   OCR2B_2_Bit              : constant Bit_Number := 2;
+   OCR2B_2_Mask             : constant Unsigned_8 := 16#04#;
    --  Timer/Counter2 Output Compare Register Bit 3
-   OCR2_3_Bit               : constant Bit_Number := 3;
-   OCR2_3_Mask              : constant Unsigned_8 := 16#08#;
+   OCR2B_3_Bit              : constant Bit_Number := 3;
+   OCR2B_3_Mask             : constant Unsigned_8 := 16#08#;
    --  Timer/Counter2 Output Compare Register Bit 4
-   OCR2_4_Bit               : constant Bit_Number := 4;
-   OCR2_4_Mask              : constant Unsigned_8 := 16#10#;
+   OCR2B_4_Bit              : constant Bit_Number := 4;
+   OCR2B_4_Mask             : constant Unsigned_8 := 16#10#;
    --  Timer/Counter2 Output Compare Register Bit 5
-   OCR2_5_Bit               : constant Bit_Number := 5;
-   OCR2_5_Mask              : constant Unsigned_8 := 16#20#;
+   OCR2B_5_Bit              : constant Bit_Number := 5;
+   OCR2B_5_Mask             : constant Unsigned_8 := 16#20#;
    --  Timer/Counter2 Output Compare Register Bit 6
-   OCR2_6_Bit               : constant Bit_Number := 6;
-   OCR2_6_Mask              : constant Unsigned_8 := 16#40#;
+   OCR2B_6_Bit              : constant Bit_Number := 6;
+   OCR2B_6_Mask             : constant Unsigned_8 := 16#40#;
    --  Timer/Counter2 Output Compare Register Bit 7
-   OCR2_7_Bit               : constant Bit_Number := 7;
-   OCR2_7_Mask              : constant Unsigned_8 := 16#80#;
+   OCR2B_7_Bit              : constant Bit_Number := 7;
+   OCR2B_7_Mask             : constant Unsigned_8 := 16#80#;
 
    --  Timer/Counter2 Output Compare Register A
    OCR2A_Addr               : constant Address    := 16#b3#;
@@ -727,6 +763,30 @@ package AVR.ATmega644P is
    OCR2A_Bits               : Bits_In_Byte;
    for OCR2A_Bits'Address use OCR2A_Addr;
    pragma Volatile (OCR2A_Bits);
+   --  Timer/Counter2 Output Compare Register Bit 0
+   OCR2A_0_Bit              : constant Bit_Number := 0;
+   OCR2A_0_Mask             : constant Unsigned_8 := 16#01#;
+   --  Timer/Counter2 Output Compare Register Bit 1
+   OCR2A_1_Bit              : constant Bit_Number := 1;
+   OCR2A_1_Mask             : constant Unsigned_8 := 16#02#;
+   --  Timer/Counter2 Output Compare Register Bit 2
+   OCR2A_2_Bit              : constant Bit_Number := 2;
+   OCR2A_2_Mask             : constant Unsigned_8 := 16#04#;
+   --  Timer/Counter2 Output Compare Register Bit 3
+   OCR2A_3_Bit              : constant Bit_Number := 3;
+   OCR2A_3_Mask             : constant Unsigned_8 := 16#08#;
+   --  Timer/Counter2 Output Compare Register Bit 4
+   OCR2A_4_Bit              : constant Bit_Number := 4;
+   OCR2A_4_Mask             : constant Unsigned_8 := 16#10#;
+   --  Timer/Counter2 Output Compare Register Bit 5
+   OCR2A_5_Bit              : constant Bit_Number := 5;
+   OCR2A_5_Mask             : constant Unsigned_8 := 16#20#;
+   --  Timer/Counter2 Output Compare Register Bit 6
+   OCR2A_6_Bit              : constant Bit_Number := 6;
+   OCR2A_6_Mask             : constant Unsigned_8 := 16#40#;
+   --  Timer/Counter2 Output Compare Register Bit 7
+   OCR2A_7_Bit              : constant Bit_Number := 7;
+   OCR2A_7_Mask             : constant Unsigned_8 := 16#80#;
 
    --  Timer/Counter2
    TCNT2_Addr               : constant Address    := 16#b2#;
@@ -824,6 +884,75 @@ package AVR.ATmega644P is
    for OCR1BH_Bits'Address use OCR1BH_Addr;
    pragma Volatile (OCR1BH_Bits);
    --  Timer/Counter1 Output Compare Register High Byte bit 0
+   OCR1BH0_Bit              : constant Bit_Number := 0;
+   OCR1BH0_Mask             : constant Unsigned_8 := 16#01#;
+   --  Timer/Counter1 Output Compare Register High Byte bit 1
+   OCR1BH1_Bit              : constant Bit_Number := 1;
+   OCR1BH1_Mask             : constant Unsigned_8 := 16#02#;
+   --  Timer/Counter1 Output Compare Register High Byte bit 2
+   OCR1BH2_Bit              : constant Bit_Number := 2;
+   OCR1BH2_Mask             : constant Unsigned_8 := 16#04#;
+   --  Timer/Counter1 Output Compare Register High Byte bit 3
+   OCR1BH3_Bit              : constant Bit_Number := 3;
+   OCR1BH3_Mask             : constant Unsigned_8 := 16#08#;
+   --  Timer/Counter1 Output Compare Register High Byte bit 4
+   OCR1BH4_Bit              : constant Bit_Number := 4;
+   OCR1BH4_Mask             : constant Unsigned_8 := 16#10#;
+   --  Timer/Counter1 Output Compare Register High Byte bit 5
+   OCR1BH5_Bit              : constant Bit_Number := 5;
+   OCR1BH5_Mask             : constant Unsigned_8 := 16#20#;
+   --  Timer/Counter1 Output Compare Register High Byte bit 6
+   OCR1BH6_Bit              : constant Bit_Number := 6;
+   OCR1BH6_Mask             : constant Unsigned_8 := 16#40#;
+   --  Timer/Counter1 Output Compare Register High Byte bit 7
+   OCR1BH7_Bit              : constant Bit_Number := 7;
+   OCR1BH7_Mask             : constant Unsigned_8 := 16#80#;
+
+   --  Timer/Counter1 Output Compare Register B Low Byte
+   OCR1BL_Addr              : constant Address    := 16#8a#;
+   OCR1B                    : Unsigned_16;
+   for OCR1B'Address use OCR1BL_Addr;
+   pragma Volatile (OCR1B);
+   OCR1BL                   : Unsigned_8 ;
+   for OCR1BL'Address use OCR1BL_Addr;
+   pragma Volatile (OCR1BL);
+   OCR1BL_Bits              : Bits_In_Byte;
+   for OCR1BL_Bits'Address use OCR1BL_Addr;
+   pragma Volatile (OCR1BL_Bits);
+   --  Timer/Counter1 Output Compare Register Low Byte Bit 0
+   OCR1BL0_Bit              : constant Bit_Number := 0;
+   OCR1BL0_Mask             : constant Unsigned_8 := 16#01#;
+   --  Timer/Counter1 Output Compare Register Low Byte Bit 1
+   OCR1BL1_Bit              : constant Bit_Number := 1;
+   OCR1BL1_Mask             : constant Unsigned_8 := 16#02#;
+   --  Timer/Counter1 Output Compare Register Low Byte Bit 2
+   OCR1BL2_Bit              : constant Bit_Number := 2;
+   OCR1BL2_Mask             : constant Unsigned_8 := 16#04#;
+   --  Timer/Counter1 Output Compare Register Low Byte Bit 3
+   OCR1BL3_Bit              : constant Bit_Number := 3;
+   OCR1BL3_Mask             : constant Unsigned_8 := 16#08#;
+   --  Timer/Counter1 Output Compare Register Low Byte Bit 4
+   OCR1BL4_Bit              : constant Bit_Number := 4;
+   OCR1BL4_Mask             : constant Unsigned_8 := 16#10#;
+   --  Timer/Counter1 Output Compare Register Low Byte Bit 5
+   OCR1BL5_Bit              : constant Bit_Number := 5;
+   OCR1BL5_Mask             : constant Unsigned_8 := 16#20#;
+   --  Timer/Counter1 Output Compare Register Low Byte Bit 6
+   OCR1BL6_Bit              : constant Bit_Number := 6;
+   OCR1BL6_Mask             : constant Unsigned_8 := 16#40#;
+   --  Timer/Counter1 Output Compare Register Low Byte Bit 7
+   OCR1BL7_Bit              : constant Bit_Number := 7;
+   OCR1BL7_Mask             : constant Unsigned_8 := 16#80#;
+
+   --  Timer/Counter1 Output Compare Register A High Byte
+   OCR1AH_Addr              : constant Address    := 16#89#;
+   OCR1AH                   : Unsigned_8 ;
+   for OCR1AH'Address use OCR1AH_Addr;
+   pragma Volatile (OCR1AH);
+   OCR1AH_Bits              : Bits_In_Byte;
+   for OCR1AH_Bits'Address use OCR1AH_Addr;
+   pragma Volatile (OCR1AH_Bits);
+   --  Timer/Counter1 Output Compare Register High Byte bit 0
    OCR1AH0_Bit              : constant Bit_Number := 0;
    OCR1AH0_Mask             : constant Unsigned_8 := 16#01#;
    --  Timer/Counter1 Output Compare Register High Byte bit 1
@@ -848,17 +977,17 @@ package AVR.ATmega644P is
    OCR1AH7_Bit              : constant Bit_Number := 7;
    OCR1AH7_Mask             : constant Unsigned_8 := 16#80#;
 
-   --  Timer/Counter1 Output Compare Register B Low Byte
-   OCR1BL_Addr              : constant Address    := 16#8a#;
-   OCR1B                    : Unsigned_16;
-   for OCR1B'Address use OCR1BL_Addr;
-   pragma Volatile (OCR1B);
-   OCR1BL                   : Unsigned_8 ;
-   for OCR1BL'Address use OCR1BL_Addr;
-   pragma Volatile (OCR1BL);
-   OCR1BL_Bits              : Bits_In_Byte;
-   for OCR1BL_Bits'Address use OCR1BL_Addr;
-   pragma Volatile (OCR1BL_Bits);
+   --  Timer/Counter1 Output Compare Register A Low Byte
+   OCR1AL_Addr              : constant Address    := 16#88#;
+   OCR1A                    : Unsigned_16;
+   for OCR1A'Address use OCR1AL_Addr;
+   pragma Volatile (OCR1A);
+   OCR1AL                   : Unsigned_8 ;
+   for OCR1AL'Address use OCR1AL_Addr;
+   pragma Volatile (OCR1AL);
+   OCR1AL_Bits              : Bits_In_Byte;
+   for OCR1AL_Bits'Address use OCR1AL_Addr;
+   pragma Volatile (OCR1AL_Bits);
    --  Timer/Counter1 Output Compare Register Low Byte Bit 0
    OCR1AL0_Bit              : constant Bit_Number := 0;
    OCR1AL0_Mask             : constant Unsigned_8 := 16#01#;
@@ -883,27 +1012,6 @@ package AVR.ATmega644P is
    --  Timer/Counter1 Output Compare Register Low Byte Bit 7
    OCR1AL7_Bit              : constant Bit_Number := 7;
    OCR1AL7_Mask             : constant Unsigned_8 := 16#80#;
-
-   --  Timer/Counter1 Output Compare Register A High Byte
-   OCR1AH_Addr              : constant Address    := 16#89#;
-   OCR1AH                   : Unsigned_8 ;
-   for OCR1AH'Address use OCR1AH_Addr;
-   pragma Volatile (OCR1AH);
-   OCR1AH_Bits              : Bits_In_Byte;
-   for OCR1AH_Bits'Address use OCR1AH_Addr;
-   pragma Volatile (OCR1AH_Bits);
-
-   --  Timer/Counter1 Output Compare Register A Low Byte
-   OCR1AL_Addr              : constant Address    := 16#88#;
-   OCR1A                    : Unsigned_16;
-   for OCR1A'Address use OCR1AL_Addr;
-   pragma Volatile (OCR1A);
-   OCR1AL                   : Unsigned_8 ;
-   for OCR1AL'Address use OCR1AL_Addr;
-   pragma Volatile (OCR1AL);
-   OCR1AL_Bits              : Bits_In_Byte;
-   for OCR1AL_Bits'Address use OCR1AL_Addr;
-   pragma Volatile (OCR1AL_Bits);
 
    --  Timer/Counter1 Input Capture Register High Byte
    ICR1H_Addr               : constant Address    := 16#87#;
@@ -1758,18 +1866,6 @@ package AVR.ATmega644P is
    SP7_Bit                  : constant Bit_Number := 7;
    SP7_Mask                 : constant Unsigned_8 := 16#80#;
 
-   --  RAM Page Z Select Register
-   RAMPZ_Addr               : constant Address    := 16#5b#;
-   RAMPZ                    : Unsigned_8 ;
-   for RAMPZ'Address use RAMPZ_Addr;
-   pragma Volatile (RAMPZ);
-   RAMPZ_Bits               : Bits_In_Byte;
-   for RAMPZ_Bits'Address use RAMPZ_Addr;
-   pragma Volatile (RAMPZ_Bits);
-   --  RAM Page Z Select Register Bit 0
-   RAMPZ0_Bit               : constant Bit_Number := 0;
-   RAMPZ0_Mask              : constant Unsigned_8 := 16#01#;
-
    --  Store Program Memory Control Register
    SPMCSR_Addr              : constant Address    := 16#57#;
    SPMCSR                   : Unsigned_8 ;
@@ -2124,22 +2220,22 @@ package AVR.ATmega644P is
    OCR0A_Bits               : Bits_In_Byte;
    for OCR0A_Bits'Address use OCR0A_Addr;
    pragma Volatile (OCR0A_Bits);
-   OCROA_0_Bit              : constant Bit_Number := 0;
-   OCROA_0_Mask             : constant Unsigned_8 := 16#01#;
-   OCROA_1_Bit              : constant Bit_Number := 1;
-   OCROA_1_Mask             : constant Unsigned_8 := 16#02#;
-   OCROA_2_Bit              : constant Bit_Number := 2;
-   OCROA_2_Mask             : constant Unsigned_8 := 16#04#;
-   OCROA_3_Bit              : constant Bit_Number := 3;
-   OCROA_3_Mask             : constant Unsigned_8 := 16#08#;
-   OCROA_4_Bit              : constant Bit_Number := 4;
-   OCROA_4_Mask             : constant Unsigned_8 := 16#10#;
-   OCROA_5_Bit              : constant Bit_Number := 5;
-   OCROA_5_Mask             : constant Unsigned_8 := 16#20#;
-   OCROA_6_Bit              : constant Bit_Number := 6;
-   OCROA_6_Mask             : constant Unsigned_8 := 16#40#;
-   OCROA_7_Bit              : constant Bit_Number := 7;
-   OCROA_7_Mask             : constant Unsigned_8 := 16#80#;
+   OCR0A_0_Bit              : constant Bit_Number := 0;
+   OCR0A_0_Mask             : constant Unsigned_8 := 16#01#;
+   OCR0A_1_Bit              : constant Bit_Number := 1;
+   OCR0A_1_Mask             : constant Unsigned_8 := 16#02#;
+   OCR0A_2_Bit              : constant Bit_Number := 2;
+   OCR0A_2_Mask             : constant Unsigned_8 := 16#04#;
+   OCR0A_3_Bit              : constant Bit_Number := 3;
+   OCR0A_3_Mask             : constant Unsigned_8 := 16#08#;
+   OCR0A_4_Bit              : constant Bit_Number := 4;
+   OCR0A_4_Mask             : constant Unsigned_8 := 16#10#;
+   OCR0A_5_Bit              : constant Bit_Number := 5;
+   OCR0A_5_Mask             : constant Unsigned_8 := 16#20#;
+   OCR0A_6_Bit              : constant Bit_Number := 6;
+   OCR0A_6_Mask             : constant Unsigned_8 := 16#40#;
+   OCR0A_7_Bit              : constant Bit_Number := 7;
+   OCR0A_7_Mask             : constant Unsigned_8 := 16#80#;
 
    --  Timer/Counter0
    TCNT0_Addr               : constant Address    := 16#46#;

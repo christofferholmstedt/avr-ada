@@ -612,17 +612,17 @@ package AVR.ATmega169 is
    for UBRR0H_Bits'Address use UBRR0H_Addr;
    pragma Volatile (UBRR0H_Bits);
    --  USART Baud Rate Register bit 8
-   UBRR8_Bit                : constant Bit_Number := 0;
-   UBRR8_Mask               : constant Unsigned_8 := 16#01#;
+   UBRR_8_Bit               : constant Bit_Number := 0;
+   UBRR_8_Mask              : constant Unsigned_8 := 16#01#;
    --  USART Baud Rate Register bit 9
-   UBRR9_Bit                : constant Bit_Number := 1;
-   UBRR9_Mask               : constant Unsigned_8 := 16#02#;
+   UBRR_9_Bit               : constant Bit_Number := 1;
+   UBRR_9_Mask              : constant Unsigned_8 := 16#02#;
    --  USART Baud Rate Register bit 10
-   UBRR10_Bit               : constant Bit_Number := 2;
-   UBRR10_Mask              : constant Unsigned_8 := 16#04#;
+   UBRR_10_Bit              : constant Bit_Number := 2;
+   UBRR_10_Mask             : constant Unsigned_8 := 16#04#;
    --  USART Baud Rate Register bit 11
-   UBRR11_Bit               : constant Bit_Number := 3;
-   UBRR11_Mask              : constant Unsigned_8 := 16#08#;
+   UBRR_11_Bit              : constant Bit_Number := 3;
+   UBRR_11_Mask             : constant Unsigned_8 := 16#08#;
 
    --  USART Baud Rate Register Low Byte
    UBRR0L_Addr              : constant Address    := 16#c4#;
@@ -636,29 +636,29 @@ package AVR.ATmega169 is
    for UBRR0L_Bits'Address use UBRR0L_Addr;
    pragma Volatile (UBRR0L_Bits);
    --  USART Baud Rate Register bit 0
---    UBRR0_Bit                : constant Bit_Number := 0;
---    UBRR0_Mask               : constant Unsigned_8 := 16#01#;
+   UBRR_0_Bit               : constant Bit_Number := 0;
+   UBRR_0_Mask              : constant Unsigned_8 := 16#01#;
    --  USART Baud Rate Register bit 1
-   UBRR1_Bit                : constant Bit_Number := 1;
-   UBRR1_Mask               : constant Unsigned_8 := 16#02#;
+   UBRR_1_Bit               : constant Bit_Number := 1;
+   UBRR_1_Mask              : constant Unsigned_8 := 16#02#;
    --  USART Baud Rate Register bit 2
-   UBRR2_Bit                : constant Bit_Number := 2;
-   UBRR2_Mask               : constant Unsigned_8 := 16#04#;
+   UBRR_2_Bit               : constant Bit_Number := 2;
+   UBRR_2_Mask              : constant Unsigned_8 := 16#04#;
    --  USART Baud Rate Register bit 3
-   UBRR3_Bit                : constant Bit_Number := 3;
-   UBRR3_Mask               : constant Unsigned_8 := 16#08#;
+   UBRR_3_Bit               : constant Bit_Number := 3;
+   UBRR_3_Mask              : constant Unsigned_8 := 16#08#;
    --  USART Baud Rate Register bit 4
-   UBRR4_Bit                : constant Bit_Number := 4;
-   UBRR4_Mask               : constant Unsigned_8 := 16#10#;
+   UBRR_4_Bit               : constant Bit_Number := 4;
+   UBRR_4_Mask              : constant Unsigned_8 := 16#10#;
    --  USART Baud Rate Register bit 5
-   UBRR5_Bit                : constant Bit_Number := 5;
-   UBRR5_Mask               : constant Unsigned_8 := 16#20#;
+   UBRR_5_Bit               : constant Bit_Number := 5;
+   UBRR_5_Mask              : constant Unsigned_8 := 16#20#;
    --  USART Baud Rate Register bit 6
-   UBRR6_Bit                : constant Bit_Number := 6;
-   UBRR6_Mask               : constant Unsigned_8 := 16#40#;
+   UBRR_6_Bit               : constant Bit_Number := 6;
+   UBRR_6_Mask              : constant Unsigned_8 := 16#40#;
    --  USART Baud Rate Register bit 7
-   UBRR7_Bit                : constant Bit_Number := 7;
-   UBRR7_Mask               : constant Unsigned_8 := 16#80#;
+   UBRR_7_Bit               : constant Bit_Number := 7;
+   UBRR_7_Mask              : constant Unsigned_8 := 16#80#;
 
    --  USART Control and Status Register C
    UCSR0C_Addr              : constant Address    := 16#c2#;
@@ -1055,7 +1055,7 @@ package AVR.ATmega169 is
    OCR1BL7_Bit              : constant Bit_Number := 7;
    OCR1BL7_Mask             : constant Unsigned_8 := 16#80#;
 
-   --  Timer/Counter1 Outbut Compare Register A High Byte
+   --  Timer/Counter1 Output Compare Register A High Byte
    OCR1AH_Addr              : constant Address    := 16#89#;
    OCR1AH                   : Unsigned_8 ;
    for OCR1AH'Address use OCR1AH_Addr;
@@ -1063,32 +1063,32 @@ package AVR.ATmega169 is
    OCR1AH_Bits              : Bits_In_Byte;
    for OCR1AH_Bits'Address use OCR1AH_Addr;
    pragma Volatile (OCR1AH_Bits);
-   --  Timer/Counter1 Outbut Compare Register High Byte bit 0
+   --  Timer/Counter1 Output Compare Register High Byte bit 0
    OCR1AH0_Bit              : constant Bit_Number := 0;
    OCR1AH0_Mask             : constant Unsigned_8 := 16#01#;
-   --  Timer/Counter1 Outbut Compare Register High Byte bit 1
+   --  Timer/Counter1 Output Compare Register High Byte bit 1
    OCR1AH1_Bit              : constant Bit_Number := 1;
    OCR1AH1_Mask             : constant Unsigned_8 := 16#02#;
-   --  Timer/Counter1 Outbut Compare Register High Byte bit 2
+   --  Timer/Counter1 Output Compare Register High Byte bit 2
    OCR1AH2_Bit              : constant Bit_Number := 2;
    OCR1AH2_Mask             : constant Unsigned_8 := 16#04#;
-   --  Timer/Counter1 Outbut Compare Register High Byte bit 3
+   --  Timer/Counter1 Output Compare Register High Byte bit 3
    OCR1AH3_Bit              : constant Bit_Number := 3;
    OCR1AH3_Mask             : constant Unsigned_8 := 16#08#;
-   --  Timer/Counter1 Outbut Compare Register High Byte bit 4
+   --  Timer/Counter1 Output Compare Register High Byte bit 4
    OCR1AH4_Bit              : constant Bit_Number := 4;
    OCR1AH4_Mask             : constant Unsigned_8 := 16#10#;
-   --  Timer/Counter1 Outbut Compare Register High Byte bit 5
+   --  Timer/Counter1 Output Compare Register High Byte bit 5
    OCR1AH5_Bit              : constant Bit_Number := 5;
    OCR1AH5_Mask             : constant Unsigned_8 := 16#20#;
-   --  Timer/Counter1 Outbut Compare Register High Byte bit 6
+   --  Timer/Counter1 Output Compare Register High Byte bit 6
    OCR1AH6_Bit              : constant Bit_Number := 6;
    OCR1AH6_Mask             : constant Unsigned_8 := 16#40#;
-   --  Timer/Counter1 Outbut Compare Register High Byte bit 7
+   --  Timer/Counter1 Output Compare Register High Byte bit 7
    OCR1AH7_Bit              : constant Bit_Number := 7;
    OCR1AH7_Mask             : constant Unsigned_8 := 16#80#;
 
-   --  Timer/Counter1 Outbut Compare Register A Low Byte
+   --  Timer/Counter1 Output Compare Register A Low Byte
    OCR1AL_Addr              : constant Address    := 16#88#;
    OCR1A                    : Unsigned_16;
    for OCR1A'Address use OCR1AL_Addr;
@@ -1099,28 +1099,28 @@ package AVR.ATmega169 is
    OCR1AL_Bits              : Bits_In_Byte;
    for OCR1AL_Bits'Address use OCR1AL_Addr;
    pragma Volatile (OCR1AL_Bits);
-   --  Timer/Counter1 Outbut Compare Register Low Byte Bit 0
+   --  Timer/Counter1 Output Compare Register Low Byte Bit 0
    OCR1AL0_Bit              : constant Bit_Number := 0;
    OCR1AL0_Mask             : constant Unsigned_8 := 16#01#;
-   --  Timer/Counter1 Outbut Compare Register Low Byte Bit 1
+   --  Timer/Counter1 Output Compare Register Low Byte Bit 1
    OCR1AL1_Bit              : constant Bit_Number := 1;
    OCR1AL1_Mask             : constant Unsigned_8 := 16#02#;
-   --  Timer/Counter1 Outbut Compare Register Low Byte Bit 2
+   --  Timer/Counter1 Output Compare Register Low Byte Bit 2
    OCR1AL2_Bit              : constant Bit_Number := 2;
    OCR1AL2_Mask             : constant Unsigned_8 := 16#04#;
-   --  Timer/Counter1 Outbut Compare Register Low Byte Bit 3
+   --  Timer/Counter1 Output Compare Register Low Byte Bit 3
    OCR1AL3_Bit              : constant Bit_Number := 3;
    OCR1AL3_Mask             : constant Unsigned_8 := 16#08#;
-   --  Timer/Counter1 Outbut Compare Register Low Byte Bit 4
+   --  Timer/Counter1 Output Compare Register Low Byte Bit 4
    OCR1AL4_Bit              : constant Bit_Number := 4;
    OCR1AL4_Mask             : constant Unsigned_8 := 16#10#;
-   --  Timer/Counter1 Outbut Compare Register Low Byte Bit 5
+   --  Timer/Counter1 Output Compare Register Low Byte Bit 5
    OCR1AL5_Bit              : constant Bit_Number := 5;
    OCR1AL5_Mask             : constant Unsigned_8 := 16#20#;
-   --  Timer/Counter1 Outbut Compare Register Low Byte Bit 6
+   --  Timer/Counter1 Output Compare Register Low Byte Bit 6
    OCR1AL6_Bit              : constant Bit_Number := 6;
    OCR1AL6_Mask             : constant Unsigned_8 := 16#40#;
-   --  Timer/Counter1 Outbut Compare Register Low Byte Bit 7
+   --  Timer/Counter1 Output Compare Register Low Byte Bit 7
    OCR1AL7_Bit              : constant Bit_Number := 7;
    OCR1AL7_Mask             : constant Unsigned_8 := 16#80#;
 

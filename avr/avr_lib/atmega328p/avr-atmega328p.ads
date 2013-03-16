@@ -525,29 +525,29 @@ package AVR.ATmega328P is
    for OCR2B_Bits'Address use OCR2B_Addr;
    pragma Volatile (OCR2B_Bits);
    --  Timer/Counter2 Output Compare Register Bit 0
-   OCR2_0_Bit               : constant Bit_Number := 0;
-   OCR2_0_Mask              : constant Unsigned_8 := 16#01#;
+   OCR2B_0_Bit              : constant Bit_Number := 0;
+   OCR2B_0_Mask             : constant Unsigned_8 := 16#01#;
    --  Timer/Counter2 Output Compare Register Bit 1
-   OCR2_1_Bit               : constant Bit_Number := 1;
-   OCR2_1_Mask              : constant Unsigned_8 := 16#02#;
+   OCR2B_1_Bit              : constant Bit_Number := 1;
+   OCR2B_1_Mask             : constant Unsigned_8 := 16#02#;
    --  Timer/Counter2 Output Compare Register Bit 2
-   OCR2_2_Bit               : constant Bit_Number := 2;
-   OCR2_2_Mask              : constant Unsigned_8 := 16#04#;
+   OCR2B_2_Bit              : constant Bit_Number := 2;
+   OCR2B_2_Mask             : constant Unsigned_8 := 16#04#;
    --  Timer/Counter2 Output Compare Register Bit 3
-   OCR2_3_Bit               : constant Bit_Number := 3;
-   OCR2_3_Mask              : constant Unsigned_8 := 16#08#;
+   OCR2B_3_Bit              : constant Bit_Number := 3;
+   OCR2B_3_Mask             : constant Unsigned_8 := 16#08#;
    --  Timer/Counter2 Output Compare Register Bit 4
-   OCR2_4_Bit               : constant Bit_Number := 4;
-   OCR2_4_Mask              : constant Unsigned_8 := 16#10#;
+   OCR2B_4_Bit              : constant Bit_Number := 4;
+   OCR2B_4_Mask             : constant Unsigned_8 := 16#10#;
    --  Timer/Counter2 Output Compare Register Bit 5
-   OCR2_5_Bit               : constant Bit_Number := 5;
-   OCR2_5_Mask              : constant Unsigned_8 := 16#20#;
+   OCR2B_5_Bit              : constant Bit_Number := 5;
+   OCR2B_5_Mask             : constant Unsigned_8 := 16#20#;
    --  Timer/Counter2 Output Compare Register Bit 6
-   OCR2_6_Bit               : constant Bit_Number := 6;
-   OCR2_6_Mask              : constant Unsigned_8 := 16#40#;
+   OCR2B_6_Bit              : constant Bit_Number := 6;
+   OCR2B_6_Mask             : constant Unsigned_8 := 16#40#;
    --  Timer/Counter2 Output Compare Register Bit 7
-   OCR2_7_Bit               : constant Bit_Number := 7;
-   OCR2_7_Mask              : constant Unsigned_8 := 16#80#;
+   OCR2B_7_Bit              : constant Bit_Number := 7;
+   OCR2B_7_Mask             : constant Unsigned_8 := 16#80#;
 
    --  Timer/Counter2 Output Compare Register A
    OCR2A_Addr               : constant Address    := 16#b3#;
@@ -557,6 +557,30 @@ package AVR.ATmega328P is
    OCR2A_Bits               : Bits_In_Byte;
    for OCR2A_Bits'Address use OCR2A_Addr;
    pragma Volatile (OCR2A_Bits);
+   --  Timer/Counter2 Output Compare Register Bit 0
+   OCR2A_0_Bit              : constant Bit_Number := 0;
+   OCR2A_0_Mask             : constant Unsigned_8 := 16#01#;
+   --  Timer/Counter2 Output Compare Register Bit 1
+   OCR2A_1_Bit              : constant Bit_Number := 1;
+   OCR2A_1_Mask             : constant Unsigned_8 := 16#02#;
+   --  Timer/Counter2 Output Compare Register Bit 2
+   OCR2A_2_Bit              : constant Bit_Number := 2;
+   OCR2A_2_Mask             : constant Unsigned_8 := 16#04#;
+   --  Timer/Counter2 Output Compare Register Bit 3
+   OCR2A_3_Bit              : constant Bit_Number := 3;
+   OCR2A_3_Mask             : constant Unsigned_8 := 16#08#;
+   --  Timer/Counter2 Output Compare Register Bit 4
+   OCR2A_4_Bit              : constant Bit_Number := 4;
+   OCR2A_4_Mask             : constant Unsigned_8 := 16#10#;
+   --  Timer/Counter2 Output Compare Register Bit 5
+   OCR2A_5_Bit              : constant Bit_Number := 5;
+   OCR2A_5_Mask             : constant Unsigned_8 := 16#20#;
+   --  Timer/Counter2 Output Compare Register Bit 6
+   OCR2A_6_Bit              : constant Bit_Number := 6;
+   OCR2A_6_Mask             : constant Unsigned_8 := 16#40#;
+   --  Timer/Counter2 Output Compare Register Bit 7
+   OCR2A_7_Bit              : constant Bit_Number := 7;
+   OCR2A_7_Mask             : constant Unsigned_8 := 16#80#;
 
    --  Timer/Counter2
    TCNT2_Addr               : constant Address    := 16#b2#;
@@ -1874,22 +1898,22 @@ package AVR.ATmega328P is
    OCR0A_Bits               : Bits_In_Byte;
    for OCR0A_Bits'Address use OCR0A_Addr;
    pragma Volatile (OCR0A_Bits);
-   OCROA_0_Bit              : constant Bit_Number := 0;
-   OCROA_0_Mask             : constant Unsigned_8 := 16#01#;
-   OCROA_1_Bit              : constant Bit_Number := 1;
-   OCROA_1_Mask             : constant Unsigned_8 := 16#02#;
-   OCROA_2_Bit              : constant Bit_Number := 2;
-   OCROA_2_Mask             : constant Unsigned_8 := 16#04#;
-   OCROA_3_Bit              : constant Bit_Number := 3;
-   OCROA_3_Mask             : constant Unsigned_8 := 16#08#;
-   OCROA_4_Bit              : constant Bit_Number := 4;
-   OCROA_4_Mask             : constant Unsigned_8 := 16#10#;
-   OCROA_5_Bit              : constant Bit_Number := 5;
-   OCROA_5_Mask             : constant Unsigned_8 := 16#20#;
-   OCROA_6_Bit              : constant Bit_Number := 6;
-   OCROA_6_Mask             : constant Unsigned_8 := 16#40#;
-   OCROA_7_Bit              : constant Bit_Number := 7;
-   OCROA_7_Mask             : constant Unsigned_8 := 16#80#;
+   OCR0A_0_Bit              : constant Bit_Number := 0;
+   OCR0A_0_Mask             : constant Unsigned_8 := 16#01#;
+   OCR0A_1_Bit              : constant Bit_Number := 1;
+   OCR0A_1_Mask             : constant Unsigned_8 := 16#02#;
+   OCR0A_2_Bit              : constant Bit_Number := 2;
+   OCR0A_2_Mask             : constant Unsigned_8 := 16#04#;
+   OCR0A_3_Bit              : constant Bit_Number := 3;
+   OCR0A_3_Mask             : constant Unsigned_8 := 16#08#;
+   OCR0A_4_Bit              : constant Bit_Number := 4;
+   OCR0A_4_Mask             : constant Unsigned_8 := 16#10#;
+   OCR0A_5_Bit              : constant Bit_Number := 5;
+   OCR0A_5_Mask             : constant Unsigned_8 := 16#20#;
+   OCR0A_6_Bit              : constant Bit_Number := 6;
+   OCR0A_6_Mask             : constant Unsigned_8 := 16#40#;
+   OCR0A_7_Bit              : constant Bit_Number := 7;
+   OCR0A_7_Mask             : constant Unsigned_8 := 16#80#;
 
    --  Timer/Counter0
    TCNT0_Addr               : constant Address    := 16#46#;

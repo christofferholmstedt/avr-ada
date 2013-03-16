@@ -72,16 +72,16 @@ package AVR.ATtiny2313 is
    --  Analog Comparator
    Sig_ANA_COMP             : constant        := 10;
    Sig_ANA_COMP_String      : constant String := "__vector_10";
-   --  
+   --
    Sig_PCINT                : constant        := 11;
    Sig_PCINT_String         : constant String := "__vector_11";
-   --  
+   --
    Sig_TIMER1_COMPB         : constant        := 12;
    Sig_TIMER1_COMPB_String  : constant String := "__vector_12";
-   --  
+   --
    Sig_TIMER0_COMPA         : constant        := 13;
    Sig_TIMER0_COMPA_String  : constant String := "__vector_13";
-   --  
+   --
    Sig_TIMER0_COMPB         : constant        := 14;
    Sig_TIMER0_COMPB_String  : constant String := "__vector_14";
    --  USI Start Condition
@@ -90,7 +90,7 @@ package AVR.ATtiny2313 is
    --  USI Overflow
    Sig_USI_OVERFLOW         : constant        := 16;
    Sig_USI_OVERFLOW_String  : constant String := "__vector_16";
-   --  
+   --
    Sig_EEPROM_Ready         : constant        := 17;
    Sig_EEPROM_Ready_String  : constant String := "__vector_17";
    --  Watchdog Timer Overflow
@@ -319,6 +319,22 @@ package AVR.ATtiny2313 is
    OCR0A_Bits               : Bits_In_Byte;
    for OCR0A_Bits'Address use OCR0A_Addr;
    pragma Volatile (OCR0A_Bits);
+   OCR0A_0_Bit              : constant Bit_Number := 0;
+   OCR0A_0_Mask             : constant Unsigned_8 := 16#01#;
+   OCR0A_1_Bit              : constant Bit_Number := 1;
+   OCR0A_1_Mask             : constant Unsigned_8 := 16#02#;
+   OCR0A_2_Bit              : constant Bit_Number := 2;
+   OCR0A_2_Mask             : constant Unsigned_8 := 16#04#;
+   OCR0A_3_Bit              : constant Bit_Number := 3;
+   OCR0A_3_Mask             : constant Unsigned_8 := 16#08#;
+   OCR0A_4_Bit              : constant Bit_Number := 4;
+   OCR0A_4_Mask             : constant Unsigned_8 := 16#10#;
+   OCR0A_5_Bit              : constant Bit_Number := 5;
+   OCR0A_5_Mask             : constant Unsigned_8 := 16#20#;
+   OCR0A_6_Bit              : constant Bit_Number := 6;
+   OCR0A_6_Mask             : constant Unsigned_8 := 16#40#;
+   OCR0A_7_Bit              : constant Bit_Number := 7;
+   OCR0A_7_Mask             : constant Unsigned_8 := 16#80#;
 
    --  MCU Control Register
    MCUCR_Addr               : constant Address    := 16#55#;
@@ -608,7 +624,7 @@ package AVR.ATtiny2313 is
    TCNT1L7_Bit              : constant Bit_Number := 7;
    TCNT1L7_Mask             : constant Unsigned_8 := 16#80#;
 
-   --  Timer/Counter1 Outbut Compare Register High Byte
+   --  Timer/Counter1 Output Compare Register High Byte
    OCR1AH_Addr              : constant Address    := 16#4b#;
    OCR1AH                   : Unsigned_8 ;
    for OCR1AH'Address use OCR1AH_Addr;
@@ -616,32 +632,32 @@ package AVR.ATtiny2313 is
    OCR1AH_Bits              : Bits_In_Byte;
    for OCR1AH_Bits'Address use OCR1AH_Addr;
    pragma Volatile (OCR1AH_Bits);
-   --  Timer/Counter1 Outbut Compare Register High Byte bit 0
+   --  Timer/Counter1 Output Compare Register High Byte bit 0
    OCR1AH0_Bit              : constant Bit_Number := 0;
    OCR1AH0_Mask             : constant Unsigned_8 := 16#01#;
-   --  Timer/Counter1 Outbut Compare Register High Byte bit 1
+   --  Timer/Counter1 Output Compare Register High Byte bit 1
    OCR1AH1_Bit              : constant Bit_Number := 1;
    OCR1AH1_Mask             : constant Unsigned_8 := 16#02#;
-   --  Timer/Counter1 Outbut Compare Register High Byte bit 2
+   --  Timer/Counter1 Output Compare Register High Byte bit 2
    OCR1AH2_Bit              : constant Bit_Number := 2;
    OCR1AH2_Mask             : constant Unsigned_8 := 16#04#;
-   --  Timer/Counter1 Outbut Compare Register High Byte bit 3
+   --  Timer/Counter1 Output Compare Register High Byte bit 3
    OCR1AH3_Bit              : constant Bit_Number := 3;
    OCR1AH3_Mask             : constant Unsigned_8 := 16#08#;
-   --  Timer/Counter1 Outbut Compare Register High Byte bit 4
+   --  Timer/Counter1 Output Compare Register High Byte bit 4
    OCR1AH4_Bit              : constant Bit_Number := 4;
    OCR1AH4_Mask             : constant Unsigned_8 := 16#10#;
-   --  Timer/Counter1 Outbut Compare Register High Byte bit 5
+   --  Timer/Counter1 Output Compare Register High Byte bit 5
    OCR1AH5_Bit              : constant Bit_Number := 5;
    OCR1AH5_Mask             : constant Unsigned_8 := 16#20#;
-   --  Timer/Counter1 Outbut Compare Register High Byte bit 6
+   --  Timer/Counter1 Output Compare Register High Byte bit 6
    OCR1AH6_Bit              : constant Bit_Number := 6;
    OCR1AH6_Mask             : constant Unsigned_8 := 16#40#;
-   --  Timer/Counter1 Outbut Compare Register High Byte bit 7
+   --  Timer/Counter1 Output Compare Register High Byte bit 7
    OCR1AH7_Bit              : constant Bit_Number := 7;
    OCR1AH7_Mask             : constant Unsigned_8 := 16#80#;
 
-   --  Timer/Counter1 Outbut Compare Register Low Byte
+   --  Timer/Counter1 Output Compare Register Low Byte
    OCR1AL_Addr              : constant Address    := 16#4a#;
    OCR1A                    : Unsigned_16;
    for OCR1A'Address use OCR1AL_Addr;
@@ -652,32 +668,32 @@ package AVR.ATtiny2313 is
    OCR1AL_Bits              : Bits_In_Byte;
    for OCR1AL_Bits'Address use OCR1AL_Addr;
    pragma Volatile (OCR1AL_Bits);
-   --  Timer/Counter1 Outbut Compare Register Low Byte Bit 0
+   --  Timer/Counter1 Output Compare Register Low Byte Bit 0
    OCR1AL0_Bit              : constant Bit_Number := 0;
    OCR1AL0_Mask             : constant Unsigned_8 := 16#01#;
-   --  Timer/Counter1 Outbut Compare Register Low Byte Bit 1
+   --  Timer/Counter1 Output Compare Register Low Byte Bit 1
    OCR1AL1_Bit              : constant Bit_Number := 1;
    OCR1AL1_Mask             : constant Unsigned_8 := 16#02#;
-   --  Timer/Counter1 Outbut Compare Register Low Byte Bit 2
+   --  Timer/Counter1 Output Compare Register Low Byte Bit 2
    OCR1AL2_Bit              : constant Bit_Number := 2;
    OCR1AL2_Mask             : constant Unsigned_8 := 16#04#;
-   --  Timer/Counter1 Outbut Compare Register Low Byte Bit 3
+   --  Timer/Counter1 Output Compare Register Low Byte Bit 3
    OCR1AL3_Bit              : constant Bit_Number := 3;
    OCR1AL3_Mask             : constant Unsigned_8 := 16#08#;
-   --  Timer/Counter1 Outbut Compare Register Low Byte Bit 4
+   --  Timer/Counter1 Output Compare Register Low Byte Bit 4
    OCR1AL4_Bit              : constant Bit_Number := 4;
    OCR1AL4_Mask             : constant Unsigned_8 := 16#10#;
-   --  Timer/Counter1 Outbut Compare Register Low Byte Bit 5
+   --  Timer/Counter1 Output Compare Register Low Byte Bit 5
    OCR1AL5_Bit              : constant Bit_Number := 5;
    OCR1AL5_Mask             : constant Unsigned_8 := 16#20#;
-   --  Timer/Counter1 Outbut Compare Register Low Byte Bit 6
+   --  Timer/Counter1 Output Compare Register Low Byte Bit 6
    OCR1AL6_Bit              : constant Bit_Number := 6;
    OCR1AL6_Mask             : constant Unsigned_8 := 16#40#;
-   --  Timer/Counter1 Outbut Compare Register Low Byte Bit 7
+   --  Timer/Counter1 Output Compare Register Low Byte Bit 7
    OCR1AL7_Bit              : constant Bit_Number := 7;
    OCR1AL7_Mask             : constant Unsigned_8 := 16#80#;
 
-   --  Timer/Counter1 Outbut Compare Register High Byte
+   --  Timer/Counter1 Output Compare Register High Byte
    OCR1BH_Addr              : constant Address    := 16#49#;
    OCR1BH                   : Unsigned_8 ;
    for OCR1BH'Address use OCR1BH_Addr;
@@ -685,6 +701,30 @@ package AVR.ATtiny2313 is
    OCR1BH_Bits              : Bits_In_Byte;
    for OCR1BH_Bits'Address use OCR1BH_Addr;
    pragma Volatile (OCR1BH_Bits);
+   --  Timer/Counter1 Output Compare Register High Byte bit 0
+   OCR1BH0_Bit              : constant Bit_Number := 0;
+   OCR1BH0_Mask             : constant Unsigned_8 := 16#01#;
+   --  Timer/Counter1 Output Compare Register High Byte bit 1
+   OCR1BH1_Bit              : constant Bit_Number := 1;
+   OCR1BH1_Mask             : constant Unsigned_8 := 16#02#;
+   --  Timer/Counter1 Output Compare Register High Byte bit 2
+   OCR1BH2_Bit              : constant Bit_Number := 2;
+   OCR1BH2_Mask             : constant Unsigned_8 := 16#04#;
+   --  Timer/Counter1 Output Compare Register High Byte bit 3
+   OCR1BH3_Bit              : constant Bit_Number := 3;
+   OCR1BH3_Mask             : constant Unsigned_8 := 16#08#;
+   --  Timer/Counter1 Output Compare Register High Byte bit 4
+   OCR1BH4_Bit              : constant Bit_Number := 4;
+   OCR1BH4_Mask             : constant Unsigned_8 := 16#10#;
+   --  Timer/Counter1 Output Compare Register High Byte bit 5
+   OCR1BH5_Bit              : constant Bit_Number := 5;
+   OCR1BH5_Mask             : constant Unsigned_8 := 16#20#;
+   --  Timer/Counter1 Output Compare Register High Byte bit 6
+   OCR1BH6_Bit              : constant Bit_Number := 6;
+   OCR1BH6_Mask             : constant Unsigned_8 := 16#40#;
+   --  Timer/Counter1 Output Compare Register High Byte bit 7
+   OCR1BH7_Bit              : constant Bit_Number := 7;
+   OCR1BH7_Mask             : constant Unsigned_8 := 16#80#;
 
    --  Timer/Counter1 Output Compare Register Low Byte
    OCR1BL_Addr              : constant Address    := 16#48#;
@@ -697,6 +737,30 @@ package AVR.ATtiny2313 is
    OCR1BL_Bits              : Bits_In_Byte;
    for OCR1BL_Bits'Address use OCR1BL_Addr;
    pragma Volatile (OCR1BL_Bits);
+   --  Timer/Counter1 Output Compare Register Low Byte Bit 0
+   OCR1BL0_Bit              : constant Bit_Number := 0;
+   OCR1BL0_Mask             : constant Unsigned_8 := 16#01#;
+   --  Timer/Counter1 Output Compare Register Low Byte Bit 1
+   OCR1BL1_Bit              : constant Bit_Number := 1;
+   OCR1BL1_Mask             : constant Unsigned_8 := 16#02#;
+   --  Timer/Counter1 Output Compare Register Low Byte Bit 2
+   OCR1BL2_Bit              : constant Bit_Number := 2;
+   OCR1BL2_Mask             : constant Unsigned_8 := 16#04#;
+   --  Timer/Counter1 Output Compare Register Low Byte Bit 3
+   OCR1BL3_Bit              : constant Bit_Number := 3;
+   OCR1BL3_Mask             : constant Unsigned_8 := 16#08#;
+   --  Timer/Counter1 Output Compare Register Low Byte Bit 4
+   OCR1BL4_Bit              : constant Bit_Number := 4;
+   OCR1BL4_Mask             : constant Unsigned_8 := 16#10#;
+   --  Timer/Counter1 Output Compare Register Low Byte Bit 5
+   OCR1BL5_Bit              : constant Bit_Number := 5;
+   OCR1BL5_Mask             : constant Unsigned_8 := 16#20#;
+   --  Timer/Counter1 Output Compare Register Low Byte Bit 6
+   OCR1BL6_Bit              : constant Bit_Number := 6;
+   OCR1BL6_Mask             : constant Unsigned_8 := 16#40#;
+   --  Timer/Counter1 Output Compare Register Low Byte Bit 7
+   OCR1BL7_Bit              : constant Bit_Number := 7;
+   OCR1BL7_Mask             : constant Unsigned_8 := 16#80#;
 
    --  Clock Prescale Register
    CLKPR_Addr               : constant Address    := 16#46#;
