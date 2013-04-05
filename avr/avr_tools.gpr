@@ -14,15 +14,15 @@ abstract project AVR_Tools is
 
    MCU  : MCU.MCU_Type     := MCU.MCU;
    Arch : MCU.Architecture := MCU.Arch;
-
-
+   RTS  := external ("RTS", "rts");
+     
    for Languages use ("Ada", "C");
 
 
    package Builder is
       for Global_Configuration_Pragmas use "gnat.adc";
       for Executable_Suffix use ".elf";
-      for Default_Switches ("Ada") use ("--RTS=rts/" & Arch);
+      for Default_Switches ("Ada") use ("--RTS=" & RTS & "/" & Arch);
    end Builder;
 
 

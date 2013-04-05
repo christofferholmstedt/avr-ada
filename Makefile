@@ -10,101 +10,181 @@
 
 # This is the top level Makefile of AVR-Ada
 #
-# useful make targets:
+# all (default)   : Build RTS
+# clean           : Clean RTS and Library
+# install         : Build and Install RTS and Library
+# uninstall       : Uninstall RTS and Library
 #
 #
 #             Run Time System
 #
-# build_rts   : rebuild the standard Ada runtime system for all supported
-#               AVR parts
-# clean_rts   : remove a potentially existing runtime installation in the
-#               compiler's default adainclude and adalib directories.
-# install_rts : copy the just built Ada runtime system into the
-#               compiler's default adainclude and adalib directories.
+# build_rts       : Build the standard Ada runtime system for all supported
+#                   AVR parts
+# clean_rts       : Clean RTS (remove a potentially existing runtime 
+#                   installation in the compiler's default adainclude and 
+#                   adalib directories)
+# install_rts     : Build and install RTS
+# uninstall_rts   : Uninstall RTS
 #
 #
-#             Support Library
+#             Library
 #
-# build_libs  : build all the support libraries
-# install_libs: copy the support libraries to $(PREFIX)/avr/ada
+# build_libs      : Build Library (all support libraries)
+# clean_libs      : Clean Library
+# install_libs    : Build and install RTS and Library
+# uninstall_libs  : Uninstall Library
 #
 #
-#             Documentation
+#             Sample Applications
 #
-# install_doc : copy the documentation to $(PREFIX)/doc/AVR-Ada/web and the
-#               examples to $(PREFIX)/doc/AVR-Ada/examples.
-#
+# build_apps      : Build Sample Applications
+# clean_apps      : Clean Sample Applications
+# install_apps    : Copy the Sample Applications to $(PREFIX)/share/doc/avr-ada/apps
+# uninstall_apps  : Uninstall Sample Applications
+
+
 ###############################################################
-
-
--include config
-
-# excluded devices should be in sync with avr/avr_lib/Makefile:excluded_parts
-include excldevs.mk
-
-MCU_LIST := $(filter-out $(excluded_parts), $(shell (cd avr/avr_lib; ls -d at*)))
-# MCU_LIST := atmega169
-ARCH_LIST := avr2 avr25 avr3 avr31 avr35 avr4 avr5 avr51 avr6
-
-DOC_DIR := $(PREFIX)/share/doc/avr-ada
-DOC_DIR_APPS := $(DOC_DIR)/apps
-DOC_DIR_DOCS := $(DOC_DIR)/.
-DOC_DIRS := $(DOC_DIR) $(DOC_DIR_APPS) $(DOC_DIR_DOCS)
-
-RTS_SOURCE   := gcc-$(major).$(minor)-rts
-
-# default rule: build rts and avrlib;
+#
+#  Top
+#
 all: build_rts build_libs
+clean: clean_rts clean_libs
+distclean: clean clean_config
+install: install_rts install_libs install_apps
+uninstall: uninstall_rts uninstall_libs uninstall_cgpr uninstall_apps
+
+.PHONY: all clean distclean install uninstall
 
 
 ###############################################################
 #
-#  build and install the run time system (RTS)
+#  Config
 #
-build_rts install_rts clean_rts:
-	$(MAKE) -C $(RTS_SOURCE) $@
+config:
+	./configure
+
+include config
+
+###############################################################
+#
+#  Settings
+#
+RTS_DIR = gcc-$(major).$(minor)-rts
+INSTALL_APPS_DIR = $(PREFIX)/share/doc/avr-ada
+INSTALL_CGPR_DIR = $(PREFIX)/share/gpr
+
+# Modes for installed items
+INSTALL_FILE_MODE = u=rw,go=r
+INSTALL_DIR_MODE = u=rwx,go=rx
 
 
 ###############################################################
 #
-#  make the AVR library
+#  Tools
 #
-build_libs: build_rts
-	$(MAKE) -C avr all
+CP        = cp
+RM        = rm -f
+MKDIR     = mkdir
+TAR       = tar
+CHMOD     = chmod
+FIND      = find
+GPRCONFIG = gprconfig
 
 
 ###############################################################
 #
-#  install the AVR library
+#  Build
 #
-install_libs:
-	$(MAKE) -C avr install
+build_rts:
+	$(MAKE) -C $(RTS_DIR) $@
 
+build_libs:
+	$(MAKE) -C avr $@
 
-###############################################################
-#
-#  install RTS and avrlib in the final gcc tree
-#
-install: install_rts install_libs install_doc
-
-
-###############################################################
-#
-#  install docs and example programs
-#
-install_doc: $(DOC_DIRS)
-	cp -a apps $(DOC_DIR)
-
-$(DOC_DIRS):
-	mkdir -p $@
-
-
-###############################################################
-#
-#  make the sample projects
-#
-samples:
+build_apps:
 	$(MAKE) -C apps all
+
+.PHONY: build_rts build_libs build_apps
+
+
+###############################################################
+#
+#  Clean
+#
+clean_rts:
+	-$(MAKE) -C $(RTS_DIR) $@
+
+clean_libs:
+	-$(MAKE) -C avr $@
+
+clean_apps:
+	-$(MAKE) -C apps clean
+
+clean_config:
+	-$(RM) config
+
+.PHONY: clean_rts clean_libs clean_apps
+
+
+###############################################################
+#
+#  Install
+#
+install_rts_part:
+	$(MAKE) -C $(RTS_DIR) install_rts
+
+install_rts: build_rts install_rts_part install_cgpr
+
+install_libs: build_libs
+	$(MAKE) -C avr $@
+
+$(INSTALL_APPS_DIR) $(INSTALL_CGPR_DIR):
+	$(MKDIR) -p $@
+	$(CHMOD) $(INSTALL_DIR_MODE) $@
+
+install_apps: $(INSTALL_APPS_DIR)
+	$(TAR) cf - apps | (cd $(INSTALL_APPS_DIR); tar xvf -)
+	$(FIND) $(INSTALL_APPS_DIR) -type f -exec $(CHMOD) $(INSTALL_FILE_MODE) '{}' \;
+	$(FIND) $(INSTALL_APPS_DIR) -type d -exec $(CHMOD) $(INSTALL_DIR_MODE) '{}' \;
+
+
+# If RTS isn't installed then this will fail to find Ada compiler yet it
+# will leave the avr.cgpr file without an Ada compiler; don't copy a bad file
+$(INSTALL_CGPR_DIR)/avr.cgpr : V := $(strip $(major).$(minor).$(patch))
+$(INSTALL_CGPR_DIR)/avr.cgpr : V_Ada := $(strip $(major).$(minor))
+$(INSTALL_CGPR_DIR)/avr.cgpr: $(INSTALL_CGPR_DIR)
+	$(GPRCONFIG) --batch --target=avr \
+	  --config=Asm,$(V) \
+	  --config=Asm2,$(V) \
+	  --config=Asm_Cpp,$(V) \
+	  --config=C,$(V) \
+	  --config=Ada,$(V_Ada) -o tmp-avr.cgpr
+	$(CP) tmp-avr.cgpr $(INSTALL_CGPR_DIR)/avr.cgpr
+	$(RM) tmp-avr.cgpr
+	$(CHMOD) $(INSTALL_FILE_MODE) $(INSTALL_CGPR_DIR)/avr.cgpr
+
+install_cgpr: $(INSTALL_CGPR_DIR)/avr.cgpr
+
+.PHONY: install_rts install_libs install_apps install_cgpr
+
+
+###############################################################
+#
+#  Uninstall
+#
+uninstall_rts:
+	$(MAKE) -C $(RTS_DIR) $@
+
+uninstall_libs:
+	$(MAKE) -C avr $@
+
+uninstall_apps:
+	$(RM) -r $(INSTALL_APPS_DIR)
+
+uninstall_cgpr:
+	$(RM) $(INSTALL_CGPR_DIR)/avr.cgpr
+
+.PHONY: uninstall_rts uninstall_libs uninstall_apps uninstall_cgpr
 
 
 ###############################################################
@@ -113,60 +193,14 @@ samples:
 #
 DIST_PREP_DIR := /c/temp/avr-ada-dist
 dist_prep:
-	mkdir -p $(DIST_PREP_DIR)
-	mkdir -p $(DIST_PREP_DIR)/Examples
-	mkdir -p $(DIST_PREP_DIR)/doc
-	cp COPYING.txt          $(DIST_PREP_DIR)
-	cp -a apps/examples     $(DIST_PREP_DIR)/Examples
-	cp -a apps/largedemo    $(DIST_PREP_DIR)/Examples
+	$(MKDIR) -p $(DIST_PREP_DIR)
+	$(MKDIR) -p $(DIST_PREP_DIR)/examples
+	$(MKDIR) -p $(DIST_PREP_DIR)/doc
+	$(CP) COPYING.txt          $(DIST_PREP_DIR)
+	$(CP) -a apps/examples     $(DIST_PREP_DIR)/examples
+	$(CP) -a apps/largedemo    $(DIST_PREP_DIR)/examples
 
 unix_eol:
 	find . -type f | xargs d2u
 
-
-###############################################################
-#
-#  clean machinery
-#
-config:
-	./configure
-
-clean:
-	-rm -f test.adb
-	-rm -f test.ali
-	-rm -f b~test.*
-	-rm -fr build
-
-distclean:  clean
-	-$(MAKE) -C $(RTS_SOURCE) clean
-	-$(MAKE) -C avr clean
-	-$(MAKE) -C apps clean
-	-rm config
-
-
-###############################################################
-#
-#  remove RTS and avrlib from the gcc tree
-#
-avrlibclean:
-	-chmod -R a+w $(PREFIX)/avr/ada
-	-rm -rf $(PREFIX)/avr/ada
-
-maintclean: clean_rts avrlibclean distclean
-
-
-###############################################################
-#
-#  Makefile stuff
-#
-.PHONY: clean distclean clean_rts maintclean samples install_rts
-
-print-%:
-	@echo $* = $($*)
-
-.PHONY: printvars
-
-printvars:
-	@$(foreach V,$(sort $(.VARIABLES)), \
-           $(if $(filter-out environment% default automatic, \
-           $(origin $V)),$(warning $V=$($V) ($(value $V)))))
+-include $(Makefile_post)

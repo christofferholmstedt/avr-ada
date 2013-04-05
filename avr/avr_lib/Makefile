@@ -8,122 +8,176 @@
 ## PURPOSE.  See the GNU General Public License for more details.        ##
 ###########################################################################
 
+# avr/avr_lib/Makefile builds the AVR-Ada MCUs & Boards
+
+###############################################################
 #
+#  Top
+#
+all: build_libs
+clean: clean_libs
+
+.PHONY: all clean
+
+
+###############################################################
+#
+#  Config
+#
+../../config:
+	$(MAKE) -C ../.. config
+
+include ../../config
+
+
+###############################################################
+#
+#  Settings
+#
+include ../../excldevs.mk
+
 # list of primary devices
-#
 PRIMARY_MCU_LIST := attiny2313 atmega8 atmega8u2 atmega168 atmega169 \
    atmega32 atmega328p atmega644p atmega2560
 
-BOARD_LIST := arduino_uno xbeeimu
-#
-# list of not yet supported devices
-# excluded_parts should be in sync with AVR-Ada/Makefile:excluded_parts
-include ../../excldevs.mk
-
-#
 # list of all supported devices
-#
-# MCU_LIST := $(filter-out $(excluded_parts), $(shell ls -d at*))
+# MCU_LIST = $(filter-out $(excluded_parts), $(shell (ls -d at*)))
 MCU_LIST = $(PRIMARY_MCU_LIST)
 
-# we build separate libraries for each supported device
-libs := $(patsubst %, %/lib/libavrada.a, $(MCU_LIST))
-thread_libs := $(patsubst %, %/thread-lib/libavr-thread.a, $(MCU_LIST))
+BOARD_LIST = \
+   arduino_uno \
+   xbeeimu \
+   sparkfun8u2
 
-# all part specific registers and definitions are made available
-mcu_specs := $(patsubst %, %/avr-mcu.ads, $(MCU_LIST))
-
-
-board_libs := $(patsubst %, board-%/lib/libavrada.a, $(BOARD_LIST))
-board_mcu_specs := $(patsubst %, board-%/avr-mcu.ads, $(BOARD_LIST))
-
-#
-#
-ALL_ASFLAGS = -mmcu=$(MCU) -I. -x assembler-with-cpp $(ASFLAGS)
-
-#
-# default target, build all libraries
-all:	stamp-links stamp-libs
-
-# first set the variable MCU
-at%/lib/libavrada.a : MCU = $(patsubst %/lib/libavrada.a,%, $@)
-at%/avr-mcu.ads     : MCU = $(patsubst %/avr-mcu.ads,%, $@)
-# at%/obj/ada_u32_img.o : MCU = $(patsubst %/obj/ada_u32_img.o,%, $@)
-at%/thread-lib/libavr-thread.a : MCU = $(patsubst %/thread-lib/libavr-thread.a,%, $@)
-
-# then provide the rules for building
-at%/lib/libavrada.a: stamp-links at%/obj at%/lib ../avr_lib.gpr ../avr_tools.gpr ../mcu.gpr at%/avr-mcu.ads
-	avr-gnatmake -p -P../avr_lib.gpr -XMCU=$(MCU)
-
-# rule for building the thread library
-at%/thread-lib/libavr-thread.a: at%/thread-obj at%/thread-lib ../threads_lib.gpr ../mcu.gpr
-	gprbuild -p --config=../avr.cgpr -P../threads_lib.gpr -XMCU=$(MCU)
-
-# custom boards
 include boards.mk
 
-board-%/lib/libavrada.a: stamp-links board-%/obj board-%/lib ../avr_lib.gpr ../mcu.gpr board-%/avr-mcu.ads
-	avr-gnatmake -P../avr_lib.gpr -XBOARD=$(BOARD) -XMCU=$(MCU)
+# Library to build for each MCU
+LIB = libavrada.a
+THREAD_LIB = libavr-thread.a
+
+# All libaries
+# we build separate libraries for each supported device and each board (why?)
+LIB_LIST := $(patsubst %, %/lib/$(LIB), $(MCU_LIST))
+THREAD_LIB_LIST := $(patsubst %, %/thread-lib/$(THREAD_LIB), $(MCU_LIST))
+BOARD_LIB_LIST := $(patsubst %, board-%/lib/$(LIB), $(BOARD_LIST))
+
+# All part specific registers and definitions
+MCU_SPECS := $(patsubst %, %/avr-mcu.ads, $(MCU_LIST))
+BOARD_MCU_SPECS := $(patsubst %, board-%/avr-mcu.ads, $(BOARD_LIST))
+
+# Point to our RTS
+XRTS = -XRTS=$(CURDIR)/../../gcc-$(major).$(minor)-rts/rts
+
+# Location of avr.cgpr if RTS has been installed
+INSTALL_CGPR_DIR = $(PREFIX)/share/gpr
 
 
-at%/avr-mcu.ads:
-	echo "pragma Style_Checks (Off);"  > $@
-	echo "with AVR.${MCU};"                    >> $@
-	echo "package AVR.MCU renames AVR.${MCU};" >> $@
-
-at%/lib at%/obj at%/thread-lib at%/thread-obj:
-	mkdir -p $@
-
-board-%/avr-mcu.ads:
-	echo "pragma Style_Checks (Off);"  > $@
-	echo "with AVR.${MCU};"                    >> $@
-	echo "package AVR.MCU renames AVR.${MCU};" >> $@
-
-board-%/obj :
-	mkdir -p $@
-
-board-%/lib :
-	mkdir -p $@
+###############################################################
+#
+#  Tools
+#
+GNATMAKE  = avr-gnatmake
+GPRBUILD  = gprbuild
+GPRCONFIG = gprconfig
+RM        = rm -f
+MKDIR     = mkdir
+ECHO      = echo
 
 
+###############################################################
+#
+#  Build
+#
+build_libs: stamp-links stamp-libs
 
-stamp-links: $(mcu_specs) $(board_mcu_specs)
+# first set the variable MCU
+at%/avr-mcu.ads : MCU = $(patsubst %/avr-mcu.ads,%, $@)
+at%/lib/$(LIB)  : MCU = $(patsubst %/lib/$(LIB),%, $@)
+at%/thread-lib/$(THREAD_LIB): MCU = $(patsubst %/thread-lib/$(THREAD_LIB),%, $@)
+
+at%/lib/$(LIB): stamp-links at%/obj at%/lib ../avr_lib.gpr ../avr_tools.gpr \
+   ../mcu.gpr at%/avr-mcu.ads
+	$(GNATMAKE) $(XRTS) -p -P../avr_lib.gpr -XMCU=$(MCU)
+
+board-%/lib/$(LIB): stamp-links board-%/obj board-%/lib ../avr_lib.gpr \
+   ../mcu.gpr board-%/avr-mcu.ads
+	$(GNATMAKE) $(XRTS) -P../avr_lib.gpr -XBOARD=$(BOARD) -XMCU=$(MCU)
+
+local-avr.cgpr: V := $(strip $(major).$(minor).$(patch))
+local-avr.cgpr:
+	$(GPRCONFIG) --batch --target=avr \
+	  --config=Asm,$(V) \
+	  --config=Asm2,$(V) \
+	  --config=Asm_Cpp,$(V) \
+	  --config=C,$(V) \
+	  -o local-avr.cgpr
+
+# rule for building the thread library
+at%/thread-lib/$(THREAD_LIB): local-avr.cgpr at%/thread-obj at%/thread-lib \
+   ../threads_lib.gpr ../mcu.gpr
+	$(GPRBUILD) -p --config=local-avr.cgpr -P../threads_lib.gpr -XMCU=$(MCU)
+
+at%/avr-mcu.ads board-%/avr-mcu.ads:
+	$(ECHO) "pragma Style_Checks (Off);"  > $@
+	$(ECHO) "with AVR.${MCU};"                    >> $@
+	$(ECHO) "package AVR.MCU renames AVR.${MCU};" >> $@
+
+at%/obj:
+	$(MKDIR) -p $@
+
+at%/lib:
+	$(MKDIR) -p $@
+
+at%/thread-obj:
+	$(MKDIR) -p $@
+
+at%/thread-lib:
+	$(MKDIR) -p $@
+
+board-%/obj:
+	$(MKDIR) -p $@
+
+board-%/lib:
+	$(MKDIR) -p $@
+
+stamp-links: $(MCU_SPECS) $(BOARD_MCU_SPECS)
 	touch $@
 
-# stamp-libs: $(thread_libs) $(libs) $(board_libs)
-stamp-libs: $(libs) $(board_libs)
+stamp-libs: $(LIB_LIST) $(BOARD_LIB_LIST) $(THREAD_LIB_LIST)
 	touch $@
 
-# Compile: create assembler files from Ada source files.
-%.s : %.adb
-	avr-gnatmake -f -u -P../avr_lib -XMCU=$(MCU) $< -cargs -S
-
-%.s : %.ads
-	avr-gnatmake -f -u -P../avr_lib -XMCU=$(MCU) $< -cargs -S
-
-# Assemble: create object files from assembler source files.
-at%/obj/ada_u32_img.o : asm/ada_32_img.S
-	avr-gcc -c $(ALL_ASFLAGS) $< -o $@
-
-clean:
-	$(RM) stamp-*
-	$(RM) *.o
-	$(RM) *.ali
-	$(RM) b_*.*
-	$(RM) b~*.*
-	$(RM) -rf obj lib
-	$(RM) -rf at*/obj at*/lib
-	$(RM) -rf at*/thread-obj at*/thread-lib
-	$(RM) -rf board-*/obj board-*/lib
-	$(RM) avr-mcu.ads at*/avr-mcu.ads
-
+.PHONY: build_libs
 
 # don't delete these intermediate files
-.PRECIOUS: at%/avr-mcu.ads at%/lib at%/obj board-%/lib board-%/obj board-%/avr-mcu.ads
+.PRECIOUS: at%/avr-mcu.ads at%/lib at%/obj board-%/avr-mcu.ads board-%/lib \
+   board-%/obj at%/thread-lib at%/thread-obj
 
-# always run these commands
-.PHONY: clean
 
-# Makefile debug
-print-%:
-	@echo $* = $($*)
+###############################################################
+#
+#  Clean
+#
+clean_libs:
+	-$(RM) stamp-*
+	-$(RM) -r at*/obj at*/lib
+	-$(RM) -r at*/thread-obj at*/thread-lib
+	-$(RM) -r board-*/obj board-*/lib
+	-$(RM) at*/avr-mcu.ads board-*/avr-mcu.ads
+	-$(RM) local-avr.cgpr
+
+.PHONY: clean_libs
+
+
+###############################################################
+#
+#  Implicit rules
+#
+
+# Create assembler files from Ada source files.
+%.s : %.adb
+	$(GNATMAKE) -f -u -P../avr_lib -XMCU=$(MCU) $< -cargs -S
+
+%.s : %.ads
+	$(GNATMAKE) -f -u -P../avr_lib -XMCU=$(MCU) $< -cargs -S
+
+-include $(Makefile_post)
