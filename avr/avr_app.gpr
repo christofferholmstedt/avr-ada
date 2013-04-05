@@ -19,6 +19,8 @@ project AVR_App is
 
    Main_Name := external ("AVRADA_MAIN", "main");
    for Main use (Main_Name);
+   
+   RTS := external ("RTS", "rts");
 
    for Languages use ("Ada");
 
@@ -35,13 +37,13 @@ project AVR_App is
         (--  the following line does not solve the problem that
          --  avr-gnatlink does not find the target parameters in
          --  system.ads
-         --  "--RTS=rts/" & MCU.Arch,     -- tell the linker about the RTS
+         --  "--RTS=" & RTS & "/" & MCU.Arch, -- tell the linker about the RTS
          --
          "-Wl,--gc-sections",    -- remove sections of unused code
          "-gdwarf-2",            -- keep binder file
          "-Wl,--relax",          -- linker relaxation
          "--GCC=avr-gcc -Os -mmcu=" & MCU.MCU
-          & " --RTS=rts/" & MCU.Arch
+          & " --RTS=" & RTS & "/" & MCU.Arch
           & " -gnatp -fdata-sections -ffunction-sections",
          Mapfile_Opt);
    end Linker;

@@ -14,15 +14,15 @@ abstract project AVR_Tools is
 
    MCU  : MCU.MCU_Type     := MCU.MCU;
    Arch : MCU.Architecture := MCU.Arch;
-
-
+   RTS  := external ("RTS", "rts");
+     
    for Languages use ("Ada", "C");
 
 
    package Builder is
       for Global_Configuration_Pragmas use "gnat.adc";
       for Executable_Suffix use ".elf";
-      for Default_Switches ("Ada") use ("--RTS=rts/" & Arch);
+      for Default_Switches ("Ada") use ("--RTS=" & RTS & "/" & Arch);
    end Builder;
 
 
@@ -43,17 +43,16 @@ abstract project AVR_Tools is
          "-gnatwp",            --  warnings on ineffective pragma Inlines
          "-gnatwu",            --  warnings on unused entities
 
-         "-gnatn",             --  enable inlining
-         --         "-gnatN",             --  enable front-end inlining
+         "-gnatn",             --  enable full inlining across modules
          "-gnatp",             --  suppress run-time checks
          "-gnatVn",            --  no validity checks (smaller code)
          "-Os",                --  optimize for space
          "-gnatef",            --  full path in error messages
          --  "-mcall-prologues",   --  use function calls for prologues
 
-         "-fverbose-asm",       --  include names of variables in asm code
+         "-fverbose-asm",      --  include names of variables in asm code
 
-         "-frename-registers",  --  avoid false dependencies in
+         "-frename-registers", --  avoid false dependencies in
          --  scheduled code
          --  Attempt to avoid false dependencies in scheduled code by
          --  making use of registers left over after register
@@ -68,11 +67,11 @@ abstract project AVR_Tools is
          --  used, on a per-function basis.
          "-gnatdY",
 
-         "-fdata-sections",     --  create separate data sections
-         "-ffunction-sections", --  create separate function sections
+         "-fdata-sections",    --  create separate data sections
+         "-ffunction-sections",--  create separate function sections
 
-         "-mmcu=" & MCU,        --  name of the micro controler
-         "-gnateDMCU=" & MCU,    --  name of the micro controler for preprocessor
+         "-mmcu=" & MCU,       --  name of the micro controler
+         "-gnateDMCU=" & MCU,  --  name of the micro controler for preprocessor
          "-gnateDUART=" & MCU.UART
         )
       & Non_Spacing_Style_Checks;
@@ -81,7 +80,7 @@ abstract project AVR_Tools is
 
    package Binder is
       for Default_Switches ("Ada") use
-        ("-freestanding");       -- small binder file
+        ("-freestanding");     -- small binder file
    end Binder;
 
 

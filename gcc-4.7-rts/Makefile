@@ -15,8 +15,31 @@
 #- executable file might be covered by the GNU Public License.           --
 #--------------------------------------------------------------------------
 
-# This makefile compiles the AVR Ada run time system (RTS)
+# gcc-*-rts/Makefile builds the AVR-Ada run time system (RTS)
 
+###############################################################
+#
+#  Top
+#
+all: build_rts
+clean: clean_rts
+install: install_rts
+uninstall: uninstall_rts
+
+.PHONY: all clean install uninstall
+
+
+###############################################################
+#
+#  Config
+#
+-include ../config # will not be found for recursive execution in rts/$(MCU)/{adainclude,adalib}
+
+
+###############################################################
+#
+#  Settings
+#
 # Ada source files
 ADASRC = system.ads \
    s-maccod.ads \
@@ -44,93 +67,145 @@ ADASRC = system.ads \
 #   s-finroo.ads s-finroo.adb a-finali.ads a-finali.adb
 #   a-reatim.adb a-reatim.ads
 #   a-interr.ads a-intnam.ads a-intsig.ads s-interr.adb s-interr.ads
-#
 
-OBJ = $(ADASRC:.ads=.o)
+ASMSRC = ada_u32_img.S
 
-LIBGNAT_OBJS = s-bitops.o a-except.o s-memory.o a-tags.o s-secsta.o ada_u32_img.o
-LIBGNAT_ALIS = $(filter %.ali,$(ADASRC:.ads=.ali)) # filter out the .adb from ADASRC
-
+# List of AVR architectures
 ARCH_LIST := avr25 avr3 avr31 avr35 avr4 avr5 avr51 avr6
 
-RTS_LIB_LIST := $(patsubst %, rts/%/adalib/libgnat.a, $(ARCH_LIST))
-RTS_INC_LIST := $(patsubst %, rts/%/adainclude, $(ARCH_LIST))
-RTS_SOURCE   := .
+# Library to build for each architecture
+LIB := libgnat.a
 
-vpath %.ads adainclude
-vpath %.adb adainclude
-vpath %.S   asm
+# Objects needed in library
+OBJS = s-bitops.o \
+       a-except.o \
+       s-memory.o \
+       a-tags.o \
+       s-secsta.o \
+       ada_u32_img.o
 
-# includes to compile
-INC	= -I- -Iadainclude
+# .ali for all specs
+ALIS = $(ADASRC:.ads=.ali)
 
-#compiler flags
+# All libraries
+RTS_LIB_LIST := $(patsubst %, rts/%/adalib/$(LIB), $(ARCH_LIST))
+
+# Sources do not exist in rts/$(MCU)/adalib but in rts/$(MCU)/adainclude
+vpath %.ads ../adainclude
+vpath %.adb ../adainclude
+vpath %.S   ../../../asm
+
+# Includes relative to rts/$(MCU)/adalib
+INC = -I- -I../adainclude
+
+# Compile flags
 ADAFLAGS = -g -Os -gnatn -gnatpg -mmcu=$(MCU) -fdata-sections -ffunction-sections
 ASMFLAGS = -c -I. -x assembler-with-cpp -mmcu=$(MCU)
 
-
-###### define some variables based on the AVR base path in $(AVR) #######
-CC	= avr-gcc
-RM	= rm -f
-COPY	= cp -p
-MOVE    = mv
-AR	= avr-ar
-RANLIB  = avr-ranlib
-
-
-# ------------------------------------------
--include ../config
+# Modes for installed items
+INSTALL_FILE_MODE = u=rw,go=r
+INSTALL_SRC_MODE = ugo=r
+INSTALL_DIR_MODE = u=rwx,go=rx
 
 
 ###############################################################
 #
-#  build the run time system (RTS)
+#  Tools
 #
-all build_rts: ${RTS_LIB_LIST}
+CC      = avr-gcc
+RM      = rm -f
+CP      = cp
+INSTALL = install
+AR      = avr-ar
+RANLIB  = avr-ranlib
+MKDIR   = mkdir
+TAR     = tar
+ECHO    = echo
+CHMOD   = chmod
+RMDIR   = rmdir
 
-rts/%/adalib/libgnat.a : MCU = $(patsubst rts/%/adalib/libgnat.a,%, $@)
 
-rts/%/adalib/libgnat.a: rts/%/adalib rts/%/adainclude
-	$(MAKE) clean
-	$(MAKE) libgnat.a MCU=$(MCU)
-	$(MOVE) libgnat.a $@
-	$(MAKE) $(LIBGNAT_ALIS) MCU=$(MCU)
-	$(COPY) $(LIBGNAT_ALIS) rts/$(MCU)/adalib
-	$(COPY) $(patsubst %,adainclude/%,$(ADASRC)) rts/$(MCU)/adainclude
-	$(MAKE) clean
+###############################################################
+#
+#  Build
+#
+build_rts: $(RTS_LIB_LIST)
+
+rts/%/adalib/$(LIB): MCU = $(patsubst rts/%/adalib/$(LIB),%, $@)
+rts/%/adalib/$(LIB): rts/%/adalib rts/%/adainclude
+	$(MAKE) -C rts/$(MCU)/adainclude -f ../../../Makefile $(ADASRC)
+	$(MAKE) -C rts/$(MCU)/adalib     -f ../../../Makefile $(ALIS) MCU=$(MCU)
+	$(MAKE) -C rts/$(MCU)/adalib     -f ../../../Makefile $(LIB) MCU=$(MCU)
 
 rts/%/adalib:
-	mkdir -p $@
+	$(MKDIR) -p $@
 
 rts/%/adainclude:
-	mkdir -p $@
+	$(MKDIR) -p $@
 
-libgnat.a: $(LIBGNAT_OBJS)
+$(LIB): $(OBJS)
 	$(AR) cr $@ $^
 	$(RANLIB) $@
 
 .PRECIOUS: rts/%/adalib rts/%/adainclude
 
-###############################################################
-#
-#  install the RTS
-#
-install_rts: build_rts clean_rts
-	$(COPY) -r rts $(RTS_BASE)
-	chmod a-w -R $(RTS_BASE)/rts
-	-mkdir $(RTS_BASE)/adainclude
-	-$(COPY) $(RTS_SOURCE)/adainclude/system.ads $(RTS_BASE)/adainclude
-	-$(COPY) $(RTS_SOURCE)/README.gnatlink_inst  $(RTS_BASE)/adainclude
-
 
 ###############################################################
 #
-#  remove RTS from the gcc tree
+#  Clean
 #
 clean_rts:
-	-chmod a+w -R $(RTS_BASE)/rts
-	-rm -rf $(RTS_BASE)/rts
+	$(RM) -r rts
 
+.PHONY: clean_rts
+
+
+###############################################################
+#
+#  Install
+#
+ifndef RTS_BASE
+install_rts:
+	$(error cannot install until 'configure' has been run)
+else
+install_rts: build_rts uninstall_rts
+	$(CP) -a rts $(RTS_BASE)
+	-$(MKDIR) $(RTS_BASE)/adainclude
+	-$(CP) adainclude/system.ads $(RTS_BASE)/adainclude
+	-$(CP) README.gnatlink_inst  $(RTS_BASE)/adainclude
+endif
+
+.PHONY: install_rts
+
+
+###############################################################
+#
+#  Uninstall
+#
+ifndef RTS_BASE
+uninstall_rts:
+	$(error cannot uninstall until 'configure' has been run)
+else
+uninstall_rts:
+	$(RM) $(RTS_BASE)/ada_source_path
+	$(RM) $(RTS_BASE)/ada_object_path
+	$(RM) -r $(RTS_BASE)/adainclude
+	$(RM) -r $(RTS_BASE)/rts
+endif
+
+.PHONY: uninstall_rts
+
+
+###############################################################
+#
+#  Implicit rules
+#
+
+# Copies source files into rts/$(MCU)/adainclude directory if they
+# have changed.  Write access is removed because we need to discourage
+# modification of these copies (mods that won't be retained).
+%: ../../../adainclude/%
+	-$(INSTALL) --preserve-timestamps --mode=$(INSTALL_SRC_MODE) ../../../adainclude/$@ .
 
 # keep the order of the following two implicit rules.  This way it
 # tries to build a .ali first from .adb if available.  Only if there
@@ -144,25 +219,4 @@ clean_rts:
 %.o : %.S
 	$(CC) -c $(ASMFLAGS) $<
 
-# --- make instruction to delete created files ---
-clean:
-	$(RM) *.o
-	$(RM) *.ali
-	$(RM) libgnat.a
-
-
-###############################################################
-#
-#  Makefile stuff
-#
-.PHONY: clean clean_rts install_rts
-
-print-%:
-	@echo $* = $($*)
-
-.PHONY: printvars
-
-printvars:
-	@$(foreach V,$(sort $(.VARIABLES)), \
-           $(if $(filter-out environment% default automatic, \
-           $(origin $V)),$(warning $V=$($V) ($(value $V)))))
+-include $(Makefile_post)

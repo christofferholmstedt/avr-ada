@@ -8,10 +8,110 @@
 ## PURPOSE.  See the GNU General Public License for more details.        ##
 ###########################################################################
 
-# inherit some vars from above
--include ../config
+# avr/Makefile builds the AVR-Ada Library
+
+###############################################################
+#
+#  Top
+#
+all: build_libs
+clean: clean_libs
+install: install_libs
+uninstall: uninstall_libs
+
+.PHONY: all clean install uninstall
+
+
+###############################################################
+#
+#  Config
+#
+../config:
+	$(MAKE) -C .. config
+
+include ../config
+
+
+###############################################################
+#
+#  Settings
+#
 include ../excldevs.mk
+
 MCU_LIST := $(filter-out $(excluded_parts), $(shell (cd avr_lib; ls -d at*)))
+
+# Additional libraries to install (don't appear to be built)
+EXTRA_LIB_NAMES := debug lcd sensirion onewire slip
+EXTRA_LIB_OBJS  := $(patsubst %,%/obj, $(EXTRA_LIB_NAMES))
+EXTRA_LIB_LIBS  := $(patsubst %,%/lib, $(EXTRA_LIB_NAMES))
+EXTRA_LIB_GPRS  := $(patsubst %,%_lib.gpr, $(EXTRA_LIB_NAMES))
+
+# Items to install
+INSTALL_SRCS = avr_lib/*.ad[sb] avr_lib/*/*.ad[sb] avr_lib/*/*.gpr \
+   avr_lib/*/*.adc
+INSTALL_GPRS = avr_tools.gpr avr_lib.gpr threads_lib.gpr mcu.gpr gnat.adc \
+   avr_app.gpr $(EXTRA_LIB_GPRS)
+INSTALL_LIBS := $(patsubst %,avr_lib/%/lib, $(MCU_LIST)) \
+   $(patsubst %,avr_lib/%/thread-lib, $(MCU_LIST))
+INSTALL_OBJS := $(patsubst %,avr_lib/%/obj, $(MCU_LIST)) \
+   $(patsubst %,avr_lib/%/thread-obj, $(MCU_LIST))
+
+# Modes for installed items
+INSTALL_FILE_MODE = ugo=r
+INSTALL_DIR_MODE = u=rwx,go=rx
+
+
+###############################################################
+#
+#  Tools
+#
+RM      = rm -f
+MKDIR   = mkdir
+TAR     = tar
+ECHO    = echo
+CHMOD   = chmod
+FIND    = find
+
+
+###############################################################
+#
+#  Build
+#
+build_libs:
+	$(MAKE) -C avr_lib $@
+
+avr_lib/stamp-links:
+	$(MAKE) -C avr_lib stamp-links
+
+avr_lib/stamp-libs:
+	$(MAKE) -C avr_lib stamp-libs
+
+$(EXTRA_LIB_OBJS) $(EXTRA_LIB_LIBS) $(INSTALL_DIR):
+	$(MKDIR) -p $@
+
+.PHONY: build_libs
+
+
+###############################################################
+#
+#  Clean
+#
+clean_libs: clean_avr_lib clean_extra_libs
+
+clean_avr_lib:
+	-$(MAKE) -C avr_lib clean_libs
+
+clean_extra_libs:
+	-$(RM) -rf $(EXTRA_LIB_LIBS)
+	-$(RM) -rf $(EXTRA_LIB_OBJS)
+
+.PHONY: clean_libs clean_avr_lib clean_extra_libs
+
+
+###############################################################
+#
+#  Install
+#
 
 #
 # Installation directory
@@ -23,64 +123,31 @@ MCU_LIST := $(filter-out $(excluded_parts), $(shell (cd avr_lib; ls -d at*)))
 PREFIX = $(RTS_BASE)/../../../..
 INSTALL_DIR = $(PREFIX)/avr/lib/gnat
 
-libraries := debug lcd sensirion onewire slip threads
-library_objs := $(patsubst %,%/obj, $(libraries))
-library_libs := $(patsubst %,%/lib, $(libraries))
-library_gprs := $(patsubst %,%_lib.gpr, $(libraries))
+$(INSTALL_DIR):
+	$(MKDIR) -p $@
 
-OBJ_DIRS := $(patsubst %,$(INSTALL_DIR)/avr_lib/%/obj, $(MCU_LIST)) $(patsubst %,$(INSTALL_DIR)/%/obj, $(libraries))
-
-#
-#
-# default target, build all libraries
-all:	avr_lib/stamp-links
-# avr_lib/stamp-libs
-
-avr_lib/stamp-links:
-	$(MAKE) -C avr_lib stamp-links
-
-avr_lib/stamp-libs:
-	$(MAKE) -C avr_lib stamp-libs
-
-../config:
-	$(MAKE) -C .. config
-
-install: $(INSTALL_DIR) $(library_objs) $(library_libs) copy_libs $(OBJ_DIRS)
 #   restrict_permissions
-
 restrict_permissions:
-	chmod -R a-w $(INSTALL_DIR)
-	-chown -R root $(INSTALL_DIR)  &>/dev/null
+	$(CHMOD) -R a-w $(INSTALL_DIR)
+	-chown -R root $(INSTALL_DIR) &>/dev/null
 
-$(library_objs) $(library_libs) $(OBJ_DIRS) $(INSTALL_DIR):
-	mkdir -p $@
+install_libs: $(INSTALL_DIR) avr_lib/stamp-links
+	$(TAR) cf - $(INSTALL_GPRS) $(INSTALL_SRCS) $(INSTALL_OBJS) \
+          $(INSTALL_LIBS) $(EXTRA_LIB_NAMES) \
+	  | (cd $(INSTALL_DIR); tar xvf -)
+	$(FIND) $(INSTALL_DIR) -type f -exec $(CHMOD) $(INSTALL_FILE_MODE) '{}' \;
+	$(FIND) $(INSTALL_DIR) -type d -exec $(CHMOD) $(INSTALL_DIR_MODE) '{}' \;
 
-copy_libs:
-	tar --create --file - \
-           --exclude .svn \
-           --exclude obj \
-           --exclude Makefile \
-           --exclude "*~" \
-           --exclude "*.o" \
-           --exclude */*~ \
-           avr_lib avr.cgpr avr_tools.gpr avr_lib.gpr threads_lib.gpr mcu.gpr gnat.adc avr_app.gpr \
-           $(libraries) \
-           $(library_gprs) \
-           | (cd $(INSTALL_DIR); tar xpvf -)
+.PHONY: install_libs
 
-clean:
-	$(RM) stamp-*
-	$(RM) *.o
-	$(RM) *.ali
-	$(RM) b_*.*
-	$(RM) b~*.*
-	$(RM) -rf obj lib
-	$(RM) sensirion/obj/*
-	$(MAKE) -C avr_lib clean
 
-# always run these commands
-.PHONY: clean install copy_libs restrict_permissions
+###############################################################
+#
+#  Uninstall
+#
+uninstall_libs:
+	$(RM) -r $(INSTALL_DIR)
 
-# Makefile debug
-print-%:
-	@echo $* = $($*)
+.PHONY: uninstall_libs
+
+-include $(Makefile_post)

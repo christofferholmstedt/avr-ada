@@ -22,7 +22,7 @@
 echo -n "checking avr-gcc ..."
 avr-gcc -v > /dev/null 2>&1
 if [ $? -ne 0 ]; then
-    echo -e "No \n Make sure that avr-gcc is in your PATH."  
+    echo -e "No\n Make sure that avr-gcc is in your PATH."  
     exit
 fi
 echo "OK"
@@ -32,44 +32,32 @@ version=`avr-gcc -dumpversion`
 major=`echo $version | awk -F. ' { print $1; } '`
 minor=`echo $version | awk -F. ' { print $2; } '`
 patch=`echo $version | awk -F. ' { print $3; } '`
-VERSION_REQ="($version) **** too old ****\n AVR-Ada requires gcc-4.3.0 or newer"
+VERSION_REQ="($version)\n **** too old ****\n AVR-Ada requires gcc-4.7.0 or newer"
 
 if [ $major -lt 4 ] ; then
     echo "$VERSION_REQ"
     exit 2
 elif [ $major -eq 4 ]; then
-    if [ $minor -lt 3 ] ; then
+    if [ $minor -lt 7 ] ; then
         echo -e "$VERSION_REQ"
         exit 2
     fi
 fi
-
 echo "($version)"
+
 
 ####################################################################
 echo -n "checking avr-gcc installation directory ..."
 LIBGCC=`avr-gcc -print-libgcc-file-name`
 RTS_BASE=`dirname $LIBGCC`
-echo "($RTS_BASE)"
-PREFIX="$RTS_BASE/../../../.."
+PREFIX=`echo $RTS_BASE | sed 's:/[^/]*/[^/]*/[^/]*/[^/]*$::'`
+echo "($PREFIX)"
+
 
 ####################################################################
 RTS_DIST=`${PWDCMD-pwd}`/gcc-$major.$minor-rts
 RTS_DIST=`echo $RTS_DIST | sed -e 's!^/cygdrive!!'`
 RTS_DIST=`echo $RTS_DIST | sed -e 's!^/\([a-z]\)/!\1:/!'`
-AVR_RTS_V=""
-
-# # clean up
-# rm -f test.adb
-# rm -f test.ali
-# rm -f test.o
-# rm -f b~test.ads
-# rm -f b~test.adb
-# rm -f b~test.ali
-# rm -f b~test.o
-# rm -f test.exe
-# rm -f test
-
 
 
 ####################################################################
@@ -78,8 +66,6 @@ AVR_ADA_HOME=`pwd`
 AVR_ADA_HOME=`echo $AVR_ADA_HOME | sed -e 's!^/cygdrive!!'`
 AVR_ADA_HOME=`echo $AVR_ADA_HOME | sed -e 's!^/\([a-z]\)/!\1:/!'`
 echo "($AVR_ADA_HOME)"
-
-
 
 
 ####################################################################
@@ -93,9 +79,10 @@ echo "The AVR-Ada run/compile-time system (RTS) will be installed in"
 echo "   $RTS_BASE/rts/<MCU>/adainclude"
 echo "   $RTS_BASE/rts/<MCU>/adalib"
 echo
-echo "The AVR-Ada libraries (libavr.a) will be installed in"
-echo "   $PREFIX/lib/gnat/avr_lib/<MCU>/lib/libavr.a"
+echo "The AVR-Ada libraries (libavrada.a) will be installed in"
+echo "   $PREFIX/avr/lib/gnat/avr_lib/<MCU>/lib/libavrada.a"
 echo
+
 
 ####################################################################
 #
@@ -109,4 +96,3 @@ echo "patch=$patch"                                               >> config
 echo "RTS_BASE=$RTS_BASE"                                         >> config
 echo "PREFIX=$PREFIX"                                             >> config
 echo "AVR_ADA_HOME=$AVR_ADA_HOME"                                 >> config
-
