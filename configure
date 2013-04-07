@@ -47,7 +47,7 @@ echo "($version)"
 
 
 ####################################################################
-echo -n "checking avr-gcc installation directory ..."
+echo -n "checking avr-gcc installation directory ... "
 LIBGCC=`avr-gcc -print-libgcc-file-name`
 RTS_BASE=`dirname $LIBGCC`
 PREFIX=`echo $RTS_BASE | sed 's:/[^/]*/[^/]*/[^/]*/[^/]*$::'`
@@ -61,7 +61,7 @@ RTS_DIST=`echo $RTS_DIST | sed -e 's!^/\([a-z]\)/!\1:/!'`
 
 
 ####################################################################
-echo -n "checking BUILD directory ..."
+echo -n "checking BUILD directory ... "
 AVR_ADA_HOME=`pwd`
 AVR_ADA_HOME=`echo $AVR_ADA_HOME | sed -e 's!^/cygdrive!!'`
 AVR_ADA_HOME=`echo $AVR_ADA_HOME | sed -e 's!^/\([a-z]\)/!\1:/!'`

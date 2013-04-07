@@ -132,9 +132,9 @@ restrict_permissions:
 	-chown -R root $(INSTALL_DIR) &>/dev/null
 
 install_libs: $(INSTALL_DIR) avr_lib/stamp-links
-	$(TAR) cf - $(INSTALL_GPRS) $(INSTALL_SRCS) $(INSTALL_OBJS) \
+	$(TAR) chf - $(INSTALL_GPRS) $(INSTALL_SRCS) $(INSTALL_OBJS) \
           $(INSTALL_LIBS) $(EXTRA_LIB_NAMES) \
-	  | (cd $(INSTALL_DIR); tar xvf -)
+	  | (cd $(INSTALL_DIR); $(TAR) xvf -)
 	$(FIND) $(INSTALL_DIR) -type f -exec $(CHMOD) $(INSTALL_FILE_MODE) '{}' \;
 	$(FIND) $(INSTALL_DIR) -type d -exec $(CHMOD) $(INSTALL_DIR_MODE) '{}' \;
 
