@@ -171,8 +171,10 @@ else
 install_rts: build_rts uninstall_rts
 	$(CP) -a rts $(RTS_BASE)
 	-$(MKDIR) $(RTS_BASE)/adainclude
+	-$(MKDIR) $(RTS_BASE)/adalib
 	-$(CP) adainclude/system.ads $(RTS_BASE)/adainclude
 	-$(CP) README.gnatlink_inst  $(RTS_BASE)/adainclude
+	-$(CP) README.gprconfig      $(RTS_BASE)/adalib
 endif
 
 .PHONY: install_rts
