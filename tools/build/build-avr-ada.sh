@@ -3,8 +3,8 @@
 #--------------------------------------------------------------------------
 #-                AVR-Ada - A GCC Ada environment for AVR-Atmel          --
 #-                                      *                                --
-#-                                 AVR-Ada 1.2.1                         --
-#-                     Copyright (C) 2005, 2007, 2012 Rolf Ebert         --
+#-                                 AVR-Ada 1.3.0                         --
+#-                     Copyright (C) 2005, 2007, 2012, 2013 Rolf Ebert   --
 #-                     Copyright (C) 2009 Neil Davenport                 --
 #-                     Copyright (C) 2005 Stephane Riviere               --
 #-                     Copyright (C) 2003-2005 Bernd Trog                --
@@ -65,6 +65,7 @@
 #
 #---------------------------------------------------------------------------
 
+
 BASE_DIR=$PWD
 OS=`uname -s`
 case "$OS" in
@@ -72,6 +73,8 @@ case "$OS" in
         PREFIX="/opt/avr_472_gnat"
         WITHGMP="/usr"
         WITHMPFR="/usr";;
+        # line below may be needed to fix Debian multiarch..
+        # export LIBRARY_PATH=/usr/lib/x86_64-linux-gnu
     "Darwin" )
         PREFIX="/opt/avr_472_gnat"
         WITHGMP="/opt/local"
@@ -80,6 +83,8 @@ case "$OS" in
         PREFIX="/mingw/avr_472_gnat"
         WITHGMP="/mingw"
         WITHMPFR="/mingw";;
+        export PATH=/mingw/local/bin:${PATH}
+        export LIBRARY_PATH=/mingw/lib
 esac
 
 # add PREFIX/bin to the PATH
@@ -87,8 +92,6 @@ esac
 # very end.
 export PATH="${PREFIX}/bin:${PATH}"
 
-export PATH=/mingw/local/bin:${PATH}
-export LIBRARY_PATH=/mingw/lib
 
 VER_BINUTILS=2.20.1
 VER_GCC=4.7.2
@@ -96,7 +99,7 @@ VER_MPFR=3.1.0
 VER_MPC=0.8.2
 VER_GMP=4.3.2
 VER_LIBC=1.8.0
-VER_AVRADA=1.2.1
+VER_AVRADA=1.3.0
 
 FILE_BINUTILS="binutils-$VER_BINUTILS"
 FILE_GCC="gcc-$VER_GCC"
@@ -114,6 +117,14 @@ AVRADA_DIR=$AVR_BUILD/avr-ada-$VER_AVRADA/patches
 AVRADA_GCC_DIR="$AVRADA_DIR/gcc/$VER_GCC"
 AVRADA_BIN_DIR="$AVRADA_DIR/binutils/$VER_BINUTILS"
 
+# To overcome discrepancy beween patches downloaded by current script
+# and patches required...
+# Modify this below to point to extra patches - or an empty directory
+EXTRA_AVRADA_GCC_PATCH_DIR="$BASE_DIR/../$FILE_AVRADA/patches/gcc/$VER_GCC"
+
+# Location of any patches to the AVRAda RTS or library files
+AVRADA_PATCH_DIR="$BASE_DIR/../$FILE_AVRADA/patches/avrada/$VER_AVRADA"
+
 
 # actions:
 
@@ -128,7 +139,7 @@ build_mpfr="no"
 build_mpc="no"
 build_gmp="no"
 build_libc="yes"
-build_avrada="no"
+build_avrada="yes"
 
 # The following are advanced options not required for a normal build
 # either delete the build directory completely
@@ -199,8 +210,6 @@ function check_return_code () {
 # build script
 #---------------------------------------------------------------------------
 
-export PATH=$PREFIX/bin:$PATH
-
 echo "--------------------------------------------------------------"
 echo "GCC AVR-Ada build script: all output is saved in log files"
 echo "--------------------------------------------------------------"
@@ -213,7 +222,7 @@ GCC_VERSION=`$CC -dumpversion`
 
 if [[ "$GCC_VERSION" < "4.7.0" ]] ; then  # string comparison (?)
     echo "($GCC_VERSION) is too old"
-    echo "AVR-Ada V1.2 requires gcc-4.7 as build compiler"
+    echo "AVR-Ada V1.3 requires gcc-4.7 as build compiler"
     exit 2
 else
     echo "Found native compiler gcc-"$GCC_VERSION
@@ -292,7 +301,14 @@ if test "x$download_files" = "xyes" ; then
     display "Downloading MPFR"
     display "--------------------------------------------------------------"
     display
-    $WGET "http://www.mpfr.org/mpfr-current/$FILE_MPFR.tar.bz2"
+    $WGET "http://www.mpfr.org/mpfr-$VER_MPFR/$FILE_MPFR.tar.bz2"
+
+
+    display "--------------------------------------------------------------"
+    display "Downloading MPC"
+    display "--------------------------------------------------------------"
+    display
+    $WGET "http://www.multiprecision.org/mpc/download/$FILE_MPC.tar.gz"
 
 
     display "--------------------------------------------------------------"
@@ -329,7 +345,8 @@ AVRADA_BIN_PATCHES=`(cd $AVRADA_BIN_DIR; ls -1 [0-9][0-9][0-9]-*binutils-*.patch
 BIN_PATCHES=`echo "$AVRADA_BIN_PATCHES" | sort | uniq`
 
 AVRADA_GCC_PATCHES=`(cd $AVRADA_GCC_DIR; ls -1 [0-9][0-9]-*gcc-*.patch)`
-GCC_PATCHES=`echo "$AVRADA_GCC_PATCHES" | sort | uniq`
+EXTRA_GCC_PATCHES=`(cd $EXTRA_AVRADA_GCC_PATCH_DIR; ls -1 [0-9][0-9]-*gcc-*.patch)`
+GCC_PATCHES=`echo "$AVRADA_GCC_PATCHES $EXTRA_GCC_PATCHES" | sort | uniq`
 
 # AVRADA_LIBC_PATCHES=`(cd $AVRADA_LIBC_DIR; ls -1 [0-9][0-9]-*libc-*.patch)`
 # LIBC_PATCHES=`echo "$AVRADA_LIBC_PATCHES" | sort | uniq`
@@ -412,10 +429,7 @@ if test "$build_gcc" = "yes" ; then
 
     cd $AVR_BUILD
 
-    if test "x$no_extract" = "xyes" ; then
-        true
-        # do nothing
-    else
+    if test "x$no_extract" != "xyes" ; then
         display "Extracting $DOWNLOAD/$FILE_GCC.tar.bz2 ..."
         bunzip2 -c $DOWNLOAD/$FILE_GCC.tar.bz2 | tar xf -
 
@@ -423,10 +437,10 @@ if test "$build_gcc" = "yes" ; then
             bunzip2 -c $DOWNLOAD/$FILE_MPFR.tar.bz2 | \
 		(cd $FILE_GCC; tar xf -; mv $FILE_MPFR mpfr)
 	else
-	    GCC_OPS="$GCC_OPS --with-mpfr=$PREFIX"
+	    GCC_OPS="$GCC_OPS --with-mpfr=$WITHMPFR"
 	fi
 	if test "x$build_mpc" = "xyes" ; then
-            bunzip2 -c $DOWNLOAD/$FILE_MPC.tar.bz2 | \
+            gunzip -c $DOWNLOAD/$FILE_MPC.tar.gz | \
 		(cd $FILE_GCC; tar xf -; mv $FILE_MPC mpc)
 	else
 	    GCC_OPS="$GCC_OPS --with-mpc=$PREFIX"
@@ -435,7 +449,7 @@ if test "$build_gcc" = "yes" ; then
             bunzip2 -c $DOWNLOAD/$FILE_GMP.tar.bz2 | \
 		(cd $FILE_GCC; tar xf -; mv $FILE_GMP gmp)
 	else
-	    GCC_OPS="$GCC_OPS --with-gmp=$PREFIX"
+	    GCC_OPS="$GCC_OPS --with-gmp=$WITHGMP"
 	fi
     fi
 
@@ -451,6 +465,8 @@ if test "$build_gcc" = "yes" ; then
             display "   $p"
             if test -f $AVRADA_GCC_DIR/$p ; then
                 PDIR=$AVRADA_GCC_DIR
+            elif test -f $EXTRA_AVRADA_GCC_PATCH_DIR/$p ; then
+                PDIR=$EXTRA_AVRADA_GCC_PATCH_DIR
             else
                 display "cannot find $p in any of the patch directories"
                 exit 2
@@ -480,6 +496,30 @@ if test "$build_gcc" = "yes" ; then
         &>$AVR_BUILD/step04_gcc_configure.log
     check_return_code
 
+    if test "$build_gmp" = "yes" ; then
+        display "Make GMP ...          (log in $AVR_BUILD/step05.1_gcc_gmp.log)"
+
+        make all-gmp &> $AVR_BUILD/step05.1_gcc_gmp.log
+        check_return_code
+
+        display "Install GMP ...       (log in $AVR_BUILD/step05.1_install_gmp.log)"
+ 
+        make -C gmp install &> $AVR_BUILD/step05.1_install_gmp.log
+        check_return_code
+    fi
+
+    if test "$build_mpfr" = "yes" ; then
+        display "Make MPFR ...         (log in $AVR_BUILD/step05.2_gcc_mpfr.log)"
+
+        make all-mpfr &> $AVR_BUILD/step05.2_gcc_mpfr.log
+        check_return_code
+
+        display "Install MPFR ...      (log in $AVR_BUILD/step05.2_install_mpfr.log)"
+
+        make -C mpfr install &> $AVR_BUILD/step05.2_install_mpfr.log
+        check_return_code
+    fi
+
     display "Make GCC ...          (log in $AVR_BUILD/step05_gcc_gcc_obj.log)"
 
     make &> $AVR_BUILD/step05_gcc_gcc_obj.log
@@ -500,13 +540,15 @@ if test "x$build_libc" = "xyes" ; then
 
     cd $AVR_BUILD
 
-    display "Extracting $DOWNLOAD/$FILE_LIBC.tar.bz2 ..."
-    bunzip2 -c $DOWNLOAD/$FILE_LIBC.tar.bz2 | tar xf -
+    if test "x$no_extract" != "xyes" ; then
+        display "Extracting $DOWNLOAD/$FILE_LIBC.tar.bz2 ..."
+        bunzip2 -c $DOWNLOAD/$FILE_LIBC.tar.bz2 | tar xf -
+    fi
 
     cd $AVR_BUILD/$FILE_LIBC
 
     display "configure AVR-LIBC ... (log in $AVR_BUILD/step09_libc_conf.log)"
-    CC=avr-gcc ./configure --build=`./config.guess` --host=avr --prefix=$PREFIX &>$AVR_BUILD/step09_libc_conf.log
+    CC="avr-gcc -v" ./configure --build=`./config.guess` --host=avr --prefix=$PREFIX &>$AVR_BUILD/step09_libc_conf.log
     check_return_code
 
     display "Make AVR-LIBC ...       (log in $AVR_BUILD/step10_libc_make.log)"
@@ -527,14 +569,17 @@ if test "x$build_avradarts" = "xyes" ; then
 
     cd $AVR_BUILD
 
-    display "Extracting $DOWNLOAD/$FILE_AVRADA.tar.bz2 ..."
-    bunzip2 -c $DOWNLOAD/$FILE_AVRADA.tar.bz2 | tar xf -
+    if test "x$no_extract" != "xyes" ; then
+        display "Extracting $DOWNLOAD/$FILE_AVRADA.tar.bz2 ..."
+        bunzip2 -c $DOWNLOAD/$FILE_AVRADA.tar.bz2 | tar xf -
+    fi
 
     cd $AVR_BUILD/$FILE_AVRADA
 
     display "configure AVR-Ada ... (log in $AVR_BUILD/step12_avrada_conf.log)"
     ./configure >& ../step12_avrada_conf.log
     check_return_code
+
     display "build AVR-Ada RTS ... (log in $AVR_BUILD/step13_avrada_rts.log)"
     make build_rts >& ../step13_avrada_rts.log
     check_return_code
