@@ -3,9 +3,9 @@
 #--------------------------------------------------------------------------
 #-                AVR-Ada - A GCC Ada environment for AVR-Atmel          --
 #-                                      *                                --
-#-                                 AVR-Ada 1.2.0                         --
+#-                                 AVR-Ada 1.2.1                         --
+#-                     Copyright (C) 2005, 2007, 2012 Rolf Ebert         --
 #-                     Copyright (C) 2009 Neil Davenport                 --
-#-                     Copyright (C) 2005, 2007 Rolf Ebert               --
 #-                     Copyright (C) 2005 Stephane Riviere               --
 #-                     Copyright (C) 2003-2005 Bernd Trog                --
 #-                            avr-ada.sourceforge.net                    --
@@ -29,22 +29,22 @@
 #-  easier for beginners and experts alike                               --
 #-                                      *                                --
 #-  To use simply create a directory and copy this script to it then     --
-#-  cd into the directory and type ./build-avr-ada-gcc-4.5.sh            --
+#-  cd into the directory and type ./build-avr-ada.sh                    --
 #-
 #-  N.B. This script was written for BASH. If you use another shell      --
-#-  invoke with bash ./build-avr-ada-gcc-4.5.sh                          --
+#-  invoke with bash ./build-avr-ada.sh                                  --
 #-                                                                       --
 #--------------------------------------------------------------------------
 
 #--------------------------------------------------------------------------
-# Under Windows 2K/XP, you need :
+# Under Windows XP, you need :
 #
 # MinGW-5.1.6.exe (Windows installer).
 # MSYS-1.0.10.exe (Windows installer).
 # msysCORE-1.0.11-<latestdate>
 # msysDTK-1.0.1.exe (Windows installer).
-# flex-2.5.33-MSYS-1.0.11-1
-# bison-2.3-MSYS-1.0.11-1
+# flex-2.5.35-MSYS-1.0.11-1
+# bison-2.4.2-MSYS-1.0.11-1
 # regex-0.12-MSYS-1.0.11-1
 # gettext-0.16.1-1
 # tar-1.13.19-MSYS-2005.06.08
@@ -67,11 +67,20 @@
 
 BASE_DIR=$PWD
 OS=`uname -s`
-if test $OS = "Linux" ; then
-    PREFIX="/opt/avr_470_gnat"
-else
-    PREFIX="/mingw/avr_470_gnat"
-fi
+case "$OS" in
+    "Linux" )
+        PREFIX="/opt/avr_472_gnat"
+        WITHGMP="/usr"
+        WITHMPFR="/usr";;
+    "Darwin" )
+        PREFIX="/opt/avr_472_gnat"
+        WITHGMP="/opt/local"
+        WITHMPFR="/opt/local";;
+    * )
+        PREFIX="/mingw/avr_472_gnat"
+        WITHGMP="/mingw"
+        WITHMPFR="/mingw";;
+esac
 
 # add PREFIX/bin to the PATH
 # Be sure to have the local directory very late in your PATH, best at the
@@ -82,12 +91,12 @@ export PATH=/mingw/local/bin:${PATH}
 export LIBRARY_PATH=/mingw/lib
 
 VER_BINUTILS=2.20.1
-VER_GCC=4.7-20120428
+VER_GCC=4.7.2
 VER_MPFR=3.1.0
 VER_MPC=0.8.2
 VER_GMP=4.3.2
 VER_LIBC=1.8.0
-VER_AVRADA=1.2.0
+VER_AVRADA=1.2.1
 
 FILE_BINUTILS="binutils-$VER_BINUTILS"
 FILE_GCC="gcc-$VER_GCC"
@@ -101,7 +110,7 @@ BASE_DIR=$PWD
 DOWNLOAD="$BASE_DIR/src"
 AVR_BUILD="$BASE_DIR/build"
 
-AVRADA_DIR=$DOWNLOAD/AVR-Ada/patches
+AVRADA_DIR=$AVR_BUILD/avr-ada-$VER_AVRADA/patches
 AVRADA_GCC_DIR="$AVRADA_DIR/gcc/$VER_GCC"
 AVRADA_BIN_DIR="$AVRADA_DIR/binutils/$VER_BINUTILS"
 
@@ -110,15 +119,15 @@ AVRADA_BIN_DIR="$AVRADA_DIR/binutils/$VER_BINUTILS"
 
 # Download necessary tarbals and patches using wget and cvs
 download_files="no"
-delete_obj_dirs="yes"
-delete_build_dir="no"
-delete_install_dir="no"
-build_binutils="no"
+delete_obj_dirs="no"
+delete_build_dir="yes"
+delete_install_dir="yes"
+build_binutils="yes"
 build_gcc="yes"
 build_mpfr="no"
 build_mpc="no"
 build_gmp="no"
-build_libc="no"
+build_libc="yes"
 build_avrada="no"
 
 # The following are advanced options not required for a normal build
@@ -202,7 +211,7 @@ GCC_VERSION=`$CC -dumpversion`
 # GCC_MINOR=`echo $GCC_VERSION | awk -F. ' { print $2; } '`
 # GCC_PATCH=`echo $GCC_VERSION | awk -F. ' { print $3; } '`
 
-if [[ "$GCC_VERSION" < "4.5.0" ]] ; then  # string comparison (?)
+if [[ "$GCC_VERSION" < "4.7.0" ]] ; then  # string comparison (?)
     echo "($GCC_VERSION) is too old"
     echo "AVR-Ada V1.2 requires gcc-4.7 as build compiler"
     exit 2
@@ -299,19 +308,19 @@ if test "x$download_files" = "xyes" ; then
     display
     $WGET "http://downloads.sourceforge.net/avr-ada/$FILE_AVRADA.tar.bz2"
 
-
-    display "--------------------------------------------------------------"
-    display "Checking out AVR-Ada Patches"
-    display "--------------------------------------------------------------"
-    display
-    mkdir -p $AVRADA_DIR
-    (cd $AVRADA_DIR/..; svn co \
-	http://avr-ada.svn.sourceforge.net/svnroot/avr-ada/trunk/patches)
-
 fi
 print_time > $AVR_BUILD/time_run.log
 
 #---------------------------------------------------------------------------
+
+#
+# unpack AVR-Ada first to get access to the patches
+#
+
+cd $AVR_BUILD
+
+display "Extracting $DOWNLOAD/$FILE_AVRADA.tar.bz2 ..."
+bunzip2 -c $DOWNLOAD/$FILE_AVRADA.tar.bz2 | tar xf -
 
 #
 # set the list of patches after downloading
@@ -321,6 +330,9 @@ BIN_PATCHES=`echo "$AVRADA_BIN_PATCHES" | sort | uniq`
 
 AVRADA_GCC_PATCHES=`(cd $AVRADA_GCC_DIR; ls -1 [0-9][0-9]-*gcc-*.patch)`
 GCC_PATCHES=`echo "$AVRADA_GCC_PATCHES" | sort | uniq`
+
+# AVRADA_LIBC_PATCHES=`(cd $AVRADA_LIBC_DIR; ls -1 [0-9][0-9]-*libc-*.patch)`
+# LIBC_PATCHES=`echo "$AVRADA_LIBC_PATCHES" | sort | uniq`
 
 #---------------------------------------------------------------------------
 
@@ -345,15 +357,7 @@ if test "x$build_binutils" = "xyes" ; then
         cd $AVR_BUILD/$FILE_BINUTILS
         for p in $BIN_PATCHES; do
             display "   $p"
-            if test -f $AVRADA_BIN_DIR/$p ; then
-	        # if a patch is part of AVR-Ada -> take it and skip
-	        # duplicates from WinAVR
-                PDIR=$AVRADA_BIN_DIR
-            else
-                display "cannot find $p in any of the patch directories"
-                exit 2
-            fi
-            patch --verbose --strip=0 --input=$PDIR/$p  2>&1 >> $AVR_BUILD/build.log
+            patch --verbose --strip=0 --input=$AVRADA_BIN_DIR/$p  2>&1 >> $AVR_BUILD/build.log
             check_return_code
         done
     fi
@@ -364,23 +368,34 @@ if test "x$build_binutils" = "xyes" ; then
 
     display "Configure binutils ... (log in $AVR_BUILD/step01_bin_configure.log)"
 
-    if test $OS = "Linux" ; then
-        BINUTILS_OPS=
-    else
-        BINUTILS_OPS=--build=x86-winnt-mingw32
-    fi
-    ../$FILE_BINUTILS/configure --prefix=$PREFIX \
+    case "$OS" in
+        "Linux" | "Darwin" )
+            BINUTILS_OPS=;;
+        * )
+            BINUTILS_OPS=--build=x86-winnt-mingw32;;
+    esac
+    ../$FILE_BINUTILS/configure \
+        --prefix=$PREFIX \
         --target=avr \
         --disable-nls \
+        --enable-doc \
         --disable-werror \
         $BINUTILS_OPS \
         &>$AVR_BUILD/step01_bin_configure.log
     check_return_code
 
 
-    display "Make binutils ...      (log in $AVR_BUILD/step02_bin_make.log)"
+    display "Make binutils bfd-headers ... (log in $AVR_BUILD/step02_bin_make.log)"
+    make all-bfd TARGET-bfd=headers &>$AVR_BUILD/step02.0_bin_make_bfd_headers.log
+    check_return_code
 
-    make &>$AVR_BUILD/step02_bin_make.log
+    rm -f bfd/Makefile
+    check_return_code
+
+    make configure-host             &>$AVR_BUILD/step02.1_bin_configure.log
+    check_return_code
+
+    make all                        &>$AVR_BUILD/step02.2_bin_make_all.log
     check_return_code
 
     display "Install binutils ...   (log in $AVR_BUILD/step03_bin_install.log)"
@@ -460,17 +475,14 @@ if test "$build_gcc" = "yes" ; then
         --disable-libssp \
         --disable-libada \
         --with-bugurl=http://avr-ada.sourceforge.net \
-	--with-gmp=$PREFIX \
-	--with-mpfr=$PREFIX \
+	--with-gmp=$WITHGMP \
+	--with-mpfr=$WITHMPFR \
         &>$AVR_BUILD/step04_gcc_configure.log
     check_return_code
 
     display "Make GCC ...          (log in $AVR_BUILD/step05_gcc_gcc_obj.log)"
 
     make &> $AVR_BUILD/step05_gcc_gcc_obj.log
-    # error in gcc-4.7.0 multilib support for Ada
-    cp gcc/s-avr-mlib gcc/ada/tools/
-    make &> $AVR_BUILD/step05.1_gcc_gcc_obj.log
     check_return_code
 
     display "Install GCC ...       (log in $AVR_BUILD/step08_gcc_install.log)"
@@ -509,9 +521,9 @@ print_time >> $AVR_BUILD/time_run.log
 
 #---------------------------------------------------------------------------
 
-if test "x$build_avrada" = "xyes" ; then
+if test "x$build_avradarts" = "xyes" ; then
     #########################################################################
-    header "Building AVR-Ada"
+    header "Building AVR-Ada RTS"
 
     cd $AVR_BUILD
 
@@ -528,6 +540,14 @@ if test "x$build_avrada" = "xyes" ; then
     check_return_code
     make install_rts >& ../step13_avrada_rts_inst.log
     check_return_code
+fi
+
+if test "x$build_avrada" = "xyes" ; then
+    #########################################################################
+    header "Building AVR-Ada libraries"
+
+    cd $AVR_BUILD/$FILE_AVRADA
+
     display "build AVR-Ada libs ... (log in $AVR_BUILD/step14_avrada_libs.log)"
     make build_libs >& ../step14_avrada_libs.log
     check_return_code
