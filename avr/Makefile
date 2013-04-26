@@ -41,7 +41,7 @@ include ../excldevs.mk
 MCU_LIST := $(filter-out $(excluded_parts), $(shell (cd avr_lib; ls -d at*)))
 
 # Additional libraries to install (don't appear to be built)
-EXTRA_LIB_NAMES := debug lcd sensirion onewire slip
+EXTRA_LIB_NAMES := crc debug fs lcd mcp4922 onewire sensirion slip
 EXTRA_LIB_OBJS  := $(patsubst %,%/obj, $(EXTRA_LIB_NAMES))
 EXTRA_LIB_LIBS  := $(patsubst %,%/lib, $(EXTRA_LIB_NAMES))
 EXTRA_LIB_GPRS  := $(patsubst %,%_lib.gpr, $(EXTRA_LIB_NAMES))
