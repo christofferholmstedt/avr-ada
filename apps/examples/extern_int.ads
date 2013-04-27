@@ -16,22 +16,9 @@
 ---------------------------------------------------------------------------
 
 
---   Title:    Read input port using external Interrupt
---   Author:   Peter Fleury <pfleury@gmx.ch> http://jump.to/fleury
---   Date:     December 2002
-
---   Description: Demonstrates use of external interrupts.  Each time
---   a push button is pressed, the external interrupt INT0 is called,
---   which increments the global variable led and outputs its value to
---   port B.  For simplicity, no de-bouncing is implemented.
-
-
-with AVR;                          use AVR;
-
 package Extern_Int is
-   pragma Elaborate_Body;
+   pragma Preelaborate;
 
-
-   LED : Nat8 := 0;
+   procedure Init;
 
 end Extern_Int;

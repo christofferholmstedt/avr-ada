@@ -16,31 +16,20 @@
 ---------------------------------------------------------------------------
 
 
-with AVR.Interrupts;
-with AVR;                          use AVR;
-with AVR.MCU;
+--  Test external interrupts 0 and 1. They are triggered by a falling
+--  edge on their respective external interrupt pins.  On the Arduino
+--  that is port D2 (digital 2) for external interrupt 0 and port D3
+--  (digital 3) for external interrupt 1.  Both interrupt routines
+--  send corresponding debug messages to the serial port.
+
+with AVR.UART;
 with Extern_Int;
 
 procedure Extern_Int_Main is
-   Enable_Ext_Int0 : Boolean renames
-#if MCU = "atmega8" or else MCU = "atmega32" then
-     MCU.GICR_Bits (MCU.INT0_Bit);
-#elsif MCU = "atmega168" or else MCU = "atmega328p" or else MCU = "atmega644p" then
-     MCU.PCMSK0_Bits (MCU.PCINT0_Bit);
-#end if;
-
 begin
-
-   MCU.DDRB_Bits := (others => DD_Output); -- use all pins on PortB for output
-   MCU.PORTB := 16#FF#;                    -- and turn off all LEDs
-
-   MCU.DDRD_Bits := (others => DD_Input);  -- use all pins on port D for input
-   MCU.PORTD := 16#FF#;                    -- activate internal pull-up
-
-   Enable_Ext_Int0 := True;                -- enable external int0
-   MCU.MCUCR_Bits (MCU.ISC01_Bit) := True; -- falling egde: int0
-
-   AVR.Interrupts.Enable;                  -- enable interrupts
+   AVR.UART.Init (AVR.UART.Baud_19200_16MHz);
+   AVR.UART.Put_Line("start test of external interrupts");
+   Extern_Int.Init;
 
    loop null; end loop;                    -- loop for ever
 end Extern_Int_Main;

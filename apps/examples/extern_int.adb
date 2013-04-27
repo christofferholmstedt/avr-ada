@@ -15,22 +15,62 @@
 -- executable file might be covered by the GNU Public License.           --
 ---------------------------------------------------------------------------
 
-with Interfaces;                   use type Interfaces.Unsigned_8;
+with AVR;                          use AVR;
 with AVR.MCU;
+with AVR.Interrupts;
+with AVR.UART;
 
 package body Extern_Int is
 
+   Enable_Ext_Int0 : Boolean renames MCU.EIMSK_Bits (MCU.INT0_Bit);
+   Enable_Ext_Int1 : Boolean renames MCU.EIMSK_Bits (MCU.INT1_Bit);
 
-   procedure On_Keypress;
-   pragma Machine_Attribute (Entity         => On_Keypress,
-                             Attribute_Name => "signal");
-   pragma Export (C, On_Keypress, AVR.MCU.Sig_INT0_String);
-   --  attach the routine On_Keypress to the external interrupt 0
+   Int0_Pin : Boolean renames MCU.PORTD_Bits(2);
+   Int1_Pin : Boolean renames MCU.PORTD_Bits(3);
+   Int0_DD  : Boolean renames MCU.DDRD_Bits(2);
+   Int1_DD  : Boolean renames MCU.DDRD_Bits(3);
 
-   procedure On_Keypress is
+   procedure Init is
    begin
-      LED := LED + 1;
-      MCU.PORTB := not LED;
-   end On_Keypress;
+      --  set the key pins to input
+      Int0_DD := DD_Input;
+      Int1_DD := DD_Input;
+      --  enable internal pull ups
+      Int0_Pin := High;
+      Int1_Pin := High;
+      --  configure ext int 0 and 1 to trigger at falling edges
+      MCU.EICRA_Bits := (MCU.ISC00_Bit => Low,
+                         MCU.ISC01_Bit => High,
+                         MCU.ISC10_Bit => Low,
+                         MCU.ISC11_Bit => High,
+                         others => Low);
+      --  enable the external interrupts in the interrupt mask
+      Enable_Ext_Int0 := True;
+      Enable_Ext_Int1 := True;
+      --  enable interrupts generally in the MCU
+      AVR.Interrupts.Enable;
+   end Init;
+
+
+   procedure On_Keypress_0;
+   pragma Machine_Attribute (Entity         => On_Keypress_0,
+                             Attribute_Name => "signal");
+   pragma Export (C, On_Keypress_0, AVR.MCU.Sig_INT0_String);
+
+   procedure On_Keypress_0 is
+   begin
+      UART.Put_Line("keypress 0");
+   end On_Keypress_0;
+
+
+   procedure On_Keypress_1;
+   pragma Machine_Attribute (Entity         => On_Keypress_1,
+                             Attribute_Name => "signal");
+   pragma Export (C, On_Keypress_1, AVR.MCU.Sig_INT1_String);
+
+   procedure On_Keypress_1 is
+   begin
+      UART.Put_Line("keypress 1");
+   end On_Keypress_1;
 
 end Extern_Int;
