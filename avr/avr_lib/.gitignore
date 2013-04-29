@@ -1,3 +1,4 @@
 stamp-links
 avr-mcu.ads
 stamp-libs
+local-avr.cgpr

@@ -19,7 +19,7 @@ package AVR.Containers8 is
 
    --  reduced ranges to fit into 8 bits
    type Hash_Type is mod 2**8;
-   type Count_Type is range 0 .. 2**7 - 1;
+   type Count_Type is range 0 .. 2**8 - 1;
 
 private
    for Hash_Type'Size use 8;

@@ -103,7 +103,7 @@ package body DHT is
       Data := 0;
       CRC  := 0;
 
-      AVR.Interrupts.Save_Disable;
+      AVR.Interrupts.Save_And_Disable;
 
       S1_DD := DD_Output;
       S1_Out := Low;

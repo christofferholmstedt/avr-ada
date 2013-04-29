@@ -41,6 +41,11 @@
 # clean_apps      : Clean Sample Applications
 # install_apps    : Copy the Sample Applications to $(PREFIX)/share/doc/avr-ada/apps
 # uninstall_apps  : Uninstall Sample Applications
+#
+#
+#             Distribution
+# source_dist     : checkout all and pack them 
+# source_checkout : checkout a specific version of the source files
 
 
 ###############################################################
@@ -83,6 +88,8 @@ APP_FILES += $(patsubst %,apps/%/*.gpr, $(APPS))
 # Modes for installed items
 INSTALL_FILE_MODE = u=rw,go=r
 INSTALL_DIR_MODE = u=rwx,go=rx
+
+AVRADA_VERSION = 1.3.0.test
 
 
 ###############################################################
@@ -198,16 +205,37 @@ uninstall_cgpr:
 #
 #  prepare building the installer program
 #
-DIST_PREP_DIR := /c/temp/avr-ada-dist
-dist_prep:
-	$(MKDIR) -p $(DIST_PREP_DIR)
-	$(MKDIR) -p $(DIST_PREP_DIR)/examples
-	$(MKDIR) -p $(DIST_PREP_DIR)/doc
-	$(CP) COPYING.txt          $(DIST_PREP_DIR)
-	$(CP) -a apps/examples     $(DIST_PREP_DIR)/examples
-	$(CP) -a apps/largedemo    $(DIST_PREP_DIR)/examples
+DIST_SRC_DIR := /c/temp/avr-ada-$(AVRADA_VERSION)
 
-unix_eol:
-	find . -type f | xargs d2u
+DIST_ROOT = Makefile config excldevs.mk
+DIST_RTS = gcc-4.7-rts
+DIST_AVR = Makefile avr_app.gpr avr_lib.gpr avr_tools.gpr gnat.adc mcu.gpr \
+   threads-1.3 threads_lib.gpr
+DIST_AVR_LIB = Makefile at* avr*.ad[sb] board-* boards.mk 
+DIST_LIBS = crc fs lcd mcp4922 midi onewire sensirion slip 
+DIST_PATCHES = gcc/4.7.2 binutils/2.20.1
+DIST_TOOLS = Checklist_Release.txt XML mk_ada_app build/build-avr-ada.sh 
+
+DIST_FILES = $(DIST_ROOT) \
+   $(DIST_RTS) \
+   $(patsubst %,patches/%, $(DIST_PATCHES)) \
+   $(patsubst %,avr/%, $(DIST_AVR)) \
+   $(patsubst %,avr/avr_lib/%, $(DIST_AVR_LIB)) \
+   $(patsubst %,avr/%, $(DIST_LIBS)) \
+   $(patsubst %,avr/%_lib.gpr, $(DIST_LIBS)) \
+   $(APP_FILES) \
+   $(patsubst %,tools/%, $(DIST_TOOLS))
+
+dist_prep:
+	-$(MKDIR) -p $(DIST_SRC_DIR)
+	$(TAR) --create \
+           --exclude=obj --exclude=lib \
+           --exclude=thread-obj --exclude=thread-lib \
+           --exclude-backups -f - $(DIST_FILES) | \
+           (cd $(DIST_SRC_DIR); tar xvf -)
+
+dist_pack: dist_prep
+	(cd $(DIST_SRC_DIR)/..; tar cjf avr-ada-$(AVRADA_VERSION).tar.bz2 avr-ada-$(AVRADA_VERSION))
+
 
 -include $(Makefile_post)
