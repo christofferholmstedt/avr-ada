@@ -1,11 +1,14 @@
+pragma Warnings (Off, "* is an internal GNAT unit");
+with System.Int_Img;
+pragma Warnings (On,  "* is an internal GNAT unit");
+
 package AVR.Strings.Edit.Generic_Integers is
    pragma Preelaborate;
 
 
    --  the base of the integer to be read or written. The most common
    --  values are 10 (default), 16, or 2.
-   type Number_Base is new Nat8 range 2 .. 16;
-   for Number_Base'Size use 8;
+   subtype Number_Base is System.Int_Img.Radix_Range;
 
 
    -- Get -- Get an integer number from the Input_Line

@@ -135,6 +135,10 @@ install_libs: $(INSTALL_DIR) avr_lib/stamp-links
 	$(TAR) chf - $(INSTALL_GPRS) $(INSTALL_SRCS) $(INSTALL_OBJS) \
           $(INSTALL_LIBS) $(EXTRA_LIB_NAMES) \
 	  | (cd $(INSTALL_DIR); $(TAR) xvf -)
+	sed '/^ *for Externally_Built/,/end Threads_Lib;/d' < $(INSTALL_DIR)/threads_lib.gpr > $(INSTALL_DIR)/tmp_lib.gpr
+	mv -f $(INSTALL_DIR)/tmp_lib.gpr $(INSTALL_DIR)/threads_lib.gpr
+	echo '   for Externally_Built use "true";' >> $(INSTALL_DIR)/threads_lib.gpr
+	echo 'end Threads_Lib;' >> $(INSTALL_DIR)/threads_lib.gpr
 	$(FIND) $(INSTALL_DIR) -type f -exec $(CHMOD) $(INSTALL_FILE_MODE) '{}' \;
 	$(FIND) $(INSTALL_DIR) -type d -exec $(CHMOD) $(INSTALL_DIR_MODE) '{}' \;
 

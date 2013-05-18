@@ -33,20 +33,20 @@ package System.Int_Img is
    --
    --  Value ist the value to be converted.
    --
-   --  Buf points to the second character of a string buffer.  The actual
-   --  strings starts at Buf+1, leaving space for a sign.
+   --  Buf points to a string buffer.  The actual strings starts at
+   --  Buf+1, leaving space for a sign.
    --
    --  Radix is the number base in the range of 2 .. 36.
    --
    --  The return value is length+1 of the generated string
 
-   type Radix_Range is 2 .. 36;
+   type Radix_Range is range 2 .. 36;
    for Radix_Range'Size use 8;
 
    function U32_Img (Value : Interfaces.Unsigned_32; -- value to be converted
                      Buf   : not null access Character;  --  to buffer
                      Radix : Radix_Range := 10)      -- range 2 .. 36
-                    return Interfaces.Unsigned_8;    -- (length+1) of the string
+                    return Interfaces.Unsigned_8;   -- (length+1) of the string
    pragma Import (C, U32_Img, "ada_u32_img");
    pragma Pure_Function (U32_Img);
 

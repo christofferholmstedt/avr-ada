@@ -1,7 +1,3 @@
-pragma Warnings (Off, "* is an internal GNAT unit");
-with System.Int_Img;
-pragma Warnings (On,  "* is an internal GNAT unit");
-
 with Interfaces;                   use Interfaces;
 
 package body AVR.Strings.Edit.Generic_Integers is
@@ -129,7 +125,7 @@ package body AVR.Strings.Edit.Generic_Integers is
    begin
       Len := U32_Img (Value,
                       Target(Target'First+1)'Unchecked_Access,
-                      Unsigned_8(Base));
+                      Base);
       Last := Target'First + Len;
    end Put_U32;
 

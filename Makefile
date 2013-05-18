@@ -44,8 +44,10 @@
 #
 #
 #             Distribution
-# source_dist     : checkout all and pack them 
-# source_checkout : checkout a specific version of the source files
+# dist_prep       : copy the selected files for a source dist from the
+#                   checkout dir to the DIST_SRC_DIR
+# dist_pack       : pack the prepared files for a source distribution
+# -- dist_co         : checkout a specific version of the source files
 
 
 ###############################################################
@@ -79,7 +81,7 @@ INSTALL_APPS_DIR = $(PREFIX)/share/doc/avr-ada
 INSTALL_CGPR_DIR = $(PREFIX)/share/gpr
 
 # applications that are provided as examples
-APPS = LCD debounce delays ds1820 examples largedemo uart_echo
+APPS = DHT LCD commands debounce delays ds1820 examples largedemo uart_echo
 # application source files to be installed
 APP_FILES := $(patsubst %,apps/%/Makefile, $(APPS))
 APP_FILES += $(patsubst %,apps/%/*.ad[sb], $(APPS))
@@ -89,7 +91,7 @@ APP_FILES += $(patsubst %,apps/%/*.gpr, $(APPS))
 INSTALL_FILE_MODE = u=rw,go=r
 INSTALL_DIR_MODE = u=rwx,go=rx
 
-AVRADA_VERSION = 1.3.0.test
+AVRADA_VERSION = 1.2.2
 
 
 ###############################################################
@@ -207,24 +209,33 @@ uninstall_cgpr:
 #
 DIST_SRC_DIR := /c/temp/avr-ada-$(AVRADA_VERSION)
 
+# files from the AVR-Ada root directory
 DIST_ROOT = Makefile config excldevs.mk
+# RTS files
 DIST_RTS = gcc-4.7-rts
+# files from ~/avr
 DIST_AVR = Makefile avr_app.gpr avr_lib.gpr avr_tools.gpr gnat.adc mcu.gpr \
    threads-1.3 threads_lib.gpr
+# files from ~/avr/avr_lib
 DIST_AVR_LIB = Makefile at* avr*.ad[sb] board-* boards.mk 
+# libs from ~/avr
 DIST_LIBS = crc fs lcd mcp4922 midi onewire sensirion slip 
+# files from ~/patches
 DIST_PATCHES = gcc/4.7.2 binutils/2.20.1
+# files from ~/tools
 DIST_TOOLS = Checklist_Release.txt XML mk_ada_app build/build-avr-ada.sh 
+# files from ~/apps
+DIST_APPS = Makefile
 
 DIST_FILES = $(DIST_ROOT) \
    $(DIST_RTS) \
-   $(patsubst %,patches/%, $(DIST_PATCHES)) \
-   $(patsubst %,avr/%, $(DIST_AVR)) \
+   $(patsubst %,patches/%,     $(DIST_PATCHES)) \
+   $(patsubst %,avr/%,         $(DIST_AVR)) \
    $(patsubst %,avr/avr_lib/%, $(DIST_AVR_LIB)) \
-   $(patsubst %,avr/%, $(DIST_LIBS)) \
+   $(patsubst %,avr/%,         $(DIST_LIBS)) \
    $(patsubst %,avr/%_lib.gpr, $(DIST_LIBS)) \
-   $(APP_FILES) \
-   $(patsubst %,tools/%, $(DIST_TOOLS))
+   $(patsubst %,apps/%,        $(DIST_APPS)) $(APP_FILES) \
+   $(patsubst %,tools/%,       $(DIST_TOOLS))
 
 dist_prep:
 	-$(MKDIR) -p $(DIST_SRC_DIR)

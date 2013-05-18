@@ -39,7 +39,7 @@ GPR := examples.gpr
 
 # put the names of the target files here (without extension)
 ADA_TARGETS := pwm_demo flash_led hello_led test_eeprom walking_led_main \
-   test_starterkit_main extern_int_main test_progmem test_local_exception test_tags
+   test_starterkit_main extern_int_main test_progmem test_local_exception
 
 
 #---------------- GNATMAKE Options ----------------

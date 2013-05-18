@@ -21,7 +21,8 @@ library project Threads_Lib is
    for Library_Name use "avr-thread";
    for Library_Dir  use "avr_lib/" & MCU & "/thread-lib";
    for Library_Kind use "static";
-
+   for Externally_Built use "false";
+   
    for Languages use ("C", "Asm_Cpp");
    for Object_Dir use "avr_lib/" & MCU & "/thread-obj";
 
