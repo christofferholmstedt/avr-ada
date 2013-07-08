@@ -93,6 +93,7 @@ build_libs: stamp-links stamp-libs
 # first set the variable MCU
 at%/avr-mcu.ads : MCU = $(patsubst %/avr-mcu.ads,%, $@)
 at%/lib/$(LIB)  : MCU = $(patsubst %/lib/$(LIB),%, $@)
+board-%/lib/$(LIB)  : MCU = $(patsubst board-%/lib/$(LIB),%, $@)
 at%/thread-lib/$(THREAD_LIB): MCU = $(patsubst %/thread-lib/$(THREAD_LIB),%, $@)
 
 at%/lib/$(LIB): stamp-links at%/obj at%/lib ../avr_lib.gpr ../avr_tools.gpr \

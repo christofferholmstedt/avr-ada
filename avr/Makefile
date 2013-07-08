@@ -40,6 +40,12 @@ include ../excldevs.mk
 
 MCU_LIST := $(filter-out $(excluded_parts), $(shell (cd avr_lib; ls -d at*)))
 
+BOARD_LIST = \
+	arduino_uno \
+	xbeeimu \
+	sparkfun8u2
+
+
 # Additional libraries to install (don't appear to be built)
 EXTRA_LIB_NAMES := crc debug fs lcd mcp4922 onewire sensirion slip
 EXTRA_LIB_OBJS  := $(patsubst %,%/obj, $(EXTRA_LIB_NAMES))
@@ -52,9 +58,11 @@ INSTALL_SRCS = avr_lib/*.ad[sb] avr_lib/*/*.ad[sb] avr_lib/*/*.gpr \
 INSTALL_GPRS = avr_tools.gpr avr_lib.gpr threads_lib.gpr mcu.gpr gnat.adc \
    avr_app.gpr $(EXTRA_LIB_GPRS)
 INSTALL_LIBS := $(patsubst %,avr_lib/%/lib, $(MCU_LIST)) \
-   $(patsubst %,avr_lib/%/thread-lib, $(MCU_LIST))
+   $(patsubst %,avr_lib/%/thread-lib, $(MCU_LIST)) \
+   $(patsubst %,avr_lib/board-%/lib, $(BOARD_LIST))
 INSTALL_OBJS := $(patsubst %,avr_lib/%/obj, $(MCU_LIST)) \
-   $(patsubst %,avr_lib/%/thread-obj, $(MCU_LIST))
+   $(patsubst %,avr_lib/%/thread-obj, $(MCU_LIST)) \
+   $(patsubst %,avr_lib/board-%/obj, $(BOARD_LIST))
 
 # Modes for installed items
 INSTALL_FILE_MODE = ugo=r
