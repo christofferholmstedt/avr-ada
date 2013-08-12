@@ -72,7 +72,7 @@ library project AVR_Lib is
        "avr-strings-edit.ads",         "avr-strings-edit.adb",
        "avr-strings-edit-integers.ads",
        "avr-strings-edit-generic_integers.ads", "avr-strings-edit-generic_integers.adb",
-       
+
        "avr-containers8.ads",
        "avr-containers8-generic_bounded_priority_queues.ads",
        "avr-containers8-generic_bounded_priority_queues.adb",
@@ -121,6 +121,10 @@ library project AVR_Lib is
    Power_Sources    := ("avr-power.ads",         "avr-power.adb");
 
    Threads_Sources  := ("avr-threads.ads",       "avr-threads.adb");
+
+   USI_TWI_Sources  := ("avr-usi_twi.ads",
+                        "avr-usi_twi-master.ads",
+                        "avr-usi_twi-master.adb");
 
    ----------------------------------------------------------------------------
 
@@ -234,7 +238,8 @@ library project AVR_Lib is
       when "attiny2313" | "attiny4313" =>
          for Source_Files use
            Std_Sources & UART_Sources & EEPROM_Sources & WDT_Sources
-           & Timer0_Sources & Timer1_Sources & Time_Sources & Sleep_Sources;
+           & Timer0_Sources & Timer1_Sources & Time_Sources & Sleep_Sources
+           & USI_TWI_Sources;
 
       when "attiny25" | "attiny45" | "attiny85" =>
          for Source_Files use
@@ -243,12 +248,12 @@ library project AVR_Lib is
       when "atmega16" | "atmega161" | "atmega163" =>
          for Source_Files use
            Std_Sources & EEPROM_Sources;
-         
+
       when "atmega8u2" =>
          for Source_Files use
-           Std_Sources & Timer0_Sources & Timer1_Sources & Time_Sources & 
+           Std_Sources & Timer0_Sources & Timer1_Sources & Time_Sources &
            Serial_Sources & Sleep_Sources & UART_Sources;
-         
+
       when others =>
          for Source_Files use Std_Sources;
    end case;
