@@ -25,3 +25,8 @@ board-sparkfun8u2/lib/libavrada.a : MCU = atmega8u2
 board-sparkfun8u2/lib/libavrada.a : BOARD = sparkfun8u2
 board-sparkfun8u2/avr-mcu.ads     : MCU = atmega8u2
 board-sparkfun8u2/avr-mcu.ads     : BOARD = sparkfun8u2
+
+board-teensyplusplus2/lib/libavrada.a : MCU = at90usb1286
+board-teensyplusplus2/lib/libavrada.a : BOARD = teensyplusplus2
+board-teensyplusplus2/avr-mcu.ads     : MCU = at90usb1286
+board-teensyplusplus2/avr-mcu.ads     : BOARD = teensyplusplus2

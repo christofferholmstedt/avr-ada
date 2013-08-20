@@ -149,6 +149,7 @@ abstract project MCU is
       "net-io",         -- Pollin AVR Net-IO
       "butterfly",
       "xbeeimu",
+      "teensyplusplus2",
       "sparkfun8u2");
 
    Board : Board_Type := external ("BOARD", "none");
@@ -161,6 +162,7 @@ abstract project MCU is
       when "butterfly"        => MCU := "atmega169";
       when "net-io"           => MCU := "atmega644";
       when "xbeeimu"          => MCU := "atmega328p";
+      when "teensyplusplus2"  => MCU := "at90usb1286";
       when "sparkfun8u2"      => MCU := "atmega8u2";
       when others =>
    end case;

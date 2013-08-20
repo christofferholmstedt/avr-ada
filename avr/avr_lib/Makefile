@@ -38,7 +38,7 @@ include ../../excldevs.mk
 
 # list of primary devices
 PRIMARY_MCU_LIST := attiny2313 atmega8 atmega8u2 atmega168 atmega169 \
-   atmega32 atmega328p atmega644p atmega2560
+   atmega32 atmega328p atmega644p atmega2560 at90usb1286
 
 # list of all supported devices
 # MCU_LIST = $(filter-out $(excluded_parts), $(shell (ls -d at*)))
@@ -47,6 +47,7 @@ MCU_LIST = $(PRIMARY_MCU_LIST)
 BOARD_LIST = \
    arduino_uno \
    xbeeimu \
+   teensyplusplus2 \
    sparkfun8u2
 
 include boards.mk
