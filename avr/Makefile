@@ -43,6 +43,7 @@ MCU_LIST := $(filter-out $(excluded_parts), $(shell (cd avr_lib; ls -d at*)))
 BOARD_LIST = \
 	arduino_uno \
 	xbeeimu \
+	teensyplusplus2 \
 	sparkfun8u2
 
 
