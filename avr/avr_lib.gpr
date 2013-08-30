@@ -255,7 +255,9 @@ library project AVR_Lib is
            Serial_Sources & Sleep_Sources & UART_Sources;
 
       when "at90usb1286" =>
-         for Source_Files use Std_Sources;
+         for Source_Files use
+           Std_Sources & Timer0_Sources & Timer1_Sources &
+           Serial_Sources & UART_Sources & EEPROM_Sources;
 
       when others =>
          for Source_Files use Std_Sources;

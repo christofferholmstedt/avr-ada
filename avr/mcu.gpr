@@ -265,7 +265,7 @@ abstract project MCU is
 
    case MCU is
    when "atmega168"  | "atmega328p" | "atmega644"  | "atmega644p"
-      | "atmega2560" | "attiny2313" | "attiny4313"
+      | "atmega2560" | "attiny2313" | "attiny4313" | "at90usb1286"
      => Eeprom_WE := "eeprom_pe";
    when others
      => Eeprom_WE := "eeprom_we";
@@ -283,7 +283,7 @@ abstract project MCU is
      => UART := "uart";
    when "atmega8"    | "atmega32" | "attiny2313" | "attiny4313"
      => UART := "usart";
-   when "atmega8u2"
+   when "atmega8u2" | "at90usb1286"
      => UART := "usart1";
    when others
      => UART := "usart0";

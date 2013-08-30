@@ -38,7 +38,7 @@ package body AVR.Timer1 is
    Prescale_Reg       : Unsigned_8 renames MCU.TCCR1B;
 
 
-#if MCU = "atmega168" or else MCU = "atmega169" or else MCU = "atmega2560" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" or else MCU = "atmega8u2" then
+#if MCU = "atmega168" or else MCU = "atmega169" or else MCU = "atmega2560" or else MCU = "atmega328p" or else MCU = "atmega644" or else MCU = "atmega644p" or else MCU = "atmega8u2" or else MCU = "at90usb1286" then
    Interrupt_Mask : Bits_In_Byte renames MCU.TIMSK1_Bits;
 #elsif MCU = "atmega8" or else MCU = "atmega32" or else MCU = "attiny4313" or else MCU = "attiny2313" then
    Interrupt_Mask : Bits_In_Byte renames MCU.TIMSK_Bits;
@@ -95,7 +95,7 @@ package body AVR.Timer1 is
       --  reset power reduction for Timer1
 #if MCU = "atmega328p" then
       MCU.PRR_Bits (MCU.PRTIM1_Bit) := Low;
-#elsif MCU = "atmega644p" or else MCU = "atmega2560" or else MCU = "atmega8u2" then
+#elsif MCU = "atmega644p" or else MCU = "atmega2560" or else MCU = "atmega8u2" or else MCU = "at90usb1286" then
       MCU.PRR0_Bits (MCU.PRTIM1_Bit) := Low;
 #end if;
 
