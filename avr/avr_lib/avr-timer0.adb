@@ -117,7 +117,7 @@ package body AVR.Timer0 is
 
    function Scale_By_128    return Scale_Type is
    begin
-#if MCU = "attiny2313" or else MCU = "attiny4313" or else MCU = "atmega168" or else MCU = "atmega328p" or else MCU = "atmega2560" or else MCU = "atmega8u2" then
+#if MCU = "attiny2313" or else MCU = "attiny4313" or else MCU = "atmega168" or else MCU = "atmega328p" or else MCU = "atmega2560" or else MCU = "atmega8u2" or else MCU = "at90usb1286" then
       raise Program_Error with "1/128 not available for this MCU";
 #end if;
       return MCU.CS02_Mask or MCU.CS00_Mask;
@@ -125,7 +125,7 @@ package body AVR.Timer0 is
 
    function Scale_By_256    return Scale_Type is
    begin
-#if MCU = "attiny2313" or else MCU = "attiny4313" or else MCU = "atmega8" or else MCU = "atmega32" or else MCU = "atmega168" or else MCU = "atmega328p" or else MCU = "atmega2560" or else MCU = "atmega8u2" then
+#if MCU = "attiny2313" or else MCU = "attiny4313" or else MCU = "atmega8" or else MCU = "atmega32" or else MCU = "atmega168" or else MCU = "atmega328p" or else MCU = "atmega2560" or else MCU = "atmega8u2" or else MCU = "at90usb1286" then
       return MCU.CS02_Mask;
 #else
       return MCU.CS02_Mask or MCU.CS01_Mask;
@@ -134,7 +134,7 @@ package body AVR.Timer0 is
 
    function Scale_By_1024   return Scale_Type is
    begin
-#if MCU = "attiny2313" or else MCU = "attiny4313" or else MCU = "atmega32" or else MCU = "atmega168" or else MCU = "atmega328p" or else MCU = "atmega2560" or else MCU = "atmega8u2" then
+#if MCU = "attiny2313" or else MCU = "attiny4313" or else MCU = "atmega32" or else MCU = "atmega168" or else MCU = "atmega328p" or else MCU = "atmega2560" or else MCU = "atmega8u2" or else MCU = "at90usb1286" then
       return MCU.CS02_Mask or MCU.CS00_Mask;
 #else
       return MCU.CS02_Mask or MCU.CS01_Mask or MCU.CS00_Mask;
