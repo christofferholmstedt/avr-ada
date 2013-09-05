@@ -118,8 +118,18 @@ private
    ------------------------------------------------------------------
    -- I/O Pins Configuration
    ------------------------------------------------------------------
+   #if MCU="at90usb1286" then
+   DDR_SPI :       Nat8 renames MCU.DDRB;
+   DDR_SPI_Bits :  Bits_In_Byte renames MCU.DDRB_Bits;
 
-   --#if MCU="atmega168" or else MCU="atmega168p" or else MCU="atmega168pa" then
+   BV_DD_SCK :        Boolean renames DDR_SPI_Bits(MCU.DDB1_Bit);
+   BV_DD_MISO :       Boolean renames DDR_SPI_Bits(MCU.DDB3_Bit);
+   BV_DD_MOSI :       Boolean renames DDR_SPI_Bits(MCU.DDB2_Bit);
+   BV_DD_SS :         Boolean renames DDR_SPI_Bits(MCU.DDB0_Bit);
+
+   BV_SS :            Boolean renames MCU.PORTB_Bits(MCU.PORTB0_Bit);
+   --#elsif MCU="atmega168" or else MCU="atmega168p" or else MCU="atmega168pa" then
+   #else
    DDR_SPI :       Nat8 renames MCU.DDRB;
    DDR_SPI_Bits :  Bits_In_Byte renames MCU.DDRB_Bits;
 
@@ -130,7 +140,7 @@ private
 
    BV_SS :            Boolean renames MCU.PORTB_Bits(MCU.PORTB2_Bit);
 
-   --#end if
+   #end if;
 
    ------------------------------------------------------------------
    -- SPCR - SPI Control Register
@@ -166,7 +176,7 @@ private
    ------------------------------------------------------------------
    -- PRR - Power Reduction Register
    ------------------------------------------------------------------
-#if MCU = "atmega644p" or MCU = "atmega2560" then
+#if MCU = "atmega644p" or MCU = "atmega2560" or MCU = "at90usb1286" then
    PRR :           Nat8 renames MCU.PRR0;
    BV_PRSPI :      Boolean renames MCU.PRR0_Bits(MCU.PRSPI_Bit);
 #else
