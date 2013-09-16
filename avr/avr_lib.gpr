@@ -259,6 +259,12 @@ library project AVR_Lib is
            Std_Sources & Timer0_Sources & Timer1_Sources &
            Serial_Sources & UART_Sources & EEPROM_Sources;
 
+      when "atmega32u4" =>
+         for Source_Files use
+           Std_Sources & Timer0_Sources & Timer1_Sources &
+           Time_Sources & Sleep_Sources &
+           Serial_Sources & UART_Sources & EEPROM_Sources;
+
       when others =>
          for Source_Files use Std_Sources;
    end case;
