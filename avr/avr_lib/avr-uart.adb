@@ -84,12 +84,11 @@ package body AVR.UART is
       --  at least on atmega8 UCSRC and UBRRH share the same address.
       --  When writing to the ACSRC register, the URSEL must be set,
       --  too.
-#elsif UART = "USART0" then
+#elsif UART = "USART0" or else UART = "USART1" then
       -- Async. mode, 8N1
       UCSRC := +(UCSZ0_Bit => True,
                  UCSZ1_Bit => True,
                  others => False);
-
 #end if;
    end Init_Common;
 
