@@ -235,6 +235,10 @@ library project AVR_Lib is
          for Source_Files use
            Std_Sources & EEPROM_Sources & WDT_Sources & Time_Sources;
 
+      when "at90can128" =>
+         for Source_Files use
+           Std_Sources & EEPROM_Sources & WDT_Sources & Time_Sources;
+
       when "attiny2313" | "attiny4313" =>
          for Source_Files use
            Std_Sources & UART_Sources & EEPROM_Sources & WDT_Sources
