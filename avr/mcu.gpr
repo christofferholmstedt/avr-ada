@@ -284,7 +284,7 @@ abstract project MCU is
      => UART := "uart";
    when "atmega8"    | "atmega32" | "attiny2313" | "attiny4313"
      => UART := "usart";
-   when "atmega8u2" | "at90usb1286" | "atmega32u4"
+   when "atmega8u2" | "at90usb1286" | "at90can128" | "atmega32u4"
      => UART := "usart1";
    when others
      => UART := "usart0";

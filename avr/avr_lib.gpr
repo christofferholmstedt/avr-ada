@@ -228,14 +228,10 @@ library project AVR_Lib is
            & Timer0_Sources & Time_No_Clock_Sources;
 
       when   "atmega165"  | "atmega64"  | "atmega128"
-           | "at90can128" | "at90can32" | "at90can64"  | "atmega325"
+           | "at90can32"  | "at90can64" | "atmega325"
            | "atmega3250" | "atmega329" | "atmega3290" | "atmega645"
            | "atmega6450" | "atmega649" | "atmega6490" | "atmega8515"
            | "atmega8535" | "attiny26"  =>
-         for Source_Files use
-           Std_Sources & EEPROM_Sources & WDT_Sources & Time_Sources;
-
-      when "at90can128" =>
          for Source_Files use
            Std_Sources & EEPROM_Sources & WDT_Sources & Time_Sources;
 
@@ -259,6 +255,11 @@ library project AVR_Lib is
            Serial_Sources & Sleep_Sources & UART_Sources;
 
       when "at90usb1286" =>
+         for Source_Files use
+           Std_Sources & Timer0_Sources & Timer1_Sources &
+           Serial_Sources & UART_Sources & EEPROM_Sources;
+
+      when "at90can128" =>
          for Source_Files use
            Std_Sources & Timer0_Sources & Timer1_Sources &
            Serial_Sources & UART_Sources & EEPROM_Sources;
