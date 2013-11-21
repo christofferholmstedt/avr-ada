@@ -46,9 +46,9 @@ package body AVR.Timer0 is
 #end if;
 
    Prescale_Reg   : Unsigned_8 renames
-#if MCU = "attiny13" or else MCU = "attiny13a" or else MCU = "attiny2313" or else MCU = "attiny4313" or else MCU = "atmega168" or else MCU = "atmega328p" or else MCU = "atmega2560" or else MCU = "atmega8u2" or else MCU = "at90usb1286" or else MCU = "at90can128" or else MCU = "atmega32u4" then
+#if MCU = "attiny13" or else MCU = "attiny13a" or else MCU = "attiny2313" or else MCU = "attiny4313" or else MCU = "atmega168" or else MCU = "atmega328p" or else MCU = "atmega2560" or else MCU = "atmega8u2" or else MCU = "at90usb1286" or else MCU = "atmega32u4" then
     MCU.TCCR0B;
-#elsif MCU = "atmega169" or else MCU = "atmega644" or else MCU = "atmega644p" then
+#elsif MCU = "atmega169" or else MCU = "atmega644" or else MCU = "atmega644p" or else MCU = "at90can128" then
     MCU.TCCR0A;
 #elsif MCU = "atmega8" or else MCU = "atmega32" then
     MCU.TCCR0;
